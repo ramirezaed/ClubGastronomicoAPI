@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-  "server": "npm run dev",
-  "build": "tsc",
-  "start": "npm run build && node dist/server.js"
-},
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "server": "npm run dev",
+    "build": "tsc",
+    "start": "npm run build && node dist/server.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ramirezaed/ClubGastronomicoAPI.git"
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/ramirezaed/ClubGastronomicoAPI#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -29,6 +30,7 @@
     "mongoose": "^9.3.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
