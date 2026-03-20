@@ -1,0 +1,1 @@
+// clase con errores personalizados
