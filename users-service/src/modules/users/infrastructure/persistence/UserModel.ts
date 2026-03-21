@@ -4,8 +4,24 @@ import { IUserDocument } from "./IUserDocument";
 
 const UsersSchema = new Schema<IUserDocument>(
   {
-    name: { type: String, required: true },
-    lastname: { type: String, required: true },
+    company_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      default: null,
+    },
+    branch_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Branch",
+      default: null,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    lastname: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -15,15 +31,25 @@ const UsersSchema = new Schema<IUserDocument>(
         "Por favor ingrese un correo electrónico válido",
       ],
     },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: true,
+    },
     role: {
       type: String,
       enum: ["SuperAdmin", "owner", "employee"],
       default: "owner",
       required: true,
     },
-    is_active: { type: Boolean, required: true, default: false },
-    deleted_at: { type: Date, default: null },
+    is_active: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: {

@@ -4,6 +4,8 @@
 export class User {
   constructor(
     public readonly id: string,
+    public company_id: string | null,
+    public branch_id: string | null,
     public name: string,
     public lastname: string,
     public email: string,
