@@ -5,5 +5,5 @@ export interface IRegisterUserDTO {
   lastname: string;
   email: string;
   password: string;
-  role: "SuperAdmin" | "owner" | "employee";
+  role_id: string | null;
 }

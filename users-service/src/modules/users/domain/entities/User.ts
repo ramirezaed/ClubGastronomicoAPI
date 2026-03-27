@@ -10,7 +10,7 @@ export class User {
     public lastname: string,
     public email: string,
     public password: string,
-    public role: "SuperAdmin" | "owner" | "employee",
+    public role_id: string | null,
     public is_active: boolean,
     public deleted_at: Date | null,
   ) {}

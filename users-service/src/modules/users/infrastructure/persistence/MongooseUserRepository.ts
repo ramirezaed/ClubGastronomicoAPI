@@ -15,7 +15,7 @@ export class MongooseUserRepository implements IUserRepository {
       doc.lastname,
       doc.email,
       doc.password,
-      doc.role,
+      doc.role_id,
       doc.is_active,
       doc.deleted_at,
     );
@@ -29,7 +29,7 @@ export class MongooseUserRepository implements IUserRepository {
       lastname: user.lastname,
       email: user.email,
       password: user.password,
-      role: user.role,
+      role_id: user.role_id,
       is_active: user.is_active,
       deleted_at: user.deleted_at,
     });
@@ -43,7 +43,7 @@ export class MongooseUserRepository implements IUserRepository {
       saved.lastname,
       saved.email,
       saved.password,
-      saved.role,
+      saved.role_id,
       saved.is_active,
       saved.deleted_at,
     );

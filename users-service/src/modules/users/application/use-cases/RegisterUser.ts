@@ -9,10 +9,10 @@ export class RegisterUser {
 
   async execute(dto: IRegisterUserDTO): Promise<Omit<User, "password">> {
     const existe = await this.userRepository.findByEmail(dto.email);
+    //verifica si el correo ya esta en uso, en ese caso lanza el error DuplicateEmailError
     if (existe) {
       throw new DuplicateEmailError(dto.email);
     }
-
     const user = new User(
       "",
       dto.company_id ?? null,
@@ -21,11 +21,12 @@ export class RegisterUser {
       dto.lastname,
       dto.email,
       dto.password,
-      dto.role,
+      dto.role_id ?? null,
       false,
       null,
     );
     const guardar = await this.userRepository.save(user);
+
     if (!guardar) {
       throw new RegisterUserError();
     }

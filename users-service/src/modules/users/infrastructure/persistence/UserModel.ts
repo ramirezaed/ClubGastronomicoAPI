@@ -35,10 +35,9 @@ const UsersSchema = new Schema<IUserDocument>(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["SuperAdmin", "owner", "employee"],
-      default: "owner",
+    role_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Role",
       required: true,
     },
     is_active: {

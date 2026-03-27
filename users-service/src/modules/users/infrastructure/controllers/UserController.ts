@@ -9,7 +9,7 @@ export class UserController {
   constructor(private readonly registerUser: RegisterUser) {}
 
   async register(req: Request, res: Response): Promise<void> {
-    const { name, lastname, email, password, role } =
+    const { name, lastname, email, password, role_id } =
       req.body as IRegisterUserDTO;
 
     if (!name || !lastname || !email || !password) {
@@ -23,7 +23,7 @@ export class UserController {
         lastname,
         email,
         password,
-        role,
+        role_id,
       });
       res
         .status(201)
@@ -37,6 +37,7 @@ export class UserController {
         res.status(500).json({ message: error.message });
         return;
       }
+
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
