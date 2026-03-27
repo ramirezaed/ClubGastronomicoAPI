@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
-import { IUserDocument } from "./IUserDocument";
+import { IUserDocument } from "@infra/persistence/IUserDocument";
 
 const UsersSchema = new Schema<IUserDocument>(
   {

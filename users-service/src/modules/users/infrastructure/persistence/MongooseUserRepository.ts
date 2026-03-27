@@ -1,6 +1,6 @@
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { User } from "../../domain/entities/User";
-import UserModel from "./UserModel";
+import UserModel from "@infra/persistence/UserModel";
+import { IUserRepository } from "@domain/repositories/IUserRepository";
+import { User } from "@domain/entities/User";
 
 export class MongooseUserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {

@@ -1,6 +1,6 @@
-import { IRegisterUserDTO } from "../dtos/RegisterUserDTO"; //importo la interface
-import { IUserRepository } from "../../domain/repositories/IUserRepository"; //importo los metodos para registrar el usuario
-import { User } from "../../domain/entities/User"; //importo la clase usuario
+import { IRegisterUserDTO } from "@application/dtos/RegisterUserDTO";
+import { IUserRepository } from "@domain/repositories/IUserRepository"; //importo los metodos para registrar el usuario
+import { User } from "@domain/entities/User";
 
 export class RegisterUser {
   constructor(private readonly userRepository: IUserRepository) {}
