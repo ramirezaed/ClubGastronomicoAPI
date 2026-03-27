@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 
 import { RegisterUser } from "@application/use-cases/RegisterUser";
 import { IRegisterUserDTO } from "@application/dtos/RegisterUserDTO";
+import { RegisterUserError } from "@domain/exceptions/RegisterUserError";
+import { DuplicateEmailError } from "@domain/exceptions/DuplicateEmailError";
 
 export class UserController {
   constructor(private readonly registerUser: RegisterUser) {}
@@ -27,8 +29,12 @@ export class UserController {
         .status(201)
         .json({ message: "Usuario registrado exitosamente", user });
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof DuplicateEmailError) {
         res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RegisterUserError) {
+        res.status(500).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
