@@ -6,6 +6,7 @@ import { connectDB } from "@/config/db";
 import router from "@infra/http/user.router";
 import { swaggerSpec } from "@/config/swagger";
 import swaggerUi from "swagger-ui-express";
+import { seedRoles } from "@/config/roleSeeder";
 
 config();
 
@@ -29,6 +30,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); //las rutas
 const startServer = async () => {
   try {
     await connectDB();
+    await seedRoles();
     app.listen(PORT, () => {
       console.log(`Server is running on http://${HOST}:${PORT}`);
       console.log(`Docs en http://${HOST}:${PORT}/api/docs`);
