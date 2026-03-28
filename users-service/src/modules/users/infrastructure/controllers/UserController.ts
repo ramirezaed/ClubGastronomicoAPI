@@ -9,14 +9,14 @@ export class UserController {
   constructor(private readonly registerUser: RegisterUser) {}
 
   async register(req: Request, res: Response): Promise<void> {
+    //se tipa como el DTO para asegurar la forma esperada
     const { name, lastname, email, password, role_id } =
       req.body as IRegisterUserDTO;
-
     if (!name || !lastname || !email || !password) {
       res.status(400).json({ message: "Todos los campos son requeridos" });
       return;
     }
-
+    // ejecuta el caso de uso RegisterUser
     try {
       const user = await this.registerUser.execute({
         name,
@@ -37,7 +37,6 @@ export class UserController {
         res.status(500).json({ message: error.message });
         return;
       }
-
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }

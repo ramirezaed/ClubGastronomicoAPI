@@ -1,3 +1,6 @@
+//traduce los documentos de MongoDB a entidades de dominio
+//y de Entidades de dominio a MongoDB
+
 import UserModel from "@infra/persistence/UserModel";
 import { IUserRepository } from "@domain/repositories/IUserRepository";
 import { User } from "@domain/entities/User";
@@ -7,6 +10,7 @@ export class MongooseUserRepository implements IUserRepository {
     const doc = await UserModel.findOne({ email });
     if (!doc) return null;
 
+    // Mapeo: Documento Mongo → Entidad de Dominio
     return new User(
       doc._id.toString(),
       doc.company_id?.toString() ?? null,
@@ -20,7 +24,7 @@ export class MongooseUserRepository implements IUserRepository {
       doc.deleted_at,
     );
   }
-
+  // Mapeo: Entidad de Dominio → Documento Mongo
   async save(user: User): Promise<User> {
     const doc = new UserModel({
       company_id: user.company_id,
@@ -33,8 +37,10 @@ export class MongooseUserRepository implements IUserRepository {
       is_active: user.is_active,
       deleted_at: user.deleted_at,
     });
+    //Se Guarda en MongoDB
     const saved = await doc.save();
 
+    // Mapeo: Documento Mongo → Entidad de Dominio
     return new User(
       saved._id.toString(),
       saved.company_id,
