@@ -3,6 +3,13 @@
     /* Estructura */
     "rootDir": "./src",
     "outDir": "./dist",
+    "baseUrl": ".",                          
+    "paths": {                               
+  //  "@/*":            ["src/*"],
+  "@domain/*":      ["src/modules/users/domain/*"],
+  "@application/*": ["src/modules/users/application/*"],
+  "@infra/*":       ["src/modules/users/infrastructure/*"]
+    },
 
     /* Entorno */
     "module": "commonjs",
