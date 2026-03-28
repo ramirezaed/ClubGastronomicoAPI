@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { connectDB } from "./config/db";
-import router from "./modules/users/infrastructure/http/user.router";
+import router from "@infra/http/user.router";
 
 config();
 
