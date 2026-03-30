@@ -1,8 +1,8 @@
 //caso de uso registrar role
 
 import { IRegisterRoleDTO } from "@/modules/users/application/dtos/role/RegisterRoleDTO";
-import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { Role } from "@/modules/users/domain/entities/Role";
+import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { DuplicateNameError } from "@/modules/users/domain/exceptions/role/DuplicateNameError";
 import { RegisterRoleError } from "@/modules/users/domain/exceptions/role/RegisterRoleError";
 
