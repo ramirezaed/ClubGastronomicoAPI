@@ -1,0 +1,188 @@
+import { Router } from "express";
+import { MongooseUserRepository } from "@infra/persistence/MongooseUserRepository";
+import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUserUseCase";
+import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUseCase";
+import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
+import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
+
+const router = Router();
+
+const userRepository = new MongooseUserRepository();
+
+const registerUserUseCase = new RegisterUser(userRepository);
+const loginUseCase = new LoginUseCase(userRepository);
+const refreshToken = new RefreshTokenUseCase();
+const authController = new AuthController(
+  registerUserUseCase,
+  loginUseCase,
+  refreshToken,
+);
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registrar un nuevo usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, lastname, email, password, role_id]
+ *             properties:
+ *               company_id:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *                 description: ID de la empresa (opcional)
+ *               branch_id:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "64f1a2b3c4d5e6f7a8b9c0d2"
+ *                 description: ID de la sucursal (opcional)
+ *               name:
+ *                 type: string
+ *                 example: Alejandro
+ *                 description: Nombre del usuario
+ *               lastname:
+ *                 type: string
+ *                 example: Ramirez
+ *                 description: Apellido del usuario
+ *               email:
+ *                 type: string
+ *                 example: ale@gmail.com
+ *                 description: Correo electrónico del usuario
+ *               password:
+ *                 type: string
+ *                 example: "123456"
+ *                 description: Contraseña del usuario
+ *               role_id:
+ *                 type: string
+ *                 example: "64f1a2b3c4d5e6f7a8b9c0d3"
+ *                 description: ID del rol del usuario
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente
+ *       400:
+ *         description: Todos los campos son requeridos
+ *       409:
+ *         description: El correo ya está registrado
+ *       500:
+ *         description: No se pudo completar el registro de usuario
+ */
+router.post("/register", (req, res) => authController.register(req, res));
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Iniciar sesión
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: ale@gmail.com
+ *                 description: Correo electrónico del usuario
+ *               password:
+ *                 type: string
+ *                 example: "123456"
+ *                 description: Contraseña del usuario
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                   description: Token de acceso (expira en 15min)
+ *                 refreshToken:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                   description: Token de refresco (expira en 7d)
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *                     company_id:
+ *                       type: string
+ *                       nullable: true
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d2"
+ *                     branch_id:
+ *                       type: string
+ *                       nullable: true
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d3"
+ *                     name:
+ *                       type: string
+ *                       example: Alejandro
+ *                     email:
+ *                       type: string
+ *                       example: ale@gmail.com
+ *                     role_id:
+ *                       type: string
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d4"
+ *       400:
+ *         description: Todos los campos son requeridos
+ *       401:
+ *         description: Credenciales inválidas
+ *       403:
+ *         description: Usuario inactivo
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.post("/login", (req, res) => authController.login(req, res));
+
+/**
+ * @swagger
+ * /api/auth/refreshToken:
+ *   post:
+ *     summary: Obtener nuevo access token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [refreshToken]
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                 description: Token de refresco obtenido en el login
+ *     responses:
+ *       200:
+ *         description: Nuevo access token generado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                   description: Nuevo token de acceso (expira en 15min)
+ *       400:
+ *         description: refreshToken requerido
+ *       401:
+ *         description: Refresh token inválido o expirado
+ */
+router.post("/refreshToken", (req, res) =>
+  authController.TokenRefresh(req, res),
+);
+
+export default router;

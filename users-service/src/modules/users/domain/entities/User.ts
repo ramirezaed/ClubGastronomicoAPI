@@ -15,7 +15,7 @@ export class User {
     public lastname: string,
     public email: string,
     public password: string,
-    public role_id: string | null,
+    public role_id: string,
     public is_active: boolean,
     public deleted_at: Date | null,
   ) {}
