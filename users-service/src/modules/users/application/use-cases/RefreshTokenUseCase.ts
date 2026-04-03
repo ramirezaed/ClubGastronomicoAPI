@@ -25,7 +25,7 @@ export class RefreshTokenUseCase {
       );
       return { accessToken };
     } catch {
-      throw new Error("Refresh token invalido o expirado");
+      throw new Error("Token invalido o expirado");
     }
   }
 }

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { IJwtPayloadDTO } from "@/modules/users/application/dtos/IJwtPayloadDTO";
+import { InvalidtokenError } from "@/modules/users/domain/exceptions/invalidToken";
 
 export class ValidateTokenUseCase {
   async execute(token: string): Promise<IJwtPayloadDTO> {
@@ -13,7 +14,7 @@ export class ValidateTokenUseCase {
       return payload;
     } catch {
       //si el token no es valido o expiro devuelve error
-      throw new Error("Invalid token");
+      throw new InvalidtokenError();
     }
   }
 }
