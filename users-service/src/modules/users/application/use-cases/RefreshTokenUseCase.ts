@@ -11,7 +11,6 @@ export class RefreshTokenUseCase {
         refreshToken,
         process.env.JWT_REFRESH_SECRET!,
       ) as IJwtPayloadDTO;
-
       //genera nuevo access token
       const accessToken = jwt.sign(
         {
@@ -24,7 +23,6 @@ export class RefreshTokenUseCase {
         process.env.JWT_SECRET!,
         { expiresIn: "15m" },
       );
-
       return { accessToken };
     } catch {
       throw new Error("Refresh token invalido o expirado");

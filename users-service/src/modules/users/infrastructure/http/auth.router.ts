@@ -4,6 +4,7 @@ import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUser
 import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUseCase";
 import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
 import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
+import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
 
 const router = Router();
 
@@ -12,10 +13,12 @@ const userRepository = new MongooseUserRepository();
 const registerUserUseCase = new RegisterUser(userRepository);
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
+const validateToken = new ValidateTokenUseCase();
 const authController = new AuthController(
   registerUserUseCase,
   loginUseCase,
   refreshToken,
+  validateToken,
 );
 
 /**
@@ -72,8 +75,6 @@ const authController = new AuthController(
  *       500:
  *         description: No se pudo completar el registro de usuario
  */
-router.post("/register", (req, res) => authController.register(req, res));
-
 /**
  * @swagger
  * /api/auth/login:
@@ -144,8 +145,6 @@ router.post("/register", (req, res) => authController.register(req, res));
  *       500:
  *         description: Error interno del servidor
  */
-router.post("/login", (req, res) => authController.login(req, res));
-
 /**
  * @swagger
  * /api/auth/refreshToken:
@@ -181,8 +180,49 @@ router.post("/login", (req, res) => authController.login(req, res));
  *       401:
  *         description: Refresh token inválido o expirado
  */
+/**
+ * @swagger
+ * /api/auth/validate:
+ *   get:
+ *     summary: Validar access token
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         description: Token de acceso en formato Bearer
+ *     responses:
+ *       200:
+ *         description: Token válido, retorna el payload
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *                 email:
+ *                   type: string
+ *                   example: "ale@gmail.com"
+ *                 role_id:
+ *                   type: string
+ *                   example: "64f1a2b3c4d5e6f7a8b9c0d3"
+ *       401:
+ *         description: Token ausente o inválido/expirado
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.post("/register", (req, res) => authController.register(req, res));
+router.post("/login", (req, res) => authController.login(req, res));
 router.post("/refreshToken", (req, res) =>
   authController.TokenRefresh(req, res),
 );
+router.get("/validate", (req, res) => authController.tokenValidate(req, res));
 
 export default router;

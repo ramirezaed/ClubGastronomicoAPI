@@ -9,14 +9,16 @@ import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUse
 import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
 import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/InvalidCreedentialError";
 import { InactiveUserError } from "@/modules/users/domain/exceptions/InactiveUser";
+import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
+import { InvalidtokenError } from "@/modules/users/domain/exceptions/invalidToken";
 
 export class AuthController {
   constructor(
     private readonly registerUser: RegisterUser,
     private readonly loginUser: LoginUseCase,
     private readonly refreshToken: RefreshTokenUseCase,
+    private readonly validateToken: ValidateTokenUseCase,
   ) {}
-
   async register(req: Request, res: Response): Promise<void> {
     //se tipa como el DTO para asegurar la forma esperada
     const { name, lastname, email, password, role_id } =
@@ -49,6 +51,7 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
+
   async login(req: Request, res: Response): Promise<void> {
     const data = req.body as ILoginDTO;
     if (!data.email || !data.password) {
@@ -70,6 +73,7 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
+
   async TokenRefresh(req: Request, res: Response): Promise<void> {
     try {
       const { refreshToken } = req.body;
@@ -80,7 +84,33 @@ export class AuthController {
       const result = await this.refreshToken.execute(refreshToken);
       res.status(200).json(result);
     } catch (error) {
-      res.status(401).json({ message: "Refresh token invalido o expirado" });
+      if (error instanceof InvalidtokenError) {
+        res.status(401).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async tokenValidate(req: Request, res: Response): Promise<void> {
+    const tokenHeader = req.headers.authorization;
+    if (!tokenHeader) {
+      res.status(401).json({ message: "No autorizado" });
+      return;
+    }
+    //divide el texto de array y ocupa el que se encuentra en la posicion 1
+    //  [ "Bearer" , "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"]
+    //el string de la posicion 1 es  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    const token = tokenHeader.split(" ")[1];
+    try {
+      const payload = await this.validateToken.execute(token);
+      res.status(200).json(payload);
+    } catch (error) {
+      if (error instanceof InvalidtokenError) {
+        res.status(401).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   }
 }
