@@ -26,7 +26,7 @@ export class RegisterUser {
       dto.lastname,
       dto.email,
       dto.password,
-      dto.role_id ?? null,
+      dto.role_id,
       false,
       null,
     );

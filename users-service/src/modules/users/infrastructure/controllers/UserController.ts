@@ -10,15 +10,17 @@ export class UserController {
 
   async register(req: Request, res: Response): Promise<void> {
     //se tipa como el DTO para asegurar la forma esperada
-    const { name, lastname, email, password, role_id } =
+    const { company_id, branch_id, name, lastname, email, password, role_id } =
       req.body as IRegisterUserDTO;
-    if (!name || !lastname || !email || !password) {
+    if (!name || !lastname || !email || !password || !role_id) {
       res.status(400).json({ message: "Todos los campos son requeridos" });
       return;
     }
     // ejecuta el caso de uso RegisterUser
     try {
       const user = await this.registerUser.execute({
+        company_id,
+        branch_id,
         name,
         lastname,
         email,
