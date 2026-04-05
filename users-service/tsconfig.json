@@ -3,13 +3,16 @@
     /* Estructura */
     "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": ".",                          
-    "paths": {                               
-    "@/*":            ["src/*"],
-  "@domain/*":      ["src/modules/users/domain/*"],
-  "@application/*": ["src/modules/users/application/*"],
-  "@infra/*":       ["src/modules/users/infrastructure/*"]
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@domain/*": ["src/modules/users/domain/*"],
+      "@application/*": ["src/modules/users/application/*"],
+      "@infra/*": ["src/modules/users/infrastructure/*"]
     },
+
+    /* 👇 AGREGAR ESTA LINEA */
+    "ignoreDeprecations": "6.0",
 
     /* Entorno */
     "module": "commonjs",
