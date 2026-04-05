@@ -7,6 +7,7 @@ import router from "@/modules/users/infrastructure/http/auth.router";
 import { swaggerSpec } from "@/config/swagger";
 import swaggerUi from "swagger-ui-express";
 import { seedRoles } from "@/config/roleSeeder";
+import RoleRouter from "@/modules/users/infrastructure/http/role.router";
 
 config();
 
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", router);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); //las rutas para swagger
+app.use("/api/roles", RoleRouter);
 
 const startServer = async () => {
   try {

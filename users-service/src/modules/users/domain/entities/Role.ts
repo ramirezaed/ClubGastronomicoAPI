@@ -5,7 +5,6 @@ export class Role {
     public permissions: string[],
     public description: string,
     public is_active: boolean,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    public deleted_at: Date | null,
   ) {}
 }
