@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    /* Estructura */
     "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": ".",
@@ -11,24 +10,16 @@
       "@infra/*": ["src/modules/users/infrastructure/*"]
     },
 
-    /* 👇 AGREGAR ESTA LINEA */
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
 
-    /* Entorno */
     "module": "commonjs",
     "target": "es2019",
     "lib": ["es2019"],
     "types": ["node"],
-
-    /* Interoperabilidad */
     "esModuleInterop": true,
     "resolveJsonModule": true,
-
-    /* Calidad */
     "strict": true,
     "skipLibCheck": true,
-
-    /* Debug */
     "sourceMap": true
   }
 }

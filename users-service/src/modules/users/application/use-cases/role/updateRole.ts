@@ -1,7 +1,6 @@
 import { IUpdateRoleDTO } from "@/modules/users/application/dtos/role/UpdateRoleDTO";
 import { Role } from "@/modules/users/domain/entities/Role";
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
-import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 import { UpdateRoleError } from "@/modules/users/domain/exceptions/role/UpdateRoleError";
 
 export class UpdateRole {

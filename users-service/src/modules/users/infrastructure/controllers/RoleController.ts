@@ -44,6 +44,7 @@ export class RoleController {
         description,
         is_active,
       });
+
       res.status(201).json({ message: "nuevo rol registrado", rol });
     } catch (error) {
       if (error instanceof DuplicateNameError) {
@@ -58,7 +59,10 @@ export class RoleController {
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
     const { permissions, description, is_active } = req.body as IUpdateRoleDTO;
-
+    if (!permissions || !description) {
+      res.status(400).json({ message: "Todos los datos son necesarios" });
+      return;
+    }
     try {
       const rolActualizado = await this.updateRole.execute(id, {
         permissions,
@@ -74,6 +78,7 @@ export class RoleController {
       if (error instanceof UpdateRoleError) {
         res.status(500).json({ message: error.message });
       }
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   }
   async getRoleByID(req: Request, res: Response) {

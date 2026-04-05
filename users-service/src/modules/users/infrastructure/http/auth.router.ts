@@ -5,20 +5,29 @@ import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUse
 import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
 import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
+import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateUserUseCase";
 
 const router = Router();
+//inyeccion de dependencias
 
+// capa de Infraestructura (Adaptadores de salida)
+//Instancia del repositorio basada en Mongoose */
 const userRepository = new MongooseUserRepository();
-
+//capa de aplicacion (Casos de Uso)
+//aca se define que hace
 const registerUserUseCase = new RegisterUser(userRepository);
+const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
+//capa de interfaz
+//se inyectan las dependencias
 const authController = new AuthController(
   registerUserUseCase,
   loginUseCase,
   refreshToken,
   validateToken,
+  updateUserUseCase,
 );
 
 /**
@@ -218,11 +227,64 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
+/**
+ * @swagger
+ * /api/auth/update/{id}:
+ *   patch:
+ *     summary: Actualizar datos del usuario
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *         description: ID del usuario a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, lastname]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Alejandro
+ *                 description: Nuevo nombre del usuario
+ *               lastname:
+ *                 type: string
+ *                 example: Ramirez
+ *                 description: Nuevo apellido del usuario
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: usuario actualizado
+ *                 userActualizado:
+ *                   type: object
+ *                   description: Usuario actualizado
+ *       400:
+ *         description: Todos los datos son necesarios
+ *       404:
+ *         description: El usuario no existe o fue eliminado
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.post("/register", (req, res) => authController.register(req, res));
 router.post("/login", (req, res) => authController.login(req, res));
 router.post("/refreshToken", (req, res) =>
   authController.TokenRefresh(req, res),
 );
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
-
+router.patch("/update/:id", (req, res) => authController.update(req, res));
 export default router;

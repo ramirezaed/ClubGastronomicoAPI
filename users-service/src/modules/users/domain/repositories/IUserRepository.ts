@@ -5,8 +5,8 @@
 import { User } from "@domain/entities/User";
 
 export interface IUserRepository {
-  //findByEmail: se utiliza principalmente para que no hayan email duplicados
   findByEmail(email: string): Promise<User | null>;
-  //save : se utiliza para guardar un usuario en el sistema
+  findById(id: string): Promise<User | null>;
   save(user: User): Promise<User>;
+  update(user: User): Promise<User>;
 }

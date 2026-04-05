@@ -11,13 +11,17 @@ import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/Inval
 import { InactiveUserError } from "@/modules/users/domain/exceptions/InactiveUser";
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
 import { InvalidtokenError } from "@/modules/users/domain/exceptions/invalidToken";
-
+import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateUserUseCase";
+import { IUpdateUserDTO } from "@/modules/users/application/dtos/UpdateUserDTO";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
+import { UpdateUserError } from "@/modules/users/domain/exceptions/UpdateUserError";
 export class AuthController {
   constructor(
     private readonly registerUser: RegisterUser,
     private readonly loginUser: LoginUseCase,
     private readonly refreshToken: RefreshTokenUseCase,
     private readonly validateToken: ValidateTokenUseCase,
+    private readonly updateUser: UpdateUserUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     //se tipa como el DTO para asegurar la forma esperada
@@ -109,6 +113,31 @@ export class AuthController {
       if (error instanceof InvalidtokenError) {
         res.status(401).json({ message: error.message });
         return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+  async update(req: Request, res: Response) {
+    const id = req.params.id as string;
+    const { name, lastname } = req.body as IUpdateUserDTO;
+    if (!name || !lastname) {
+      res.status(400).json({ message: "Todos los datos son necesarios" });
+      return;
+    }
+    try {
+      const userActualizado = await this.updateUser.execute(id, {
+        name,
+        lastname,
+      });
+      res
+        .status(200)
+        .json({ message: " usuario actualizado", userActualizado });
+    } catch (error) {
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+      }
+      if (error instanceof UpdateUserError) {
+        res.status(500).json({ message: "Error interno del servidor" });
       }
       res.status(500).json({ message: "Error interno del servidor" });
     }

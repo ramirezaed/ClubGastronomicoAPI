@@ -14,6 +14,7 @@ export class MongooseRoleRepository implements IRoleRepository {
       doc.deleted_at,
     );
   }
+
   async findByName(name: string): Promise<Role | null> {
     const doc = await RoleModel.findOne({ name, deleted_at: null });
     if (!doc) return null; //si no existe retorna null
@@ -35,10 +36,11 @@ export class MongooseRoleRepository implements IRoleRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  async findAll(): Promise<Role[]> {
+  async findAll(): Promise<Role[] | null> {
     const doc = await RoleModel.find({ deleted_at: null });
     // Mongo devuelve Document[] , el dominio necesita Role[]
     // se aplica el mapper toEntity() a cada documento.
+    if (!doc) return null;
     return doc.map((doc) => this.toEntity(doc));
   }
   async update(role: Role): Promise<Role> {
