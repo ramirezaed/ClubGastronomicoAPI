@@ -15,6 +15,7 @@ import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateU
 import { IUpdateUserDTO } from "@/modules/users/application/dtos/UpdateUserDTO";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
 import { UpdateUserError } from "@/modules/users/domain/exceptions/UpdateUserError";
+import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
 export class AuthController {
   constructor(
     private readonly registerUser: RegisterUser,
@@ -22,6 +23,7 @@ export class AuthController {
     private readonly refreshToken: RefreshTokenUseCase,
     private readonly validateToken: ValidateTokenUseCase,
     private readonly updateUser: UpdateUserUseCase,
+    private readonly getAllUser: GetAllUsersUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     //se tipa como el DTO para asegurar la forma esperada
@@ -55,7 +57,6 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
-
   async login(req: Request, res: Response): Promise<void> {
     const data = req.body as ILoginDTO;
     if (!data.email || !data.password) {
@@ -77,7 +78,6 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
-
   async TokenRefresh(req: Request, res: Response): Promise<void> {
     try {
       const { refreshToken } = req.body;
@@ -95,7 +95,6 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
-
   async tokenValidate(req: Request, res: Response): Promise<void> {
     const tokenHeader = req.headers.authorization;
     if (!tokenHeader) {
@@ -140,6 +139,19 @@ export class AuthController {
         res.status(500).json({ message: "Error interno del servidor" });
       }
       res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      let is_active: boolean | undefined;
+      if (req.query.is_active === "true") is_active = true;
+      else if (req.query.is_active === "false") is_active = false;
+      // si no viene el param, queda undefined → trae todos
+      const users = await this.getAllUser.execute({ is_active });
+      return res.status(200).json({ message: "Lista de Usuarios", users });
+    } catch (error) {
+      return res.status(500).json({ message: "Error interno del servidor" });
     }
   }
 }

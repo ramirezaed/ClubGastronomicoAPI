@@ -6,6 +6,8 @@ import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/Refre
 import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
 import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateUserUseCase";
+import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
+import { HttpCompanyBranchService } from "@/modules/users/infrastructure/services/HttpCompanyBranchService";
 
 const router = Router();
 //inyeccion de dependencias
@@ -17,6 +19,11 @@ const userRepository = new MongooseUserRepository();
 //aca se define que hace
 const registerUserUseCase = new RegisterUser(userRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
+const companyBranchService = new HttpCompanyBranchService();
+const getAllUserUseCase = new GetAllUsersUseCase(
+  userRepository,
+  companyBranchService,
+);
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
@@ -28,6 +35,7 @@ const authController = new AuthController(
   refreshToken,
   validateToken,
   updateUserUseCase,
+  getAllUserUseCase,
 );
 
 /**
@@ -287,4 +295,5 @@ router.post("/refreshToken", (req, res) =>
 );
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
 router.patch("/update/:id", (req, res) => authController.update(req, res));
+router.get("/users", (req, res) => authController.getAll(req, res));
 export default router;
