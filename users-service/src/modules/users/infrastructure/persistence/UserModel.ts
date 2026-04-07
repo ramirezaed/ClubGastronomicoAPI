@@ -26,10 +26,7 @@ const UsersSchema = new Schema<IUserDocument>(
       type: String,
       required: true,
       unique: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        "Por favor ingrese un correo electrónico válido",
-      ],
+      match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Por favor ingrese un correo electrónico válido"],
     },
     password: {
       type: String,

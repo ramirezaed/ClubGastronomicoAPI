@@ -8,6 +8,7 @@ import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/Vali
 import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateUserUseCase";
 import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
 import { HttpCompanyBranchService } from "@/modules/users/infrastructure/services/HttpCompanyBranchService";
+import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
 
 const router = Router();
 //inyeccion de dependencias
@@ -20,10 +21,8 @@ const userRepository = new MongooseUserRepository();
 const registerUserUseCase = new RegisterUser(userRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const companyBranchService = new HttpCompanyBranchService();
-const getAllUserUseCase = new GetAllUsersUseCase(
-  userRepository,
-  companyBranchService,
-);
+const getAllUserUseCase = new GetAllUsersUseCase(userRepository, companyBranchService);
+const changeStatusUseCase = new ChangeStatusUserUseCase(userRepository);
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
@@ -36,6 +35,7 @@ const authController = new AuthController(
   validateToken,
   updateUserUseCase,
   getAllUserUseCase,
+  changeStatusUseCase,
 );
 
 /**
@@ -288,12 +288,132 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
+/**
+ * @swagger
+ * /api/auth/users:
+ *   get:
+ *     summary: Obtener todos los usuarios
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: is_active
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: "Filtra por estado. Sin el param: todos. true: activos. false: inactivos."
+ *     responses:
+ *       200:
+ *         description: Lista de usuarios con rol, empresa y sucursal
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *                   name:
+ *                     type: string
+ *                     example: "Alejandro"
+ *                   lastname:
+ *                     type: string
+ *                     example: "Ramirez"
+ *                   email:
+ *                     type: string
+ *                     example: "ale@gmail.com"
+ *                   is_active:
+ *                     type: boolean
+ *                     example: true
+ *                   role:
+ *                     type: object
+ *                     nullable: true
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                         example: "Admin"
+ *                   company:
+ *                     type: object
+ *                     nullable: true
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                         example: "Empresa S.A."
+ *                   branch:
+ *                     type: object
+ *                     nullable: true
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                         example: "Sucursal Centro"
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: Error interno del servidor
+ */
+
+/**
+ * @swagger
+ * /api/auth/changeStatus/{id}:
+ *   patch:
+ *     summary: Cambiar estado activo/inactivo de un usuario
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *         description: ID del usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [is_active]
+ *             properties:
+ *               is_active:
+ *                 type: boolean
+ *                 example: false
+ *                 description: Nuevo estado del usuario
+ *     responses:
+ *       200:
+ *         description: Estado cambiado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Estado actualizado correctamente"
+ *                 is_active:
+ *                   type: boolean
+ *                   example: false
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.post("/register", (req, res) => authController.register(req, res));
 router.post("/login", (req, res) => authController.login(req, res));
-router.post("/refreshToken", (req, res) =>
-  authController.TokenRefresh(req, res),
-);
+router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res));
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
 router.patch("/update/:id", (req, res) => authController.update(req, res));
 router.get("/users", (req, res) => authController.getAll(req, res));
+router.patch("/changeStatus/:id", (req, res) => authController.changeStatus(req, res));
 export default router;

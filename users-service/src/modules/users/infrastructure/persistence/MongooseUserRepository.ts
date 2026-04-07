@@ -11,20 +11,19 @@ export class MongooseUserRepository implements IUserRepository {
       doc.name,
       doc.lastname,
       doc.email,
-      doc.password,
+      doc.role_id.toString(),
       doc.role_id,
       doc.is_active,
       doc.deleted_at,
     );
   }
-
   async findByEmail(email: string): Promise<User | null> {
     const doc = await UserModel.findOne({ email });
     if (!doc) return null;
     return this.toEntity(doc); //
   }
   async findById(id: string): Promise<User | null> {
-    const doc = await UserModel.findById({ _id: id, delete_at: null });
+    const doc = await UserModel.findOne({ _id: id, delete_at: null });
     if (!doc) return null;
     return this.toEntity(doc);
   }
@@ -68,8 +67,20 @@ export class MongooseUserRepository implements IUserRepository {
           lastname: user.lastname,
         },
       },
-      { new: true },
-    );
+      { returnDocument: "after" }, // Esta es la nueva forma
+    ).select("-password"); // para que no envie el password
+    return this.toEntity(doc);
+  }
+  async activateDesactivte(id: string, is_Active: boolean): Promise<User | null> {
+    const doc = await UserModel.findOneAndUpdate(
+      { _id: id, delete_at: null }, //filtro, busca por id, y que no este eliminado
+      { $set: { is_active: is_Active } }, // el dato que se va a cambiar
+      { returnDocument: "after" }, // Esta es la nueva forma //devuelve el nuevo documento, el actualizado
+    ).select("-password"); // para que no envie el password
+    if (!doc) {
+      //si no se encuentra el documneto devuelve null
+      return null;
+    }
     return this.toEntity(doc);
   }
 }

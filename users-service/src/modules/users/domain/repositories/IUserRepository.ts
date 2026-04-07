@@ -10,4 +10,5 @@ export interface IUserRepository {
   findAll(filter?: { is_active?: boolean }): Promise<User[]>;
   save(user: User): Promise<User>;
   update(user: User): Promise<User>;
+  activateDesactivte(id: string, is_active: boolean): Promise<User | null>;
 }
