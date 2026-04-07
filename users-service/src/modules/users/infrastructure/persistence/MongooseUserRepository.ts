@@ -11,7 +11,7 @@ export class MongooseUserRepository implements IUserRepository {
       doc.name,
       doc.lastname,
       doc.email,
-      doc.role_id.toString(),
+      doc.password,
       doc.role_id,
       doc.is_active,
       doc.deleted_at,

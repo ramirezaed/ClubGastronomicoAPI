@@ -378,18 +378,6 @@ const authController = new AuthController(
  *           type: string
  *         example: "64f1a2b3c4d5e6f7a8b9c0d1"
  *         description: ID del usuario
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [is_active]
- *             properties:
- *               is_active:
- *                 type: boolean
- *                 example: false
- *                 description: Nuevo estado del usuario
  *     responses:
  *       200:
  *         description: Estado cambiado exitosamente

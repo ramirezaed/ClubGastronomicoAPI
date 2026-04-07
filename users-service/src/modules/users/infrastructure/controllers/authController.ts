@@ -28,35 +28,7 @@ export class AuthController {
     private readonly getAllUser: GetAllUsersUseCase,
     private readonly changeStatusUser: ChangeStatusUserUseCase,
   ) {}
-  async register(req: Request, res: Response): Promise<void> {
-    //se tipa como el DTO para asegurar la forma esperada
-    const { name, lastname, email, password, role_id } = req.body as IRegisterUserDTO;
-    if (!name || !lastname || !email || !password) {
-      res.status(400).json({ message: "Todos los campos son requeridos" });
-      return;
-    }
-    // ejecuta el caso de uso RegisterUser
-    try {
-      const user = await this.registerUser.execute({
-        name,
-        lastname,
-        email,
-        password,
-        role_id,
-      });
-      res.status(201).json({ message: "Usuario registrado exitosamente", user });
-    } catch (error) {
-      if (error instanceof DuplicateEmailError) {
-        res.status(409).json({ message: error.message });
-        return;
-      }
-      if (error instanceof RegisterUserError) {
-        res.status(500).json({ message: error.message });
-        return;
-      }
-      res.status(500).json({ message: "Error interno del servidor" });
-    }
-  }
+
   async login(req: Request, res: Response): Promise<void> {
     const data = req.body as ILoginDTO;
     if (!data.email || !data.password) {
@@ -75,6 +47,7 @@ export class AuthController {
         res.status(403).json({ message: error.message });
         return;
       }
+      console.error("Error al obtener usuarios:", error);
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
@@ -116,6 +89,36 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
+
+  async register(req: Request, res: Response): Promise<void> {
+    //se tipa como el DTO para asegurar la forma esperada
+    const { name, lastname, email, password, role_id } = req.body as IRegisterUserDTO;
+    if (!name || !lastname || !email || !password) {
+      res.status(400).json({ message: "Todos los campos son requeridos" });
+      return;
+    }
+    // ejecuta el caso de uso RegisterUser
+    try {
+      const user = await this.registerUser.execute({
+        name,
+        lastname,
+        email,
+        password,
+        role_id,
+      });
+      res.status(201).json({ message: "Usuario registrado exitosamente", user });
+    } catch (error) {
+      if (error instanceof DuplicateEmailError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RegisterUserError) {
+        res.status(500).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
     const { name, lastname } = req.body as IUpdateUserDTO;
@@ -131,12 +134,12 @@ export class AuthController {
       res.status(200).json({ message: " usuario actualizado", userActualizado });
     } catch (error) {
       if (error instanceof UserNotExistError) {
-        res.status(404).json({ message: error.message });
+        return res.status(404).json({ message: error.message });
       }
       if (error instanceof UpdateUserError) {
-        res.status(500).json({ message: "Error interno del servidor" });
+        return res.status(500).json({ message: "Error interno del servidor" });
       }
-      res.status(500).json({ message: "Error interno del servidor" });
+      return res.status(500).json({ message: "Error interno del servidor" });
     }
   }
   async getAll(req: Request, res: Response) {
@@ -151,20 +154,17 @@ export class AuthController {
       return res.status(500).json({ message: "Error interno del servidor" });
     }
   }
+
   async changeStatus(req: Request, res: Response) {
     const id = req.params.id as string;
-    const status = req.body;
-    if (!status) {
-      return res.status(400).json({ message: "Todos los campos son necesarios" });
-    }
     try {
-      const userActaulizado = await this.changeStatusUser.execute(id, status);
+      const userActaulizado = await this.changeStatusUser.execute(id);
       return res.status(200).json({ message: "Usuario Actualizado", userActaulizado });
     } catch (error) {
       if (error instanceof UserNotExistError) {
         return res.status(404).json({ mensage: error.message });
       }
-      res.status(500).json({ message: "Error interno del servidor" });
+      return res.status(500).json({ message: "Error interno del servidor" });
     }
   }
 }
