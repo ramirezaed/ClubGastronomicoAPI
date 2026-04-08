@@ -9,6 +9,7 @@ import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateU
 import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
 import { HttpCompanyBranchService } from "@/modules/users/infrastructure/services/HttpCompanyBranchService";
 import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
+import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
 
 const router = Router();
 //inyeccion de dependencias
@@ -22,6 +23,7 @@ const registerUserUseCase = new RegisterUser(userRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const companyBranchService = new HttpCompanyBranchService();
 const getAllUserUseCase = new GetAllUsersUseCase(userRepository, companyBranchService);
+const meUseCase = new MeUserUseCase(userRepository, companyBranchService);
 const changeStatusUseCase = new ChangeStatusUserUseCase(userRepository);
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
@@ -36,6 +38,7 @@ const authController = new AuthController(
   updateUserUseCase,
   getAllUserUseCase,
   changeStatusUseCase,
+  meUseCase,
 );
 
 /**
@@ -404,4 +407,5 @@ router.get("/validate", (req, res) => authController.tokenValidate(req, res));
 router.patch("/update/:id", (req, res) => authController.update(req, res));
 router.get("/users", (req, res) => authController.getAll(req, res));
 router.patch("/changeStatus/:id", (req, res) => authController.changeStatus(req, res));
+router.get("/me/:id", (req, res) => authController.me(req, res));
 export default router;

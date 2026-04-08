@@ -18,6 +18,7 @@ import { UpdateUserError } from "@/modules/users/domain/exceptions/UpdateUserErr
 import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
 import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
 import { error } from "node:console";
+import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
 export class AuthController {
   constructor(
     private readonly registerUser: RegisterUser,
@@ -27,6 +28,7 @@ export class AuthController {
     private readonly updateUser: UpdateUserUseCase,
     private readonly getAllUser: GetAllUsersUseCase,
     private readonly changeStatusUser: ChangeStatusUserUseCase,
+    private readonly meUser: MeUserUseCase,
   ) {}
 
   async login(req: Request, res: Response): Promise<void> {
@@ -38,6 +40,7 @@ export class AuthController {
     try {
       const result = await this.loginUser.execute(data);
       res.status(200).json(result);
+      return;
     } catch (error) {
       if (error instanceof InvalidCreedentialError) {
         res.status(401).json({ message: error.message });
@@ -47,8 +50,8 @@ export class AuthController {
         res.status(403).json({ message: error.message });
         return;
       }
-      console.error("Error al obtener usuarios:", error);
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
   async TokenRefresh(req: Request, res: Response): Promise<void> {
@@ -60,12 +63,14 @@ export class AuthController {
       }
       const result = await this.refreshToken.execute(refreshToken);
       res.status(200).json(result);
+      return;
     } catch (error) {
       if (error instanceof InvalidtokenError) {
         res.status(401).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
   async tokenValidate(req: Request, res: Response): Promise<void> {
@@ -81,15 +86,16 @@ export class AuthController {
     try {
       const payload = await this.validateToken.execute(token);
       res.status(200).json(payload);
+      return;
     } catch (error) {
       if (error instanceof InvalidtokenError) {
         res.status(401).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
-
   async register(req: Request, res: Response): Promise<void> {
     //se tipa como el DTO para asegurar la forma esperada
     const { name, lastname, email, password, role_id } = req.body as IRegisterUserDTO;
@@ -107,6 +113,7 @@ export class AuthController {
         role_id,
       });
       res.status(201).json({ message: "Usuario registrado exitosamente", user });
+      return;
     } catch (error) {
       if (error instanceof DuplicateEmailError) {
         res.status(409).json({ message: error.message });
@@ -117,54 +124,82 @@ export class AuthController {
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     const { name, lastname } = req.body as IUpdateUserDTO;
     if (!name || !lastname) {
       res.status(400).json({ message: "Todos los datos son necesarios" });
       return;
     }
+
     try {
       const userActualizado = await this.updateUser.execute(id, {
         name,
         lastname,
       });
       res.status(200).json({ message: " usuario actualizado", userActualizado });
+      return;
     } catch (error) {
       if (error instanceof UserNotExistError) {
-        return res.status(404).json({ message: error.message });
+        res.status(404).json({ message: error.message });
+        return;
       }
       if (error instanceof UpdateUserError) {
-        return res.status(500).json({ message: "Error interno del servidor" });
+        res.status(500).json({ message: "Error interno del servidor" });
+        return;
       }
-      return res.status(500).json({ message: "Error interno del servidor" });
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
-  async getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
       let is_active: boolean | undefined;
       if (req.query.is_active === "true") is_active = true;
       else if (req.query.is_active === "false") is_active = false;
-      // si no viene el param, queda undefined → trae todos
+      //      si no viene el param, queda undefined → trae todos
       const users = await this.getAllUser.execute({ is_active });
-      return res.status(200).json({ message: "Lista de Usuarios", users });
+
+      res.status(200).json({ message: "Lista de Usuarios", users });
+      return;
     } catch (error) {
-      return res.status(500).json({ message: "Error interno del servidor" });
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
 
-  async changeStatus(req: Request, res: Response) {
+  async changeStatus(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
       const userActaulizado = await this.changeStatusUser.execute(id);
-      return res.status(200).json({ message: "Usuario Actualizado", userActaulizado });
+      res.status(200).json({ message: "Usuario Actualizado", userActaulizado });
+      return;
     } catch (error) {
       if (error instanceof UserNotExistError) {
-        return res.status(404).json({ mensage: error.message });
+        res.status(404).json({ mensage: error.message });
+        return;
       }
-      return res.status(500).json({ message: "Error interno del servidor" });
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
+    }
+  }
+
+  async me(req: Request, res: Response) {
+    const id = req.params.id as string;
+    try {
+      const me = await this.meUser.execute(id);
+      res.status(200).json(me);
+      return;
+    } catch (error) {
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
 }

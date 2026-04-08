@@ -11,4 +11,5 @@ export interface IUserRepository {
   save(user: User): Promise<User>;
   update(user: User): Promise<User>;
   activateDesactivte(id: string, is_active: boolean): Promise<User | null>;
+  me(id: string): Promise<User | null>;
 }

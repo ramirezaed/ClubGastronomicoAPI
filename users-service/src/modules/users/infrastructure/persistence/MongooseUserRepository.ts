@@ -83,4 +83,10 @@ export class MongooseUserRepository implements IUserRepository {
     }
     return this.toEntity(doc);
   }
+  async me(id: string): Promise<User | null> {
+    //lean devuelve objetos JS simples, no documentos de mongoose, es mas rapido y liviano
+    const doc = await UserModel.findOne({ _id: id, delete_at: null }).populate("role_id", "name").lean();
+    if (!doc) return null;
+    return this.toEntity(doc);
+  }
 }
