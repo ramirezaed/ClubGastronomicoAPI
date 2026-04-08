@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-
 import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUserUseCase";
 import { IRegisterUserDTO } from "@application/dtos/RegisterUserDTO";
 import { RegisterUserError } from "@domain/exceptions/RegisterUserError";
@@ -17,8 +16,11 @@ import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExis
 import { UpdateUserError } from "@/modules/users/domain/exceptions/UpdateUserError";
 import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
 import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
-import { error } from "node:console";
 import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
+import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/UpdateRoleUserUseCase";
+import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/UpdateRoleUserError";
+import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
+
 export class AuthController {
   constructor(
     private readonly registerUser: RegisterUser,
@@ -29,6 +31,7 @@ export class AuthController {
     private readonly getAllUser: GetAllUsersUseCase,
     private readonly changeStatusUser: ChangeStatusUserUseCase,
     private readonly meUser: MeUserUseCase,
+    private readonly updateRoleUser: UpdateRoleUserUseCase,
   ) {}
 
   async login(req: Request, res: Response): Promise<void> {
@@ -170,7 +173,6 @@ export class AuthController {
       return;
     }
   }
-
   async changeStatus(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
@@ -186,8 +188,7 @@ export class AuthController {
       return;
     }
   }
-
-  async me(req: Request, res: Response) {
+  async me(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
       const me = await this.meUser.execute(id);
@@ -198,6 +199,36 @@ export class AuthController {
         res.status(404).json({ message: error.message });
         return;
       }
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
+    }
+  }
+
+  async updateRole(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    const { role_id } = req.body;
+    if (!role_id) {
+      res.status(400).json({ message: "Todos los campos son requeridos" });
+      return;
+    }
+    try {
+      const userActaulizado = await this.updateRoleUser.execute(id, role_id);
+      res.status(200).json({ userActaulizado });
+      return;
+    } catch (error) {
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RoleNotExistsError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error instanceof UpdateRoleUserError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      console.log(error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }

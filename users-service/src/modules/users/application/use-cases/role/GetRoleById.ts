@@ -8,7 +8,7 @@ export class GetRoleById {
     const rol = await this.roleRepository.findById(id); //busca el rol por id
     if (!rol) {
       // si no existe el id, lanza el error
-      throw new RoleNotExistsError(id); //error personalizado
+      throw new RoleNotExistsError(); //error personalizado
     }
     return rol;
   }

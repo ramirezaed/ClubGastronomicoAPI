@@ -7,7 +7,7 @@ export class DeleteRole {
     const existe = await this.roleRepository.findById(id); //verifica si existe el id
     if (!existe) {
       //si no existe lanza el error
-      throw new RoleNotExistsError(id);
+      throw new RoleNotExistsError();
     }
     await this.roleRepository.delete(id); //eliminar el rol
     return;

@@ -5,14 +5,7 @@ import RoleModel from "@/modules/users/infrastructure/persistence/RoleModel";
 export class MongooseRoleRepository implements IRoleRepository {
   //toEntity m:etodo privado que convierte un documento de Mongoose a una entidad de dominio.
   private toEntity(doc: any): Role {
-    return new Role(
-      doc._id.toString(),
-      doc.name,
-      doc.permissions,
-      doc.description,
-      doc.is_active,
-      doc.deleted_at,
-    );
+    return new Role(doc._id.toString(), doc.name, doc.permissions, doc.description, doc.is_active, doc.deleted_at);
   }
 
   async findByName(name: string): Promise<Role | null> {
@@ -32,7 +25,7 @@ export class MongooseRoleRepository implements IRoleRepository {
     return this.toEntity(guardar);
   }
   async findById(id: string): Promise<Role | null> {
-    const doc = await RoleModel.findById({ _id: id, deleted_at: null });
+    const doc = await RoleModel.findOne({ _id: id, deleted_at: null });
     if (!doc) return null;
     return this.toEntity(doc);
   }

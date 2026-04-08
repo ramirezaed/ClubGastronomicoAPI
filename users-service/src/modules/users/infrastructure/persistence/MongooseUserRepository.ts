@@ -89,4 +89,14 @@ export class MongooseUserRepository implements IUserRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
+  async updateRole(id_user: string, id_role: string): Promise<User | null> {
+    const doc = await UserModel.findOneAndUpdate(
+      { _id: id_user, delete_at: null }, //el filtro
+      { $set: { role_id: id_role } }, //el dato que se va a cambiar
+      { returnDocument: "after" }, // Esta es la nueva forma
+    )
+      .populate("role_id", "name")
+      .select("-password"); // para que no envie el password;
+    return this.toEntity(doc);
+  }
 }

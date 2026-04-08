@@ -10,6 +10,8 @@ import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAll
 import { HttpCompanyBranchService } from "@/modules/users/infrastructure/services/HttpCompanyBranchService";
 import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
 import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
+import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/UpdateRoleUserUseCase";
+import { MongooseRoleRepository } from "@/modules/users/infrastructure/persistence/MongooseRoleRepository";
 
 const router = Router();
 //inyeccion de dependencias
@@ -17,6 +19,7 @@ const router = Router();
 // capa de Infraestructura (Adaptadores de salida)
 //Instancia del repositorio basada en Mongoose */
 const userRepository = new MongooseUserRepository();
+const roleRepository = new MongooseRoleRepository();
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
 const registerUserUseCase = new RegisterUser(userRepository);
@@ -25,6 +28,7 @@ const companyBranchService = new HttpCompanyBranchService();
 const getAllUserUseCase = new GetAllUsersUseCase(userRepository, companyBranchService);
 const meUseCase = new MeUserUseCase(userRepository, companyBranchService);
 const changeStatusUseCase = new ChangeStatusUserUseCase(userRepository);
+const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
@@ -39,6 +43,7 @@ const authController = new AuthController(
   getAllUserUseCase,
   changeStatusUseCase,
   meUseCase,
+  updateRoleUserUseCase,
 );
 
 /**
@@ -480,4 +485,6 @@ router.patch("/update/:id", (req, res) => authController.update(req, res));
 router.get("/users", (req, res) => authController.getAll(req, res));
 router.patch("/changeStatus/:id", (req, res) => authController.changeStatus(req, res));
 router.get("/me/:id", (req, res) => authController.me(req, res));
+router.patch("/role/:id", (req, res) => authController.updateRole(req, res));
+
 export default router;
