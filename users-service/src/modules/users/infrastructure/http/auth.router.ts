@@ -400,6 +400,78 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
+/**
+ * @swagger
+ * /api/auth/me/{id}:
+ *   get:
+ *     summary: Obtener datos del usuario autenticado
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *         description: ID del usuario
+ *     responses:
+ *       200:
+ *         description: Datos del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *                 name:
+ *                   type: string
+ *                   example: "Alejandro"
+ *                 lastname:
+ *                   type: string
+ *                   example: "Ramirez"
+ *                 email:
+ *                   type: string
+ *                   example: "ale@gmail.com"
+ *                 is_active:
+ *                   type: boolean
+ *                   example: true
+ *                 role:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d3"
+ *                     name:
+ *                       type: string
+ *                       example: "Admin"
+ *                 company:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                       example: "Empresa S.A."
+ *                 branch:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                       example: "Sucursal Centro"
+ *       404:
+ *         description: El usuario que buscas no existe o fue eliminado
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.post("/register", (req, res) => authController.register(req, res));
 router.post("/login", (req, res) => authController.login(req, res));
 router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res));
