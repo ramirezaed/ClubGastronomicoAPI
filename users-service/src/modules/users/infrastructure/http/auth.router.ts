@@ -477,6 +477,66 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
+/**
+ * @swagger
+ * /api/auth/role/{id}:
+ *   patch:
+ *     summary: Actualizar el rol de un usuario
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *         description: ID del usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [role_id]
+ *             properties:
+ *               role_id:
+ *                 type: string
+ *                 example: "64f1a2b3c4d5e6f7a8b9c0d3"
+ *                 description: ID del nuevo rol a asignar
+ *     responses:
+ *       200:
+ *         description: Rol actualizado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userActaulizado:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *                     name:
+ *                       type: string
+ *                       example: "Alejandro"
+ *                     email:
+ *                       type: string
+ *                       example: "ale@gmail.com"
+ *                     role_id:
+ *                       type: string
+ *                       example: "64f1a2b3c4d5e6f7a8b9c0d3"
+ *       400:
+ *         description: Campos requeridos faltantes o rol no existe
+ *       404:
+ *         description: Usuario no encontrado
+ *       409:
+ *         description: Error al actualizar el rol
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.post("/register", (req, res) => authController.register(req, res));
 router.post("/login", (req, res) => authController.login(req, res));
 router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res));
