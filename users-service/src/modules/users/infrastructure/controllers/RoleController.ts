@@ -25,8 +25,7 @@ export class RoleController {
   async register(req: Request, res: Response) {
     //en lugar de hacer const data = req.body as IRegisterRoleDTO;
     //se tipa como el RoleDTO para asugurar la forma esperada
-    const { name, permissions, description, is_active } =
-      req.body as IRegisterRoleDTO;
+    const { name, permissions, description, is_active } = req.body as IRegisterRoleDTO;
     if (!name || !permissions || !description) {
       res.status(400).json({ message: "Todos los datos son necesarios" });
       return;
@@ -105,16 +104,19 @@ export class RoleController {
     }
     return res.status(500).json({ message: "error interno del servidor" });
   }
-  async softDelete(req: Request, res: Response) {
+  async softDelete(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
       await this.deleteRole.execute(id);
-      return res.status(204).json({ meesage: "Rol eliminado" });
+      res.status(204).json({ meesage: "Rol eliminado" });
+      return;
     } catch (error) {
       if (error instanceof RoleNotExistsError) {
         res.status(404).json({ message: error.message });
+        return;
       }
       res.status(500).json({ message: "error interno del servidor" });
+      return;
     }
   }
 }

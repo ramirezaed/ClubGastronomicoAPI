@@ -20,6 +20,7 @@ import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCa
 import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/UpdateRoleUserUseCase";
 import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/UpdateRoleUserError";
 import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
+import { DeleteUserUseCase } from "@/modules/users/application/use-cases/DeleteUserUseCase";
 
 export class AuthController {
   constructor(
@@ -32,6 +33,7 @@ export class AuthController {
     private readonly changeStatusUser: ChangeStatusUserUseCase,
     private readonly meUser: MeUserUseCase,
     private readonly updateRoleUser: UpdateRoleUserUseCase,
+    private readonly deleteUser: DeleteUserUseCase,
   ) {}
 
   async login(req: Request, res: Response): Promise<void> {
@@ -203,7 +205,6 @@ export class AuthController {
       return;
     }
   }
-
   async updateRole(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     const { role_id } = req.body;
@@ -230,6 +231,22 @@ export class AuthController {
       }
       console.log(error);
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
+    }
+  }
+
+  async softDelete(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    try {
+      await this.deleteUser.execute(id);
+      res.status(200).json({ message: "Usuario Eliminado" });
+      return;
+    } catch (error) {
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
       return;
     }
   }

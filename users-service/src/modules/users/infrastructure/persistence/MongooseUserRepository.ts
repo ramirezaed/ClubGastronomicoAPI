@@ -99,4 +99,8 @@ export class MongooseUserRepository implements IUserRepository {
       .select("-password"); // para que no envie el password;
     return this.toEntity(doc);
   }
+  async delete(id: string): Promise<void> {
+    const doc = await UserModel.findOneAndUpdate({ _id: id, delete_at: null }, { $set: { deleted_at: new Date() } });
+    return;
+  }
 }

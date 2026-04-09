@@ -54,7 +54,7 @@ export class MongooseRoleRepository implements IRoleRepository {
     return this.toEntity(doc);
   }
   async delete(id: string): Promise<void> {
-    const doc = await RoleModel.findByIdAndUpdate(
+    const doc = await RoleModel.findOneAndUpdate(
       { _id: id, deleted_at: null },
       {
         $set: {

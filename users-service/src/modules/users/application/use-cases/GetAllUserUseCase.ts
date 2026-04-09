@@ -1,4 +1,3 @@
-// src/modules/users/application/use-cases/GetAllUsersUseCase.ts
 import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
 import { GetUserResponseDTO } from "@/modules/users/application/dtos/GetUserResponseDTO";
 import { ICompanyBranchService } from "@/modules/users/application/ports/ICompanyService";

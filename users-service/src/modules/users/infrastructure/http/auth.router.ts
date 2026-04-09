@@ -12,6 +12,7 @@ import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/C
 import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
 import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/UpdateRoleUserUseCase";
 import { MongooseRoleRepository } from "@/modules/users/infrastructure/persistence/MongooseRoleRepository";
+import { DeleteUserUseCase } from "@/modules/users/application/use-cases/DeleteUserUseCase";
 
 const router = Router();
 //inyeccion de dependencias
@@ -29,6 +30,8 @@ const getAllUserUseCase = new GetAllUsersUseCase(userRepository, companyBranchSe
 const meUseCase = new MeUserUseCase(userRepository, companyBranchService);
 const changeStatusUseCase = new ChangeStatusUserUseCase(userRepository);
 const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
+const deleteUserUseCase = new DeleteUserUseCase(userRepository);
+///////////////////////////////
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
@@ -44,6 +47,7 @@ const authController = new AuthController(
   changeStatusUseCase,
   meUseCase,
   updateRoleUserUseCase,
+  deleteUserUseCase,
 );
 
 /**
@@ -537,14 +541,57 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
-router.post("/register", (req, res) => authController.register(req, res));
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *   delete:
+ *     summary: Eliminar un usuario (soft delete)
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *         description: ID del usuario a eliminar
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Usuario Eliminado"
+ *       404:
+ *         description: El usuario que buscas no existe o fue eliminado
+ *       500:
+ *         description: Error interno del servidor
+ */
+//iniciar sesion
 router.post("/login", (req, res) => authController.login(req, res));
+//toekn nuevo cada 15 minutos
 router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res));
+//valida token de microservicios externos
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
+//crea cuenta de usuario con role owner y is_active=false
+router.post("/register", (req, res) => authController.register(req, res));
+//modifica datos de usuario, nombre apellido
 router.patch("/update/:id", (req, res) => authController.update(req, res));
+//lista de usuarios, con filtro por estado, true o false
 router.get("/users", (req, res) => authController.getAll(req, res));
+//activar o desactivar una cuenta de usuario
 router.patch("/changeStatus/:id", (req, res) => authController.changeStatus(req, res));
+//perfil de usuario
 router.get("/me/:id", (req, res) => authController.me(req, res));
+//cambia rol de usuario
 router.patch("/role/:id", (req, res) => authController.updateRole(req, res));
+// elimina usuario
+router.delete("/:id", (req, res) => authController.softDelete(req, res));
 
 export default router;
