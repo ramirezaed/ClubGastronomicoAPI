@@ -34,7 +34,12 @@ export class MongooseUserRepository implements IUserRepository {
       query.is_active = filter.is_active;
     }
     //lean devuelve objetos JS simples, no documentos de mongoose, es mas rapido y liviano
-    const doc = await UserModel.find(query).populate("role_id", "name").lean();
+    const doc = await UserModel.find(query)
+      .populate("role_id", "name")
+      //habiliar los populate companu y branch id cuando esten sus modelos
+      // .populate("company_id")
+      // .populate("branch_id")
+      .lean();
     return doc.map((doc) => this.toEntity(doc));
   }
   async save(user: User): Promise<User> {
@@ -71,16 +76,32 @@ export class MongooseUserRepository implements IUserRepository {
     ).select("-password"); // para que no envie el password
     return this.toEntity(doc);
   }
-  async activateDesactivte(id: string, is_Active: boolean): Promise<User | null> {
+  async activate(id: string): Promise<User | null> {
     const doc = await UserModel.findOneAndUpdate(
-      { _id: id, delete_at: null }, //filtro, busca por id, y que no este eliminado
-      { $set: { is_active: is_Active } }, // el dato que se va a cambiar
-      { returnDocument: "after" }, // Esta es la nueva forma //devuelve el nuevo documento, el actualizado
-    ).select("-password"); // para que no envie el password
-    if (!doc) {
-      //si no se encuentra el documneto devuelve null
-      return null;
-    }
+      {
+        _id: id,
+        deleted_at: null,
+      },
+      {
+        $set: { is_active: true },
+      },
+      { returnDocument: "after" }, // Esta es la nueva forma
+    );
+
+    return this.toEntity(doc);
+  }
+  async deactivate(id: string): Promise<User | null> {
+    const doc = await UserModel.findOneAndUpdate(
+      {
+        _id: id,
+        deleted_at: null,
+      },
+      {
+        $set: { is_active: false },
+      },
+      { returnDocument: "after" }, // Esta es la nueva forma
+    );
+
     return this.toEntity(doc);
   }
   async me(id: string): Promise<User | null> {

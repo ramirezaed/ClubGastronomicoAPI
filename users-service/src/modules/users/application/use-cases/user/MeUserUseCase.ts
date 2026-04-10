@@ -1,6 +1,9 @@
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 import { GetUserResponseDTO } from "@/modules/users/application/dtos/user/GetUserResponseDTO";
+import { RoleDTO } from "@/modules/users/application/dtos/role/RoleDTO";
+import { CompanyDTO } from "@/modules/users/application/dtos/CompanyBranchDTO/companyDTO";
+import { BranchDTO } from "@/modules/users/application/dtos/CompanyBranchDTO/branchDTO";
 export class MeUserUseCase {
   constructor(private readonly iuserRepository: IUserRepository) {}
 
@@ -9,10 +12,9 @@ export class MeUserUseCase {
     if (!user) {
       throw new UserNotExistError();
     }
-
-    const role = user.role_id as any;
-    const company = user.company_id as any;
-    const branch = user.branch_id as any;
+    const role = user.role_id as unknown as RoleDTO;
+    const company = user.company_id as unknown as CompanyDTO | null;
+    const branch = user.branch_id as unknown as BranchDTO | null;
     return {
       id: user.id,
       name: user.name,
