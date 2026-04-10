@@ -1,8 +1,8 @@
 import { User } from "@/modules/users/domain/entities/User";
-import { IUpdateUserDTO } from "@/modules/users/application/dtos/UpdateUserDTO";
-import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
-import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
-import { UpdateUserError } from "@/modules/users/domain/exceptions/UpdateUserError";
+import { IUpdateUserDTO } from "@/modules/users/application/dtos/user/UpdateUserDTO";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { UpdateUserError } from "@/modules/users/domain/exceptions/user/UpdateUserError";
 
 export class UpdateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}

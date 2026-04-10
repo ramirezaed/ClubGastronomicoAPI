@@ -1,6 +1,6 @@
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { Role } from "@/modules/users/domain/entities/Role";
-import RoleModel from "@/modules/users/infrastructure/persistence/RoleModel";
+import RoleModel from "@/modules/users/infrastructure/persistence/role/RoleModel";
 
 export class MongooseRoleRepository implements IRoleRepository {
   //toEntity m:etodo privado que convierte un documento de Mongoose a una entidad de dominio.

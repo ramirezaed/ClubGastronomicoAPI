@@ -1,6 +1,6 @@
-import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
-import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
-import { ResponseUserDTO } from "@/modules/users/application/dtos/ResponseUserDTO";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
+import { ResponseUserDTO } from "@/modules/users/application/dtos/user/ResponseUserDTO";
 
 export class ChangeStatusUserUseCase {
   constructor(private readonly IuserRepository: IUserRepository) {}

@@ -1,10 +1,10 @@
 // recibe el LoginRequest.ts , llama a UserRepository (la interface),
 //busca al usuario y compara la contraseña, genera el token
-import { ILoginDTO } from "@/modules/users/application/dtos/LoginDTO.ts";
-import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
-import { ILoginResponseDTO } from "@/modules/users/application/dtos/ILoginResponseDTO";
-import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/InvalidCreedentialError";
-import { InactiveUserError } from "@/modules/users/domain/exceptions/InactiveUser";
+import { ILoginDTO } from "@/modules/users/application/dtos/user/LoginDTO.ts";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
+import { ILoginResponseDTO } from "@/modules/users/application/dtos/user/ILoginResponseDTO";
+import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
+import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 

@@ -1,5 +1,5 @@
-import UserModel from "@infra/persistence/UserModel";
-import { IUserRepository } from "@domain/repositories/IUserRepository";
+import UserModel from "@/modules/users/infrastructure/persistence/user/UserModel";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { User } from "@domain/entities/User";
 
 export class MongooseUserRepository implements IUserRepository {
@@ -85,7 +85,12 @@ export class MongooseUserRepository implements IUserRepository {
   }
   async me(id: string): Promise<User | null> {
     //lean devuelve objetos JS simples, no documentos de mongoose, es mas rapido y liviano
-    const doc = await UserModel.findOne({ _id: id, delete_at: null }).populate("role_id", "name").lean();
+    const doc = await UserModel.findOne({ _id: id, delete_at: null })
+      .populate("role_id", "name")
+      //habiliar los populate companu y branch id cuando esten sus modelos
+      // .populate("company_id")
+      // .populate("branch_id")
+      .lean();
     if (!doc) return null;
     return this.toEntity(doc);
   }

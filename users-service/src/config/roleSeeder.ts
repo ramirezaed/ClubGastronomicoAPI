@@ -1,5 +1,5 @@
 //
-import RoleModel from "@/modules/users/infrastructure/persistence/RoleModel";
+import RoleModel from "@/modules/users/infrastructure/persistence/role/RoleModel";
 
 const roles = [
   {

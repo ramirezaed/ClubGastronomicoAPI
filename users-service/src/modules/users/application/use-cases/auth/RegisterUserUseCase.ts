@@ -1,10 +1,10 @@
 //caso de uso Registar Usuario
 
-import { IRegisterUserDTO } from "@application/dtos/RegisterUserDTO";
-import { IUserRepository } from "@domain/repositories/IUserRepository"; //importo los metodos para registrar el usuario
+import { IRegisterUserDTO } from "@/modules/users/application/dtos/user/RegisterUserDTO";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository"; //importo los metodos para registrar el usuario
 import { User } from "@domain/entities/User";
-import { RegisterUserError } from "@domain/exceptions/RegisterUserError"; //importo error perzonalizado
-import { DuplicateEmailError } from "@domain/exceptions/DuplicateEmailError"; //importo error perzonalizado
+import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError"; //importo error perzonalizado
+import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError"; //importo error perzonalizado
 
 export class RegisterUser {
   constructor(private readonly userRepository: IUserRepository) {}

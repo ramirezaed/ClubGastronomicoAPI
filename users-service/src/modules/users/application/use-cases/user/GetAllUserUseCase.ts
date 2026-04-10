@@ -1,5 +1,5 @@
-import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
-import { GetUserResponseDTO } from "@/modules/users/application/dtos/GetUserResponseDTO";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
+import { GetUserResponseDTO } from "@/modules/users/application/dtos/user/GetUserResponseDTO";
 import { ICompanyBranchService } from "@/modules/users/application/ports/ICompanyService";
 
 export class GetAllUsersUseCase {
@@ -19,14 +19,14 @@ export class GetAllUsersUseCase {
         ]);
         const role = user.role_id as any; // ya viene populado
         return {
+          company_id: user.company_id,
+          branch_id: user.branch_id,
           id: (user.id as any).toString(),
           name: user.name,
           lastname: user.lastname,
           email: user.email,
           is_active: user.is_active,
           role: role ? { id: role._id.toString(), name: role.name } : null,
-          company,
-          branch,
         } satisfies GetUserResponseDTO;
       }),
     );

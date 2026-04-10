@@ -1,18 +1,18 @@
 import { Router } from "express";
-import { MongooseUserRepository } from "@infra/persistence/MongooseUserRepository";
-import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUserUseCase";
-import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUseCase";
-import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
+import { MongooseUserRepository } from "@/modules/users/infrastructure/persistence/user/MongooseUserRepository";
+import { RegisterUser } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
+import { LoginUseCase } from "@/modules/users/application/use-cases/auth/LoginUserUseCase";
+import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/auth/RefreshTokenUseCase";
 import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
-import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
-import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateUserUseCase";
-import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
+import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
+import { UpdateUserUseCase } from "@/modules/users/application/use-cases/user/UpdateUserUseCase";
+import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/user/GetAllUserUseCase";
 import { HttpCompanyBranchService } from "@/modules/users/infrastructure/services/HttpCompanyBranchService";
-import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
-import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
-import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/UpdateRoleUserUseCase";
-import { MongooseRoleRepository } from "@/modules/users/infrastructure/persistence/MongooseRoleRepository";
-import { DeleteUserUseCase } from "@/modules/users/application/use-cases/DeleteUserUseCase";
+import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/user/ChangeStatusUserUseCase";
+import { MeUserUseCase } from "@/modules/users/application/use-cases/user/MeUserUseCase";
+import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
+import { MongooseRoleRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleRepository";
+import { DeleteUserUseCase } from "@/modules/users/application/use-cases/user/DeleteUserUseCase";
 
 const router = Router();
 //inyeccion de dependencias
@@ -27,7 +27,6 @@ const registerUserUseCase = new RegisterUser(userRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const companyBranchService = new HttpCompanyBranchService();
 const getAllUserUseCase = new GetAllUsersUseCase(userRepository, companyBranchService);
-const meUseCase = new MeUserUseCase(userRepository, companyBranchService);
 const changeStatusUseCase = new ChangeStatusUserUseCase(userRepository);
 const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
@@ -42,10 +41,8 @@ const authController = new AuthController(
   loginUseCase,
   refreshToken,
   validateToken,
-  updateUserUseCase,
   getAllUserUseCase,
   changeStatusUseCase,
-  meUseCase,
   updateRoleUserUseCase,
   deleteUserUseCase,
 );
@@ -409,6 +406,7 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
+
 /**
  * @swagger
  * /api/auth/me/{id}:
@@ -579,16 +577,15 @@ router.post("/login", (req, res) => authController.login(req, res));
 router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res));
 //valida token de microservicios externos
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
+//
+//
 //crea cuenta de usuario con role owner y is_active=false
 router.post("/register", (req, res) => authController.register(req, res));
-//modifica datos de usuario, nombre apellido
-router.patch("/update/:id", (req, res) => authController.update(req, res));
+
 //lista de usuarios, con filtro por estado, true o false
 router.get("/users", (req, res) => authController.getAll(req, res));
 //activar o desactivar una cuenta de usuario
 router.patch("/changeStatus/:id", (req, res) => authController.changeStatus(req, res));
-//perfil de usuario
-router.get("/me/:id", (req, res) => authController.me(req, res));
 //cambia rol de usuario
 router.patch("/role/:id", (req, res) => authController.updateRole(req, res));
 // elimina usuario

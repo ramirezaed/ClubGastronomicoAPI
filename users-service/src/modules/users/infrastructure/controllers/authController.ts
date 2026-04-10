@@ -1,26 +1,22 @@
 import { Request, Response } from "express";
-import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUserUseCase";
-import { IRegisterUserDTO } from "@application/dtos/RegisterUserDTO";
-import { RegisterUserError } from "@domain/exceptions/RegisterUserError";
-import { DuplicateEmailError } from "@domain/exceptions/DuplicateEmailError";
-import { ILoginDTO } from "@/modules/users/application/dtos/LoginDTO.ts";
-import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUseCase";
-import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
-import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/InvalidCreedentialError";
-import { InactiveUserError } from "@/modules/users/domain/exceptions/InactiveUser";
-import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
-import { InvalidtokenError } from "@/modules/users/domain/exceptions/invalidToken";
-import { UpdateUserUseCase } from "@/modules/users/application/use-cases/UpdateUserUseCase";
-import { IUpdateUserDTO } from "@/modules/users/application/dtos/UpdateUserDTO";
-import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
-import { UpdateUserError } from "@/modules/users/domain/exceptions/UpdateUserError";
-import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/GetAllUserUseCase";
-import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/ChangeStatusUserUseCase";
-import { MeUserUseCase } from "@/modules/users/application/use-cases/MeUserUseCase";
-import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/UpdateRoleUserUseCase";
-import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/UpdateRoleUserError";
+import { RegisterUser } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
+import { IRegisterUserDTO } from "@/modules/users/application/dtos/user/RegisterUserDTO";
+import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
+import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError";
+import { ILoginDTO } from "@/modules/users/application/dtos/user/LoginDTO.ts";
+import { LoginUseCase } from "@/modules/users/application/use-cases/auth/LoginUserUseCase";
+import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/auth/RefreshTokenUseCase";
+import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
+import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
+import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
+import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { GetAllUsersUseCase } from "@/modules/users/application/use-cases/user/GetAllUserUseCase";
+import { ChangeStatusUserUseCase } from "@/modules/users/application/use-cases/user/ChangeStatusUserUseCase";
+import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
+import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/UpdateRoleUserError";
 import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
-import { DeleteUserUseCase } from "@/modules/users/application/use-cases/DeleteUserUseCase";
+import { DeleteUserUseCase } from "@/modules/users/application/use-cases/user/DeleteUserUseCase";
 
 export class AuthController {
   constructor(
@@ -28,10 +24,8 @@ export class AuthController {
     private readonly loginUser: LoginUseCase,
     private readonly refreshToken: RefreshTokenUseCase,
     private readonly validateToken: ValidateTokenUseCase,
-    private readonly updateUser: UpdateUserUseCase,
     private readonly getAllUser: GetAllUsersUseCase,
     private readonly changeStatusUser: ChangeStatusUserUseCase,
-    private readonly meUser: MeUserUseCase,
     private readonly updateRoleUser: UpdateRoleUserUseCase,
     private readonly deleteUser: DeleteUserUseCase,
   ) {}
@@ -132,34 +126,7 @@ export class AuthController {
       return;
     }
   }
-  async update(req: Request, res: Response): Promise<void> {
-    const id = req.params.id as string;
-    const { name, lastname } = req.body as IUpdateUserDTO;
-    if (!name || !lastname) {
-      res.status(400).json({ message: "Todos los datos son necesarios" });
-      return;
-    }
 
-    try {
-      const userActualizado = await this.updateUser.execute(id, {
-        name,
-        lastname,
-      });
-      res.status(200).json({ message: " usuario actualizado", userActualizado });
-      return;
-    } catch (error) {
-      if (error instanceof UserNotExistError) {
-        res.status(404).json({ message: error.message });
-        return;
-      }
-      if (error instanceof UpdateUserError) {
-        res.status(500).json({ message: "Error interno del servidor" });
-        return;
-      }
-      res.status(500).json({ message: "Error interno del servidor" });
-      return;
-    }
-  }
   async getAll(req: Request, res: Response): Promise<void> {
     try {
       let is_active: boolean | undefined;
@@ -190,21 +157,7 @@ export class AuthController {
       return;
     }
   }
-  async me(req: Request, res: Response): Promise<void> {
-    const id = req.params.id as string;
-    try {
-      const me = await this.meUser.execute(id);
-      res.status(200).json(me);
-      return;
-    } catch (error) {
-      if (error instanceof UserNotExistError) {
-        res.status(404).json({ message: error.message });
-        return;
-      }
-      res.status(500).json({ message: "Error interno del servidor" });
-      return;
-    }
-  }
+
   async updateRole(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     const { role_id } = req.body;

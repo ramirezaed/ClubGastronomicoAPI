@@ -1,5 +1,5 @@
-import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
-import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 
 export class DeleteUserUseCase {
   constructor(private readonly IusurRepository: IUserRepository) {}

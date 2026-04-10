@@ -1,15 +1,12 @@
 import jwt from "jsonwebtoken";
-import { IJwtPayloadDTO } from "@/modules/users/application/dtos/IJwtPayloadDTO";
-import { InvalidtokenError } from "@/modules/users/domain/exceptions/invalidToken";
+import { IJwtPayloadDTO } from "@/modules/users/application/dtos/user/IJwtPayloadDTO";
+import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
 
 export class ValidateTokenUseCase {
   async execute(token: string): Promise<IJwtPayloadDTO> {
     try {
       // verifica el token y expiracion del JWT usando la clave secreta
-      const payload = jwt.verify(
-        token,
-        process.env.JWT_SECRET!,
-      ) as IJwtPayloadDTO;
+      const payload = jwt.verify(token, process.env.JWT_SECRET!) as IJwtPayloadDTO;
       //si es correcto devuelve la info del usuario del token
       return payload;
     } catch {

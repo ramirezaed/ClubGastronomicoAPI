@@ -1,9 +1,9 @@
 import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
-import { UserNotExistError } from "@/modules/users/domain/exceptions/UserNotExistsError";
-import { IUserRepository } from "@/modules/users/domain/repositories/IUserRepository";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
-import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/UpdateRoleUserError";
-import { ResponseUserDTO } from "@/modules/users/application/dtos/ResponseUserDTO";
+import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/UpdateRoleUserError";
+import { ResponseUserDTO } from "@/modules/users/application/dtos/user/ResponseUserDTO";
 
 export class UpdateRoleUserUseCase {
   constructor(
