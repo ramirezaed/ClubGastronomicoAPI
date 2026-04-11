@@ -10,10 +10,6 @@ import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/
 import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
 import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
-import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
-import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
-import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/UpdateRoleUserError";
-import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 
 export class AuthController {
   constructor(

@@ -5,7 +5,6 @@ import { Document, Types } from "mongoose";
 import { User } from "@domain/entities/User";
 
 // export interface IUserDocument extends User, Document {}
-
 export interface IUserDocument extends Omit<User, "id" | "role_id" | "company_id" | "branch_id">, Document {
   role_id: Types.ObjectId;
   company_id: Types.ObjectId | null;

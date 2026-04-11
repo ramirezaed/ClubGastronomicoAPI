@@ -11,18 +11,18 @@ export class UpdateRoleUserUseCase {
     private readonly IroleRepository: IRoleRepository,
   ) {}
   async execute(id: string, role_id: string): Promise<ResponseUserDTO> {
-    const verif = await this.IuserRepository.findById(id);
-    if (!verif) {
+    const user = await this.IuserRepository.findById(id);
+    if (!user) {
       throw new UserNotExistError();
     }
-    const verifRole = await this.IroleRepository.findById(role_id);
-    if (!verifRole) {
+    const role = await this.IroleRepository.findById(role_id);
+    if (!role) {
       throw new RoleNotExistsError();
     }
-    const user = await this.IuserRepository.updateRole(id, role_id);
-    if (!user) {
+    const newUser = await this.IuserRepository.updateRole(id, role_id);
+    if (!newUser) {
       throw new UpdateRoleUserError();
     }
-    return user;
+    return newUser;
   }
 }

@@ -8,26 +8,26 @@ export class UpdateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
   async execute(id: string, dto: IUpdateUserDTO): Promise<User> {
-    const existe = await this.userRepository.findById(id);
-    if (!existe) {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
       throw new UserNotExistError();
     }
     const UserActualizado = new User(
-      existe.id,
-      existe.company_id,
-      existe.branch_id,
-      dto.name ?? existe.name,
-      dto.lastname ?? existe.lastname,
-      existe.email,
-      existe.password,
-      existe.role_id,
-      existe.is_active,
-      existe.deleted_at,
+      user.id,
+      user.company_id,
+      user.branch_id,
+      dto.name ?? user.name,
+      dto.lastname ?? user.lastname,
+      user.email,
+      user.password,
+      user.role_id,
+      user.is_active,
+      user.deleted_at,
     );
-    const guardar = await this.userRepository.update(UserActualizado);
-    if (!guardar) {
+    const save = await this.userRepository.update(UserActualizado);
+    if (!save) {
       throw new UpdateUserError();
     }
-    return guardar;
+    return save;
   }
 }

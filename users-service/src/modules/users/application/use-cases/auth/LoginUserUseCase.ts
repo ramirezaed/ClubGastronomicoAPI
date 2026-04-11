@@ -28,7 +28,6 @@ export class LoginUseCase {
     }
 
     //Payload separado y reutilizado en ambos tokens
-    // const payload: IJwtPayloadDTO = {
     const payload = {
       id: user.id,
       company: user.company_id,

@@ -1,6 +1,4 @@
 export interface GetUserResponseDTO {
-  company_id?: string | null;
-  branch_id?: string | null;
   id: string;
   name: string;
   lastname: string;

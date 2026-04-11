@@ -10,24 +10,17 @@ export class RegisterRole {
   constructor(private readonly roleRepository: IRoleRepository) {}
 
   async execute(dto: IRegisterRoleDTO): Promise<Role> {
-    const existe = await this.roleRepository.findByName(dto.name);
-    if (existe) {
+    const role = await this.roleRepository.findByName(dto.name);
+    if (role) {
       throw new DuplicateNameError(dto.name);
     }
     //crea la entidad del dominio role
-    const rol = new Role(
-      "",
-      dto.name,
-      dto.permissions,
-      dto.description,
-      dto.is_active,
-      null,
-    );
+    const newRole = new Role("", dto.name, dto.permissions, dto.description, dto.is_active, null);
     //se guarda el rol mediante el repositorio
-    const guardar = await this.roleRepository.save(rol);
-    if (!guardar) {
+    const save = await this.roleRepository.save(newRole);
+    if (!save) {
       throw new RegisterRoleError();
     }
-    return guardar;
+    return save;
   }
 }

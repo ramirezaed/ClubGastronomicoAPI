@@ -6,12 +6,12 @@ import { UserAlreadyActiveError } from "@/modules/users/domain/exceptions/user/U
 export class ActivateUserUseCase {
   constructor(private readonly iuserRepository: IUserRepository) {}
   async execute(id: string): Promise<ResponseUserDTO | null> {
-    const verif = await this.iuserRepository.findById(id);
-    if (!verif) {
+    const user = await this.iuserRepository.findById(id);
+    if (!user) {
       throw new UserNotExistError();
     }
     //si es true
-    if (verif.is_active) {
+    if (user.is_active) {
       throw new UserAlreadyActiveError();
     }
     return await this.iuserRepository.activate(id);

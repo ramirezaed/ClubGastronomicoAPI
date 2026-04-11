@@ -1,9 +1,5 @@
 export interface ResponseUserDTO {
-  id?: string;
-  company_id?: string | null;
-  branch_id?: string | null;
-  // company?: { id: string; name: string } | null; // Objeto con info del microservicio
-  // branch?: { id: string; name: string } | null;
+  id: string;
   name: string;
   lastname: string;
   email: string;

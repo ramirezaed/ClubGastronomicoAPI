@@ -40,6 +40,7 @@ export class UserController {
       return;
     }
   }
+
   async update(req: Request, res: Response): Promise<void> {
     const id = req.userId as string;
     const { name, lastname } = req.body as IUpdateUserDTO;
