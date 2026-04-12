@@ -17,6 +17,7 @@ export class MongooseUserRepository implements IUserRepository {
       doc.deleted_at,
     );
   }
+
   async findByEmail(email: string): Promise<User | null> {
     const doc = await UserModel.findOne({ email });
     if (!doc) return null;
@@ -27,22 +28,7 @@ export class MongooseUserRepository implements IUserRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  async findAll(filter?: { is_active?: boolean }): Promise<User[]> {
-    //unknown: de cualquier tipo, pero no puede ser usado sin comprobarlo antes
-    const query: Record<string, unknown> = { deleted_at: null };
-    if (filter?.is_active !== undefined) {
-      query.is_active = filter.is_active;
-    }
-    //lean devuelve objetos JS simples, no documentos de mongoose, es mas rapido y liviano
-    const doc = await UserModel.find(query)
-      .populate("role_id", "name")
-      //habiliar los populate companu y branch id cuando esten sus modelos
-      // .populate("company_id")
-      // .populate("branch_id")
-      .lean();
-    return doc.map((doc) => this.toEntity(doc));
-  }
-  async save(user: User): Promise<User> {
+  async save(user: User): Promise<User | null> {
     const doc = new UserModel({
       company_id: user.company_id,
       branch_id: user.branch_id,
@@ -55,74 +41,28 @@ export class MongooseUserRepository implements IUserRepository {
       deleted_at: user.deleted_at,
     });
 
+    if (!doc) return null;
     const saved = await doc.save();
-
     return this.toEntity(saved); //
   }
-  async update(user: User): Promise<User> {
-    const doc = await UserModel.findByIdAndUpdate(
+  async update(user: User): Promise<User | null> {
+    const doc = await UserModel.findOneAndUpdate(
       {
         _id: user.id,
         delete_at: null,
-        is_Active: user.is_active,
       },
       {
         $set: {
-          name: user.name,
-          lastname: user.lastname,
+          name: user.name, // para el update
+          lastname: user.lastname, // para el update
+          is_active: user.is_active, // para activate/deactivate
+          role_id: user.role_id, //para cambiar el rol
+          deleted_at: user.deleted_at, // para la eliminacion logica
         },
       },
-      { returnDocument: "after" }, // Esta es la nueva forma
-    ).select("-password"); // para que no envie el password
-    return this.toEntity(doc);
-  }
-  async activate(id: string): Promise<User | null> {
-    const doc = await UserModel.findOneAndUpdate(
-      {
-        _id: id,
-        deleted_at: null,
-      },
-      {
-        $set: { is_active: true },
-      },
-      { returnDocument: "after" }, // Esta es la nueva forma
-    );
-
-    return this.toEntity(doc);
-  }
-  async deactivate(id: string): Promise<User | null> {
-    const doc = await UserModel.findOneAndUpdate(
-      {
-        _id: id,
-        deleted_at: null,
-      },
-      {
-        $set: { is_active: false },
-      },
-      { returnDocument: "after" }, // Esta es la nueva forma
-    );
-
-    return this.toEntity(doc);
-  }
-  async me(id: string): Promise<User | null> {
-    //lean devuelve objetos JS simples, no documentos de mongoose, es mas rapido y liviano
-    const doc = await UserModel.findOne({ _id: id, delete_at: null })
-      .populate("role_id", "name")
-      //habiliar los populate companu y branch id cuando esten sus modelos
-      // .populate("company_id")
-      // .populate("branch_id")
-      .lean();
+      { returnDocument: "after" }, //antes era {new:true}
+    ).select("-password");
     if (!doc) return null;
-    return this.toEntity(doc);
-  }
-  async updateRole(id_user: string, id_role: string): Promise<User | null> {
-    const doc = await UserModel.findOneAndUpdate(
-      { _id: id_user, delete_at: null }, //el filtro
-      { $set: { role_id: id_role } }, //el dato que se va a cambiar
-      { returnDocument: "after" }, // Esta es la nueva forma
-    )
-      .populate("role_id", "name")
-      .select("-password"); // para que no envie el password;
     return this.toEntity(doc);
   }
   async delete(id: string): Promise<void> {

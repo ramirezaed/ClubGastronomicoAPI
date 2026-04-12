@@ -4,11 +4,10 @@ export interface GetUserResponseDTO {
   lastname: string;
   email: string;
   is_active: boolean;
-
   role: {
     id: string;
     name: string;
-  } | null;
+  };
   company: {
     id: string;
     name: string;

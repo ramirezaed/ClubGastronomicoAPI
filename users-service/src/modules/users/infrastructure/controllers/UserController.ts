@@ -80,6 +80,7 @@ export class UserController {
       res.status(200).json({ message: "Lista de Usuarios", users });
       return;
     } catch (error) {
+      console.log("error en getuser", error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
@@ -99,6 +100,7 @@ export class UserController {
       return;
     }
   }
+
   async activate(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {

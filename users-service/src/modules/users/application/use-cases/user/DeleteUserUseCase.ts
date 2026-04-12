@@ -9,7 +9,8 @@ export class DeleteUserUseCase {
     if (!user) {
       throw new UserNotExistError();
     }
-    await this.IusurRepository.delete(id);
+    user.delete(); // elimina el usuario, o lanza error si ya esta eliminado
+    await this.IusurRepository.update(user);
     return;
   }
 }

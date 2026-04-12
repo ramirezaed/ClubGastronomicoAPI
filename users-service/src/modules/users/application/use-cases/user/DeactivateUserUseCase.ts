@@ -1,20 +1,21 @@
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
-
-import { ResponseUserDTO } from "@/modules/users/application/dtos/user/ResponseUserDTO";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
-import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
+import { ActivateResponseUserDTO } from "@/modules/users/application/dtos/user/ActivateResponseUserDTO";
+
 export class DeactivateUserUseCase {
   constructor(private readonly iuserREpository: IUserRepository) {}
 
-  async execute(id: string): Promise<ResponseUserDTO | null> {
+  async execute(id: string): Promise<ActivateResponseUserDTO> {
     const user = await this.iuserREpository.findById(id);
     if (!user) {
       throw new UserNotExistError();
     }
-    //si no es true
-    if (!user.is_active) {
-      throw new UserAlreadyDeactiveError();
-    }
-    return await this.iuserREpository.deactivate(id);
+    user.deactivate(); // desactiva el usuario o lanza UserAlreadyDeactiveError
+    await this.iuserREpository.update(user);
+    return {
+      //mappeo que coincide con ActivateuserResponse
+      id: user.id,
+      is_active: user.is_active,
+    };
   }
 }

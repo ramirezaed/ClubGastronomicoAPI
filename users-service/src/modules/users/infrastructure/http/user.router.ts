@@ -10,15 +10,17 @@ import { DeleteUserUseCase } from "@/modules/users/application/use-cases/user/De
 import { ActivateUserUseCase } from "@/modules/users/application/use-cases/user/ActivateUserUseCase";
 import { DeactivateUserUseCase } from "@/modules/users/application/use-cases/user/DeactivateUserUseCase";
 import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
+import { MongooseUserQueryRepository } from "@/modules/users/infrastructure/persistence/user/MongooseUserQueryRepository";
 
 const UserRouter = Router();
 
 const userRepository = new MongooseUserRepository();
+const userQueryRepository = new MongooseUserQueryRepository();
 const roleRepository = new MongooseRoleRepository();
 
-const meUserUseCase = new MeUserUseCase(userRepository);
+const meUserUseCase = new MeUserUseCase(userQueryRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
-const getAllUserUseCase = new GetAllUsersUseCase(userRepository);
+const getAllUserUseCase = new GetAllUsersUseCase(userQueryRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 const activateUserUseCase = new ActivateUserUseCase(userRepository);
 const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
