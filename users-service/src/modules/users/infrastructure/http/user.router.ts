@@ -92,12 +92,11 @@ const userController = new UserController(
  *               type: string
  *               example: "Sucursal Centro"
  */
-
 /**
  * @swagger
  * /api/user/:
  *   get:
- *     summary: Obtener todos los usuarios
+ *     summary: Obtener todos los usuarios (paginado)
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -108,9 +107,23 @@ const userController = new UserController(
  *         schema:
  *           type: boolean
  *         description: "Sin el parámetro devuelve todos. true: activos. false: inactivos."
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Número de página (por defecto 1)
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: Cantidad de registros por página (por defecto 10)
  *     responses:
  *       200:
- *         description: Lista de usuarios
+ *         description: Lista de usuarios paginada
  *         content:
  *           application/json:
  *             schema:
@@ -120,9 +133,24 @@ const userController = new UserController(
  *                   type: string
  *                   example: "Lista de Usuarios"
  *                 users:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/UserResponse'
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/UserResponse'
+ *                     total:
+ *                       type: integer
+ *                       example: 25
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 10
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 3
  *       500:
  *         description: Error interno del servidor
  */
