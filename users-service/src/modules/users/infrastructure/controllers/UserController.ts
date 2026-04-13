@@ -76,8 +76,12 @@ export class UserController {
       let is_active: boolean | undefined;
       if (req.query.is_active === "true") is_active = true;
       else if (req.query.is_active === "false") is_active = false;
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
       //      si no viene el param, queda undefined → trae todos
-      const users = await this.getAllUser.execute({ is_active });
+      const users = await this.getAllUser.execute({ is_active }, { page, limit });
 
       res.status(200).json({ message: "Lista de Usuarios", users });
       return;
@@ -87,6 +91,7 @@ export class UserController {
       return;
     }
   }
+
   async softDelete(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
