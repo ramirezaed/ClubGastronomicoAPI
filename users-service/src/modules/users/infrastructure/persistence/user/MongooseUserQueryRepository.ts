@@ -46,6 +46,7 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
   async findById(id: string): Promise<GetUserResponseDTO | null> {
     const doc = await UserModel.findOne({ _id: id, deleted_at: null })
       .populate("role_id", "name")
+      //habilitar cuando este el modelo de branch y company
       // .populate("company_id", "name")
       // .populate("branch_id", "name")
       .lean();

@@ -11,6 +11,7 @@ import { ActivateUserUseCase } from "@/modules/users/application/use-cases/user/
 import { DeactivateUserUseCase } from "@/modules/users/application/use-cases/user/DeactivateUserUseCase";
 import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
 import { MongooseUserQueryRepository } from "@/modules/users/infrastructure/persistence/user/MongooseUserQueryRepository";
+import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
 
 const UserRouter = Router();
 
@@ -25,6 +26,7 @@ const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 const activateUserUseCase = new ActivateUserUseCase(userRepository);
 const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
 const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
+const findByIdUserUseCase = new findByIdUseCase(userQueryRepository);
 
 const userController = new UserController(
   meUserUseCase,
@@ -34,6 +36,7 @@ const userController = new UserController(
   activateUserUseCase,
   deactivateUserUseCase,
   updateRoleUserUseCase,
+  findByIdUserUseCase,
 );
 
 /**
@@ -148,6 +151,46 @@ UserRouter.get("/", (req, res) => userController.getAll(req, res));
  *         description: Error interno del servidor
  */
 UserRouter.get("/me", authMiddleware, (req, res) => userController.me(req, res));
+
+/**
+ * @swagger
+ * /api/user/{id}:
+ *   get:
+ *     summary: Obtener usuario por ID (solo admin)
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del usuario a buscar
+ *     responses:
+ *       200:
+ *         description: Usuario encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Usuario no existe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User not exist
+ *       500:
+ *         description: Error interno del servidor
+ */
+UserRouter.get("/:id", (req, res) => userController.findbyId(req, res));
 
 /**
  * @swagger

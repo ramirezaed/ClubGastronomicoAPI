@@ -13,6 +13,7 @@ import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user
 import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
 import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/UpdateRoleUserError";
 import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
+import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
 export class UserController {
   constructor(
     private readonly meUser: MeUserUseCase,
@@ -22,6 +23,7 @@ export class UserController {
     private readonly activateUser: ActivateUserUseCase,
     private readonly deactivateUser: DeactivateUserUseCase,
     private readonly updateRoleUser: UpdateRoleUserUseCase,
+    private readonly findByIdUser: findByIdUseCase,
   ) {}
 
   async me(req: Request, res: Response): Promise<void> {
@@ -164,6 +166,21 @@ export class UserController {
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
+    }
+  }
+  async findbyId(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    try {
+      const user = await this.findByIdUser.execute(id);
+      res.status(200).json({ user });
+      return;
+    } catch (error) {
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
       return;
     }
   }
