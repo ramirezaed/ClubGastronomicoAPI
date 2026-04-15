@@ -60,3 +60,4 @@ export class User {
     this.role_id = idRole;
   }
 }
+ 

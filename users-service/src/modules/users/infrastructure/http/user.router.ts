@@ -21,7 +21,7 @@ const roleRepository = new MongooseRoleRepository();
 
 const meUserUseCase = new MeUserUseCase(userQueryRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
-const getAllUserUseCase = new GetAllUsersUseCase(userQueryRepository);
+const getAllUserUseCase = new GetAllUsersUseCase(userQueryRepository, roleRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 const activateUserUseCase = new ActivateUserUseCase(userRepository);
 const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
@@ -92,14 +92,22 @@ const userController = new UserController(
  *               type: string
  *               example: "Sucursal Centro"
  */
+
 /**
  * @swagger
  * /api/user/:
  *   get:
- *     summary: Obtener todos los usuarios (paginado)
+ *     summary: Obtener usuarios (paginado según rol)
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
+ *     description: |
+ *       Este endpoint devuelve usuarios según el rol del usuario autenticado:
+ *
+ *       - **SuperAdmin:** puede ver TODOS los usuarios del sistema.
+ *       - **Owner:** solo puede ver los usuarios que pertenecen a su **company**.
+ *       - Cualquier otro rol no está autorizado.
+ *
  *     parameters:
  *       - in: query
  *         name: is_active
@@ -151,11 +159,13 @@ const userController = new UserController(
  *                     totalPages:
  *                       type: integer
  *                       example: 3
+ *       401:
+ *         description: No autorizado (rol sin permisos para acceder al recurso)
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.get("/", (req, res) => userController.getAll(req, res));
 
+UserRouter.get("/", authMiddleware, (req, res) => userController.getAll(req, res));
 /**
  * @swagger
  * /api/user/me:

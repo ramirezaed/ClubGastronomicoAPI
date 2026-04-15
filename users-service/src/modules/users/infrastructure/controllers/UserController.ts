@@ -14,6 +14,7 @@ import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/use
 import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/UpdateRoleUserError";
 import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
+import { UnauthorizedUserError } from "@/modules/users/domain/exceptions/user/UnauthorizedUserError";
 export class UserController {
   constructor(
     private readonly meUser: MeUserUseCase,
@@ -27,7 +28,7 @@ export class UserController {
   ) {}
 
   async me(req: Request, res: Response): Promise<void> {
-    const id = req.userId as string;
+    const id = req.user.id as string;
     try {
       const me = await this.meUser.execute(id);
       res.status(200).json(me);
@@ -44,7 +45,7 @@ export class UserController {
   }
 
   async update(req: Request, res: Response): Promise<void> {
-    const id = req.userId as string;
+    const id = req.user.id as string;
     const { name, lastname } = req.body as IUpdateUserDTO;
     if (!name || !lastname) {
       res.status(400).json({ message: "Todos los datos son necesarios" });
@@ -77,16 +78,21 @@ export class UserController {
       if (req.query.is_active === "true") is_active = true;
       else if (req.query.is_active === "false") is_active = false;
 
+      const roleName = req.query.role as string | undefined;
+      //paginacion
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      //      si no viene el param, queda undefined → trae todos
-      const users = await this.getAllUser.execute({ is_active }, { page, limit });
-
+      // si no viene el param, queda undefined → trae todos
+      const users = await this.getAllUser.execute(req.user, { is_active, roleName }, { page, limit });
       res.status(200).json({ message: "Lista de Usuarios", users });
       return;
     } catch (error) {
       console.log("error en getuser", error);
+      if (error instanceof UnauthorizedUserError) {
+        res.status(401).json({ message: error.message });
+        return;
+      }
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }

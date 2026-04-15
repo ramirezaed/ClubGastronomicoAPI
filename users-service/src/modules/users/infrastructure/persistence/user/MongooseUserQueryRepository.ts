@@ -2,6 +2,7 @@ import UserModel from "../user/UserModel";
 import { IUserQueryRepository } from "@/modules/users/domain/repositories/user/IUserqueryRepository";
 import { GetUserResponseDTO } from "@/modules/users/application/dtos/user/GetUserResponseDTO";
 import { IPaginationDTO, IPaginatedResponseDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
+import { CurrentUserDto } from "@/modules/users/application/dtos/user/CurrentUserDTO";
 
 export class MongooseUserQueryRepository implements IUserQueryRepository {
   private toDTO(doc: any): GetUserResponseDTO {
@@ -31,29 +32,37 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
   }
 
   async findAll(
-    filter?: { is_active?: boolean },
+    filter?: { is_active?: boolean; roleName?: string },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<GetUserResponseDTO>> {
     const query: Record<string, unknown> = { deleted_at: null };
+
     if (filter?.is_active !== undefined) {
       query.is_active = filter.is_active;
     }
-    const page = pagination?.page ?? 1; //por defecto empieza a mostrar desde la pag 1
-    const limit = pagination?.limit ?? 10; //cant de doc que se muestran por pag
+
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
     const skip = (page - 1) * limit;
 
-    const [docs, total] = await Promise.all([
-      UserModel.find(query)
-        .populate("role_id", "name")
-        //  .populate("company_id", "name") //  <- descomentar cuando exista el modelo
-        //  .populate("branch_id", "name") //  <- descomentar cuando exista el modelo
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      UserModel.countDocuments(query),
-    ]);
+    const docs = await UserModel.find(query)
+      .populate({
+        path: "role_id",
+        select: "name",
+        match: filter?.roleName ? { name: filter.roleName } : {},
+      })
+      // .populate("company_id", "name") //habilitar cunado esten los modelo de branch y company
+      // .populate("branch_id", "name")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    //elimina los que no matcheron en el populate, si no hay match populate devuelve rol null
+    const filteredDocs = filter?.roleName ? docs.filter((doc: any) => doc.role_id !== null) : docs;
+
+    const total = filteredDocs.length;
+
     return {
-      data: docs.map(this.toDTO),
+      data: filteredDocs.map(this.toDTO),
       total,
       page,
       limit,
@@ -61,6 +70,56 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     };
   }
 
+  async findUsersByComapny(
+    user: CurrentUserDto,
+    filter?: { is_active?: boolean; roleName?: string },
+    pagination?: IPaginationDTO,
+  ): Promise<IPaginatedResponseDTO<GetUserResponseDTO>> {
+    const query: Record<string, unknown> = { deleted_at: null };
+
+    if (filter?.is_active !== undefined) {
+      query.is_active = filter.is_active;
+    }
+
+    const companyFilter = [
+      user.company && { company_id: user.company },
+      user.branch && { branch_id: user.branch },
+    ].filter(Boolean);
+
+    if (!companyFilter.length) {
+      return { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+    }
+
+    query.$or = companyFilter;
+
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const skip = (page - 1) * limit;
+
+    const docs = await UserModel.find(query)
+      .populate({
+        path: "role_id",
+        select: "name",
+        match: filter?.roleName ? { name: filter.roleName } : {},
+      })
+      .populate("company_id", "name")
+      .populate("branch_id", "name")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    //elimina los que no matcheron en el populate, si no hay match populate devuelve rol null
+    const filteredDocs = filter?.roleName ? docs.filter((doc: any) => doc.role_id !== null) : docs;
+
+    const total = filteredDocs.length;
+
+    return {
+      data: filteredDocs.map(this.toDTO),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
   async findById(id: string): Promise<GetUserResponseDTO | null> {
     const doc = await UserModel.findOne({ _id: id, deleted_at: null })
       .populate("role_id", "name")
