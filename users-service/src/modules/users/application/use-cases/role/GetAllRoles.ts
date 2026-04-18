@@ -7,7 +7,7 @@ export class GetAllRoles {
 
   async execute(): Promise<Role[]> {
     const roles = await this.roleRepository.findAll();
-    if (roles.length === 0) {
+    if (!roles) {
       throw new RolesNotFoundError();
     }
     return roles;

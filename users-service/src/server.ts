@@ -1,13 +1,14 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import swaggerUi from "swagger-ui-express";
 import { config } from "dotenv";
 import { connectDB } from "@/config/db";
-import router from "@/modules/users/infrastructure/http/auth.router";
 import { swaggerSpec } from "@/config/swagger";
-import swaggerUi from "swagger-ui-express";
 import { seedRoles } from "@/config/roleSeeder";
+import router from "@/modules/users/infrastructure/http/auth.router";
 import RoleRouter from "@/modules/users/infrastructure/http/role.router";
+import UserRouter from "@/modules/users/infrastructure/http/user.router";
 
 config();
 
@@ -24,8 +25,9 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api/auth", router);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); //las rutas para swagger
+app.use("/api/auth", router);
+app.use("/api/user", UserRouter);
 app.use("/api/roles", RoleRouter);
 
 const startServer = async () => {

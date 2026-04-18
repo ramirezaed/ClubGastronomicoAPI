@@ -25,8 +25,7 @@ export class RoleController {
   async register(req: Request, res: Response) {
     //en lugar de hacer const data = req.body as IRegisterRoleDTO;
     //se tipa como el RoleDTO para asugurar la forma esperada
-    const { name, permissions, description, is_active } =
-      req.body as IRegisterRoleDTO;
+    const { name, permissions, description, is_active } = req.body as IRegisterRoleDTO;
     if (!name || !permissions || !description) {
       res.status(400).json({ message: "Todos los datos son necesarios" });
       return;
@@ -44,6 +43,7 @@ export class RoleController {
         description,
         is_active,
       });
+
       res.status(201).json({ message: "nuevo rol registrado", rol });
     } catch (error) {
       if (error instanceof DuplicateNameError) {
@@ -58,7 +58,10 @@ export class RoleController {
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
     const { permissions, description, is_active } = req.body as IUpdateRoleDTO;
-
+    if (!permissions || !description) {
+      res.status(400).json({ message: "Todos los datos son necesarios" });
+      return;
+    }
     try {
       const rolActualizado = await this.updateRole.execute(id, {
         permissions,
@@ -74,6 +77,7 @@ export class RoleController {
       if (error instanceof UpdateRoleError) {
         res.status(500).json({ message: error.message });
       }
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   }
   async getRoleByID(req: Request, res: Response) {
@@ -100,16 +104,19 @@ export class RoleController {
     }
     return res.status(500).json({ message: "error interno del servidor" });
   }
-  async softDelete(req: Request, res: Response) {
+  async softDelete(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
       await this.deleteRole.execute(id);
-      return res.status(204).json({ meesage: "Rol eliminado" });
+      res.status(204).json({ meesage: "Rol eliminado" });
+      return;
     } catch (error) {
       if (error instanceof RoleNotExistsError) {
         res.status(404).json({ message: error.message });
+        return;
       }
       res.status(500).json({ message: "error interno del servidor" });
+      return;
     }
   }
 }

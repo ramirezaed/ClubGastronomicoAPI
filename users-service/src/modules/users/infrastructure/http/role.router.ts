@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { MongooseRoleRepository } from "@/modules/users/infrastructure/persistence/MongooseRoleRepository";
+import { MongooseRoleRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleRepository";
 import { RegisterRole } from "@/modules/users/application/use-cases/role/RegisterRole";
 import { RoleController } from "@/modules/users/infrastructure/controllers/RoleController";
 import { GetAllRoles } from "@/modules/users/application/use-cases/role/GetAllRoles";

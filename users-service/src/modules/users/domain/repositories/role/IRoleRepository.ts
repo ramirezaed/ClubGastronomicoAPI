@@ -12,5 +12,5 @@ export interface IRoleRepository {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Role | null>;
   findByName(name: string): Promise<Role | null>;
-  findAll(): Promise<Role[]>;
+  findAll(): Promise<Role[] | null>;
 }

@@ -5,11 +5,11 @@ import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleN
 export class GetRoleById {
   constructor(private readonly roleRepository: IRoleRepository) {}
   async execute(id: string): Promise<Role> {
-    const rol = await this.roleRepository.findById(id); //busca el rol por id
-    if (!rol) {
+    const role = await this.roleRepository.findById(id); //busca el rol por id
+    if (!role) {
       // si no existe el id, lanza el error
-      throw new RoleNotExistsError(id); //error personalizado
+      throw new RoleNotExistsError(); //error personalizado
     }
-    return rol;
+    return role;
   }
 }

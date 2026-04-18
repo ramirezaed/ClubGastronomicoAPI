@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
-
-import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUserUseCase";
-import { IRegisterUserDTO } from "@application/dtos/RegisterUserDTO";
-import { RegisterUserError } from "@domain/exceptions/RegisterUserError";
-import { DuplicateEmailError } from "@domain/exceptions/DuplicateEmailError";
-import { ILoginDTO } from "@/modules/users/application/dtos/LoginDTO.ts";
-import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUseCase";
-import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
-import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/InvalidCreedentialError";
-import { InactiveUserError } from "@/modules/users/domain/exceptions/InactiveUser";
-import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
-import { InvalidtokenError } from "@/modules/users/domain/exceptions/invalidToken";
+import { RegisterUser } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
+import { IRegisterUserDTO } from "@/modules/users/application/dtos/user/RegisterUserDTO";
+import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
+import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError";
+import { ILoginDTO } from "@/modules/users/application/dtos/user/LoginDTO.ts";
+import { LoginUseCase } from "@/modules/users/application/use-cases/auth/LoginUserUseCase";
+import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/auth/RefreshTokenUseCase";
+import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
+import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
+import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
+import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
 
 export class AuthController {
   constructor(
@@ -19,38 +18,6 @@ export class AuthController {
     private readonly refreshToken: RefreshTokenUseCase,
     private readonly validateToken: ValidateTokenUseCase,
   ) {}
-  async register(req: Request, res: Response): Promise<void> {
-    //se tipa como el DTO para asegurar la forma esperada
-    const { name, lastname, email, password, role_id } =
-      req.body as IRegisterUserDTO;
-    if (!name || !lastname || !email || !password) {
-      res.status(400).json({ message: "Todos los campos son requeridos" });
-      return;
-    }
-    // ejecuta el caso de uso RegisterUser
-    try {
-      const user = await this.registerUser.execute({
-        name,
-        lastname,
-        email,
-        password,
-        role_id,
-      });
-      res
-        .status(201)
-        .json({ message: "Usuario registrado exitosamente", user });
-    } catch (error) {
-      if (error instanceof DuplicateEmailError) {
-        res.status(409).json({ message: error.message });
-        return;
-      }
-      if (error instanceof RegisterUserError) {
-        res.status(500).json({ message: error.message });
-        return;
-      }
-      res.status(500).json({ message: "Error interno del servidor" });
-    }
-  }
 
   async login(req: Request, res: Response): Promise<void> {
     const data = req.body as ILoginDTO;
@@ -61,6 +28,7 @@ export class AuthController {
     try {
       const result = await this.loginUser.execute(data);
       res.status(200).json(result);
+      return;
     } catch (error) {
       if (error instanceof InvalidCreedentialError) {
         res.status(401).json({ message: error.message });
@@ -71,9 +39,9 @@ export class AuthController {
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
-
   async TokenRefresh(req: Request, res: Response): Promise<void> {
     try {
       const { refreshToken } = req.body;
@@ -83,15 +51,16 @@ export class AuthController {
       }
       const result = await this.refreshToken.execute(refreshToken);
       res.status(200).json(result);
+      return;
     } catch (error) {
       if (error instanceof InvalidtokenError) {
         res.status(401).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
-
   async tokenValidate(req: Request, res: Response): Promise<void> {
     const tokenHeader = req.headers.authorization;
     if (!tokenHeader) {
@@ -105,12 +74,45 @@ export class AuthController {
     try {
       const payload = await this.validateToken.execute(token);
       res.status(200).json(payload);
+      return;
     } catch (error) {
       if (error instanceof InvalidtokenError) {
         res.status(401).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
+    }
+  }
+  async register(req: Request, res: Response): Promise<void> {
+    //se tipa como el DTO para asegurar la forma esperada
+    const { name, lastname, email, password, role_id } = req.body as IRegisterUserDTO;
+    if (!name || !lastname || !email || !password) {
+      res.status(400).json({ message: "Todos los campos son requeridos" });
+      return;
+    }
+    // ejecuta el caso de uso RegisterUser
+    try {
+      const user = await this.registerUser.execute({
+        name,
+        lastname,
+        email,
+        password,
+        role_id,
+      });
+      res.status(201).json({ message: "Usuario registrado exitosamente", user });
+      return;
+    } catch (error) {
+      if (error instanceof DuplicateEmailError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RegisterUserError) {
+        res.status(500).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
 }

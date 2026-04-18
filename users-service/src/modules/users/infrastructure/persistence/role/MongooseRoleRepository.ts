@@ -1,19 +1,13 @@
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { Role } from "@/modules/users/domain/entities/Role";
-import RoleModel from "@/modules/users/infrastructure/persistence/RoleModel";
+import RoleModel from "@/modules/users/infrastructure/persistence/role/RoleModel";
 
 export class MongooseRoleRepository implements IRoleRepository {
   //toEntity m:etodo privado que convierte un documento de Mongoose a una entidad de dominio.
   private toEntity(doc: any): Role {
-    return new Role(
-      doc._id.toString(),
-      doc.name,
-      doc.permissions,
-      doc.description,
-      doc.is_active,
-      doc.deleted_at,
-    );
+    return new Role(doc._id.toString(), doc.name, doc.permissions, doc.description, doc.is_active, doc.deleted_at);
   }
+
   async findByName(name: string): Promise<Role | null> {
     const doc = await RoleModel.findOne({ name, deleted_at: null });
     if (!doc) return null; //si no existe retorna null
@@ -31,14 +25,15 @@ export class MongooseRoleRepository implements IRoleRepository {
     return this.toEntity(guardar);
   }
   async findById(id: string): Promise<Role | null> {
-    const doc = await RoleModel.findById({ _id: id, deleted_at: null });
+    const doc = await RoleModel.findOne({ _id: id, deleted_at: null });
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  async findAll(): Promise<Role[]> {
+  async findAll(): Promise<Role[] | null> {
     const doc = await RoleModel.find({ deleted_at: null });
     // Mongo devuelve Document[] , el dominio necesita Role[]
     // se aplica el mapper toEntity() a cada documento.
+    if (!doc) return null;
     return doc.map((doc) => this.toEntity(doc));
   }
   async update(role: Role): Promise<Role> {
@@ -59,7 +54,7 @@ export class MongooseRoleRepository implements IRoleRepository {
     return this.toEntity(doc);
   }
   async delete(id: string): Promise<void> {
-    const doc = await RoleModel.findByIdAndUpdate(
+    const doc = await RoleModel.findOneAndUpdate(
       { _id: id, deleted_at: null },
       {
         $set: {

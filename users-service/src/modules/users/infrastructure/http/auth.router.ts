@@ -1,25 +1,26 @@
 import { Router } from "express";
-import { MongooseUserRepository } from "@infra/persistence/MongooseUserRepository";
-import { RegisterUser } from "@/modules/users/application/use-cases/RegisterUserUseCase";
-import { LoginUseCase } from "@/modules/users/application/use-cases/LoginUserUseCase";
-import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/RefreshTokenUseCase";
+import { MongooseUserRepository } from "@/modules/users/infrastructure/persistence/user/MongooseUserRepository";
+import { RegisterUser } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
+import { LoginUseCase } from "@/modules/users/application/use-cases/auth/LoginUserUseCase";
+import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/auth/RefreshTokenUseCase";
 import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
-import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/ValidateTokenUseCase";
+import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
 
 const router = Router();
-
+//inyeccion de dependencias
+// capa de Infraestructura (Adaptadores de salida)
+//Instancia del repositorio basada en Mongoose */
 const userRepository = new MongooseUserRepository();
-
+//capa de aplicacion (Casos de Uso)
+//aca se define que hace
 const registerUserUseCase = new RegisterUser(userRepository);
+///////////////////////////////
 const loginUseCase = new LoginUseCase(userRepository);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
-const authController = new AuthController(
-  registerUserUseCase,
-  loginUseCase,
-  refreshToken,
-  validateToken,
-);
+//capa de interfaz
+//se inyectan las dependencias
+const authController = new AuthController(registerUserUseCase, loginUseCase, refreshToken, validateToken);
 
 /**
  * @swagger
@@ -218,11 +219,14 @@ const authController = new AuthController(
  *       500:
  *         description: Error interno del servidor
  */
-router.post("/register", (req, res) => authController.register(req, res));
+
+//iniciar sesion
 router.post("/login", (req, res) => authController.login(req, res));
-router.post("/refreshToken", (req, res) =>
-  authController.TokenRefresh(req, res),
-);
+//toekn nuevo cada 15 minutos
+router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res));
+//valida token de microservicios externos
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
+//crea cuenta de usuario con role owner y is_active=false
+router.post("/register", (req, res) => authController.register(req, res));
 
 export default router;

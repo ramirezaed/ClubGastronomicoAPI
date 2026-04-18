@@ -1,17 +1,19 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
-import { IUserDocument } from "@infra/persistence/IUserDocument";
+import { IUserDocument } from "@/modules/users/infrastructure/persistence/user/IUserDocument";
 
 const UsersSchema = new Schema<IUserDocument>(
   {
     company_id: {
       type: Schema.Types.ObjectId,
       ref: "Company",
+      required: false,
       default: null,
     },
     branch_id: {
       type: Schema.Types.ObjectId,
       ref: "Branch",
+      required: false,
       default: null,
     },
     name: {
@@ -26,10 +28,7 @@ const UsersSchema = new Schema<IUserDocument>(
       type: String,
       required: true,
       unique: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        "Por favor ingrese un correo electrónico válido",
-      ],
+      match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Por favor ingrese un correo electrónico válido"],
     },
     password: {
       type: String,

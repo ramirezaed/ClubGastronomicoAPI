@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IRoleDocument } from "@infra/persistence/IRoleDocument";
+import { IRoleDocument } from "@/modules/users/infrastructure/persistence/role/IRoleDocument";
 
 const RoleSchema = new Schema<IRoleDocument>(
   {
