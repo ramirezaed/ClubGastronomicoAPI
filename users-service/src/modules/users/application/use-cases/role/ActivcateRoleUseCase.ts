@@ -1,7 +1,6 @@
 import { RoleResponseDto } from "@/modules/users/application/dtos/role/RoleResponseDTO";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
-import { read } from "node:fs";
 
 export class ActivateRoleUseCase {
   constructor(private readonly roleRepository: IRoleRepository) {}

@@ -7,12 +7,6 @@ export class MongooseRoleRepository implements IRoleRepository {
   private toEntity(doc: any): Role {
     return new Role(doc._id.toString(), doc.name, doc.description, doc.is_active, doc.deleted_at);
   }
-
-  async findByName(name: string): Promise<Role | null> {
-    const doc = await RoleModel.findOne({ name, deleted_at: null });
-    if (!doc) return null; //si no existe retorna null
-    return this.toEntity(doc); // si esxiste retorna el documento
-  }
   async save(role: Role): Promise<Role> {
     const doc = new RoleModel({
       name: role.name,
@@ -28,13 +22,14 @@ export class MongooseRoleRepository implements IRoleRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  async findAll(): Promise<Role[] | null> {
-    const doc = await RoleModel.find({ deleted_at: null });
-    // Mongo devuelve Document[] , el dominio necesita Role[]
-    // se aplica el mapper toEntity() a cada documento.
-    if (!doc) return null;
-    return doc.map((doc) => this.toEntity(doc));
-  }
+  // async findAll(): Promise<Role[] | null> {
+  //   const doc = await RoleModel.find({ deleted_at: null });
+  //   // Mongo devuelve Document[] , el dominio necesita Role[]
+  //   // se aplica el mapper toEntity() a cada documento.
+  //   if (!doc) return null;
+  //   return doc.map((doc) => this.toEntity(doc));
+  // }
+
   async update(role: Role): Promise<Role> {
     const doc = await RoleModel.findByIdAndUpdate(
       {

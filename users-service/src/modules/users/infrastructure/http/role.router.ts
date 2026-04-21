@@ -8,6 +8,7 @@ import { UpdateRole } from "@/modules/users/application/use-cases/role/updateRol
 import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRole";
 import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
 import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
+import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
 
 const RoleRouter = Router();
 //inyeccion de dependencias
@@ -15,11 +16,14 @@ const RoleRouter = Router();
 // capa de Infraestructura (Adaptadores de salida)
 //Instancia del repositorio basada en Mongoose */
 const roleRepository = new MongooseRoleRepository();
+const roleQueryRepository = new MongooseRoleQueryRepository();
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
-const registerRoleUseCase = new RegisterRole(roleRepository);
-const getAllRolesUseCase = new GetAllRoles(roleRepository);
-const getRoleByIdUseCase = new GetRoleById(roleRepository);
+const getAllRolesUseCase = new GetAllRoles(roleQueryRepository);
+const getRoleByIdUseCase = new GetRoleById(roleQueryRepository);
+const registerRoleUseCase = new RegisterRole(roleRepository, roleQueryRepository);
+// const getAllRolesUseCase = new GetAllRoles(roleQueryRepository);
+// const getRoleByIdUseCase = new GetRoleById(roleQueryRepository);
 const updateRoleUseCase = new UpdateRole(roleRepository);
 const deleteRoleUseCase = new DeleteRole(roleRepository);
 const activateRoleUseCase = new ActivateRoleUseCase(roleRepository);

@@ -4,12 +4,16 @@ import { IRegisterRoleDTO } from "@/modules/users/application/dtos/role/Register
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { DuplicateNameError } from "@/modules/users/domain/exceptions/role/DuplicateNameError";
 import { RoleResponseDto } from "@/modules/users/application/dtos/role/RoleResponseDTO";
+import { IRoleQueryRepository } from "@/modules/users/domain/repositories/role/IRoleQueryRepository";
 
 export class RegisterRole {
-  constructor(private readonly roleRepository: IRoleRepository) {}
+  constructor(
+    private readonly roleRepository: IRoleRepository,
+    private readonly roleQueryRepository: IRoleQueryRepository,
+  ) {}
 
   async execute(dto: IRegisterRoleDTO): Promise<RoleResponseDto> {
-    const exists = await this.roleRepository.findByName(dto.name);
+    const exists = await this.roleQueryRepository.findByName(dto.name);
     if (exists) {
       throw new DuplicateNameError(dto.name);
     }
