@@ -57,27 +57,29 @@ export class RoleController {
   }
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
-    const { permissions, description, is_active } = req.body as IUpdateRoleDTO;
-    if (!permissions || !description) {
-      res.status(400).json({ message: "Todos los datos son necesarios" });
-      return;
-    }
+    const { description } = req.body as IUpdateRoleDTO;
+    // if (!description) {
+    //   res.status(400).json({ message: "Todos los datos son necesarios" });
+    //   return;
+    // }
     try {
       const rolActualizado = await this.updateRole.execute(id, {
-        permissions,
         description,
-        is_active,
       });
       res.status(200).json({ message: "rol actualizado", rolActualizado });
+      return;
     } catch (error) {
       if (error instanceof RoleNotExistsError) {
         res.status(404).json({ message: error.message });
+        console.log("error de update role", error);
         return;
       }
       if (error instanceof UpdateRoleError) {
         res.status(500).json({ message: error.message });
+        return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
   async getRoleByID(req: Request, res: Response) {
