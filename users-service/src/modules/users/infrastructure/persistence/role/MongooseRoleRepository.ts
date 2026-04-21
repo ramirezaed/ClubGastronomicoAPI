@@ -44,9 +44,8 @@ export class MongooseRoleRepository implements IRoleRepository {
       },
       {
         $set: {
-          name: role.name,
-          permissions: role.permissions,
           description: role.description,
+          is_active: role.is_active, //para los endpoint activate/deactivate
         },
       },
       { new: true },

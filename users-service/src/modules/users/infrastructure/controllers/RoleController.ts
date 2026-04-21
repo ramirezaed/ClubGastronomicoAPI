@@ -13,6 +13,8 @@ import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/Roles
 import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRole";
 import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
 import { RoleAlreadyActivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyActiveError";
+import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
+import { RoleAlreadyDeactivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyDeactivateError";
 
 export class RoleController {
   constructor(
@@ -22,6 +24,7 @@ export class RoleController {
     private readonly getAllRoles: GetAllRoles,
     private readonly deleteRole: DeleteRole,
     private readonly activateRole: ActivateRoleUseCase,
+    private readonly deactivateRole: DeactivateRoleUserUseCase,
   ) {}
 
   async register(req: Request, res: Response) {
@@ -133,6 +136,26 @@ export class RoleController {
       }
       if (error instanceof RoleAlreadyActivateError) {
         res.status(409).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+
+  async deactivate(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    try {
+      const response = await this.deactivateRole.exectute(id);
+      res.status(200).json({ message: "Rol Desactivado", response });
+      return;
+    } catch (error) {
+      if (error instanceof RoleAlreadyDeactivateError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RolesNotFoundError) {
+        res.status(404).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "error interno del servidor" });

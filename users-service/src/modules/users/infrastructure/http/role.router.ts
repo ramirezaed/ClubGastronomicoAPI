@@ -7,6 +7,7 @@ import { GetRoleById } from "@/modules/users/application/use-cases/role/GetRoleB
 import { UpdateRole } from "@/modules/users/application/use-cases/role/updateRole";
 import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRole";
 import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
+import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
 
 const RoleRouter = Router();
 //inyeccion de dependencias
@@ -22,6 +23,7 @@ const getRoleByIdUseCase = new GetRoleById(roleRepository);
 const updateRoleUseCase = new UpdateRole(roleRepository);
 const deleteRoleUseCase = new DeleteRole(roleRepository);
 const activateRoleUseCase = new ActivateRoleUseCase(roleRepository);
+const deactivateRoleUseCase = new DeactivateRoleUserUseCase(roleRepository);
 //capa de interfaz
 //se inyectan las dependencias
 const roleController = new RoleController(
@@ -31,6 +33,7 @@ const roleController = new RoleController(
   getAllRolesUseCase,
   deleteRoleUseCase,
   activateRoleUseCase,
+  deactivateRoleUseCase,
 );
 
 /**
@@ -302,6 +305,64 @@ const roleController = new RoleController(
  *                   type: string
  *                   example: error interno del servidor
  */
+/**
+ * @swagger
+ * /api/roles/deactivate/{id}:
+ *   patch:
+ *     summary: Desactivar un rol existente
+ *     tags: [Roles]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del rol a desactivar
+ *         schema:
+ *           type: string
+ *           example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *     responses:
+ *       200:
+ *         description: Rol desactivado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Rol desactivado correctamente
+ *                 response:
+ *                   $ref: '#/components/schemas/Rol'
+ *       404:
+ *         description: El rol no existe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: El rol que intentás consultar no existe.
+ *       409:
+ *         description: El rol ya se encuentra desactivado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: El rol ya se encuentra desactivado.
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: error interno del servidor
+ */
 
 //registrar nuevo Rol
 RoleRouter.post("/", (req, res) => roleController.register(req, res));
@@ -313,6 +374,8 @@ RoleRouter.get("/:id", (req, res) => roleController.getRoleByID(req, res));
 RoleRouter.patch("/:id", (req, res) => roleController.update(req, res));
 //activar rol
 RoleRouter.patch("/activate/:id", (req, res) => roleController.activate(req, res));
+//desactivar rol
+RoleRouter.patch("/deactivate/:id", (req, res) => roleController.deactivate(req, res));
 // eliminar rol
 RoleRouter.delete("/:id", (req, res) => roleController.softDelete(req, res));
 export default RoleRouter;
