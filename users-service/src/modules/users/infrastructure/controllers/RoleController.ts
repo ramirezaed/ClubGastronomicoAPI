@@ -58,10 +58,7 @@ export class RoleController {
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
     const { description } = req.body as IUpdateRoleDTO;
-    // if (!description) {
-    //   res.status(400).json({ message: "Todos los datos son necesarios" });
-    //   return;
-    // }
+
     try {
       const rolActualizado = await this.updateRole.execute(id, {
         description,

@@ -1,6 +1,6 @@
 export class RoleInactiveError extends Error {
   constructor() {
-    super(`El rol se encuntra desactivado`);
+    super("No podés usar este rol porque está desactivado.");
     this.name = "RoleInactiveError";
   }
 }

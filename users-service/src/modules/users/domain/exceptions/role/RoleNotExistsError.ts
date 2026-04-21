@@ -1,6 +1,6 @@
 export class RoleNotExistsError extends Error {
   constructor() {
-    super(`el rol que buscas no se encuentra`);
+    super("El rol que intentás consultar no existe.");
     this.name = "RoleNotExistsError";
   }
 }

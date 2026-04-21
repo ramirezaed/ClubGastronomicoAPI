@@ -1,6 +1,6 @@
 export class RegisterRoleError extends Error {
   constructor() {
-    super(`No se pudo registrar el rol`);
+    super("No pudimos registrar el rol. Intentalo nuevamente.");
     this.name = "RegisterRoleError";
   }
 }
