@@ -1,8 +1,8 @@
-import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { UpdateRoleUserDTO } from "@/modules/users/application/dtos/user/UpdateRoleUserResponseDTO";
+import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 
 export class UpdateRoleUserUseCase {
   constructor(
@@ -17,7 +17,7 @@ export class UpdateRoleUserUseCase {
 
     const role = await this.IroleRepository.findById(role_id);
     if (!role) {
-      throw new RoleNotExistsError();
+      throw new RolesNotFoundError();
     }
     user.updateRole(role_id);
     await this.IuserRepository.update(user);

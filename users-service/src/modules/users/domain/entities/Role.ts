@@ -1,3 +1,4 @@
+import { RoleAlreadyActivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyActiveError";
 import { RoleInactiveError } from "@/modules/users/domain/exceptions/role/RoleInactiveError";
 
 export class Role {
@@ -15,5 +16,11 @@ export class Role {
       throw new RoleInactiveError(); // si el rol no esta activado lanza error
     }
     this.description = description ?? this.description;
+  }
+  activate(): void {
+    if (this.is_active) {
+      throw new RoleAlreadyActivateError(); //si el rol ya esta activado lanza error
+    }
+    this.is_active = true;
   }
 }

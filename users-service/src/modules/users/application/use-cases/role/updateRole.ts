@@ -2,12 +2,12 @@ import { IUpdateRoleDTO } from "@/modules/users/application/dtos/role/UpdateRole
 //
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
 import { UpdateRoleError } from "@/modules/users/domain/exceptions/role/UpdateRoleError";
-import { UpdateRoleResponseDto } from "@/modules/users/application/dtos/role/UpdateRoleResponseDTO";
+import { RoleResponseDto } from "@/modules/users/application/dtos/role/RoleResponseDTO";
 
 export class UpdateRole {
   constructor(private readonly roleRepository: IRoleRepository) {}
 
-  async execute(id: string, dto: IUpdateRoleDTO): Promise<UpdateRoleResponseDto> {
+  async execute(id: string, dto: IUpdateRoleDTO): Promise<RoleResponseDto> {
     //busca el rol por id y comprueba si existe ese rol
     const role = await this.roleRepository.findById(id);
     if (!role) {

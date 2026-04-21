@@ -6,6 +6,7 @@ import { GetAllRoles } from "@/modules/users/application/use-cases/role/GetAllRo
 import { GetRoleById } from "@/modules/users/application/use-cases/role/GetRoleById";
 import { UpdateRole } from "@/modules/users/application/use-cases/role/updateRole";
 import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRole";
+import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
 
 const RoleRouter = Router();
 //inyeccion de dependencias
@@ -20,6 +21,7 @@ const getAllRolesUseCase = new GetAllRoles(roleRepository);
 const getRoleByIdUseCase = new GetRoleById(roleRepository);
 const updateRoleUseCase = new UpdateRole(roleRepository);
 const deleteRoleUseCase = new DeleteRole(roleRepository);
+const activateRoleUseCase = new ActivateRoleUseCase(roleRepository);
 //capa de interfaz
 //se inyectan las dependencias
 const roleController = new RoleController(
@@ -28,6 +30,7 @@ const roleController = new RoleController(
   getRoleByIdUseCase,
   getAllRolesUseCase,
   deleteRoleUseCase,
+  activateRoleUseCase,
 );
 
 /**
@@ -241,6 +244,64 @@ const roleController = new RoleController(
  *       500:
  *         description: Error interno
  */
+/**
+ * @swagger
+ * /api/roles/activate/{id}:
+ *   patch:
+ *     summary: Activar un rol existente
+ *     tags: [Roles]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del rol a activar
+ *         schema:
+ *           type: string
+ *           example: "64f1a2b3c4d5e6f7a8b9c0d1"
+ *     responses:
+ *       200:
+ *         description: Rol activado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Rol activado correctamente
+ *                 response:
+ *                   $ref: '#/components/schemas/Rol'
+ *       404:
+ *         description: El rol no existe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: El rol que intentás consultar no existe.
+ *       409:
+ *         description: El rol ya se encuentra activo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: El rol ya se encuentra activo.
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: error interno del servidor
+ */
 
 //registrar nuevo Rol
 RoleRouter.post("/", (req, res) => roleController.register(req, res));
@@ -250,6 +311,8 @@ RoleRouter.get("/", (req, res) => roleController.getAll(req, res));
 RoleRouter.get("/:id", (req, res) => roleController.getRoleByID(req, res));
 // actualizar rol
 RoleRouter.patch("/:id", (req, res) => roleController.update(req, res));
+//activar rol
+RoleRouter.patch("/activate/:id", (req, res) => roleController.activate(req, res));
 // eliminar rol
 RoleRouter.delete("/:id", (req, res) => roleController.softDelete(req, res));
 export default RoleRouter;

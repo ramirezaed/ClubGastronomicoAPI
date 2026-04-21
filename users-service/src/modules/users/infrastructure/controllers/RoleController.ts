@@ -6,12 +6,13 @@ import { IRegisterRoleDTO } from "@/modules/users/application/dtos/role/Register
 import { IUpdateRoleDTO } from "@/modules/users/application/dtos/role/UpdateRoleDTO";
 import { RegisterRoleError } from "@/modules/users/domain/exceptions/role/RegisterRoleError";
 import { DuplicateNameError } from "@/modules/users/domain/exceptions/role/DuplicateNameError";
-import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 import { UpdateRoleError } from "@/modules/users/domain/exceptions/role/UpdateRoleError";
 import { GetRoleById } from "@/modules/users/application/use-cases/role/GetRoleById";
 import { GetAllRoles } from "@/modules/users/application/use-cases/role/GetAllRoles";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRole";
+import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
+import { RoleAlreadyActivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyActiveError";
 
 export class RoleController {
   constructor(
@@ -20,6 +21,7 @@ export class RoleController {
     private readonly getRoleByid: GetRoleById,
     private readonly getAllRoles: GetAllRoles,
     private readonly deleteRole: DeleteRole,
+    private readonly activateRole: ActivateRoleUseCase,
   ) {}
 
   async register(req: Request, res: Response) {
@@ -66,7 +68,7 @@ export class RoleController {
       res.status(200).json({ message: "rol actualizado", rolActualizado });
       return;
     } catch (error) {
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
         console.log("error de update role", error);
         return;
@@ -86,7 +88,7 @@ export class RoleController {
       const rol = await this.getRoleByid.execute(id);
       return res.status(200).json({ message: "Rol", rol });
     } catch (error) {
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
       }
       res.status(500).json({ message: "Error interno del servidor" });
@@ -110,8 +112,27 @@ export class RoleController {
       res.status(204).json({ meesage: "Rol eliminado" });
       return;
     } catch (error) {
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async activate(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    try {
+      const response = await this.activateRole.execute(id);
+      res.status(200).json({ message: "Rol Activado: ", response });
+      return;
+    } catch (error) {
+      if (error instanceof RolesNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RoleAlreadyActivateError) {
+        res.status(409).json({ message: error.message });
         return;
       }
       res.status(500).json({ message: "error interno del servidor" });

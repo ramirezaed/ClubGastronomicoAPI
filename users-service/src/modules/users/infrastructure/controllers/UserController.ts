@@ -12,9 +12,9 @@ import { DeactivateUserUseCase } from "@/modules/users/application/use-cases/use
 import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
 import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/user/UpdateRoleUserUseCase";
 import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/UpdateRoleUserError";
-import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
 import { UnauthorizedUserError } from "@/modules/users/domain/exceptions/user/UnauthorizedUserError";
+import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 export class UserController {
   constructor(
     private readonly meUser: MeUserUseCase,
@@ -168,7 +168,7 @@ export class UserController {
         res.status(404).json({ message: error.message });
         return;
       }
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
         res.status(400).json({ message: error.message });
         return;
       }
