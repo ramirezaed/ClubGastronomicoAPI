@@ -30,34 +30,31 @@ export class RoleController {
   async register(req: Request, res: Response) {
     //en lugar de hacer const data = req.body as IRegisterRoleDTO;
     //se tipa como el RoleDTO para asugurar la forma esperada
-    const { name, permissions, description, is_active } = req.body as IRegisterRoleDTO;
-    if (!name || !permissions || !description) {
-      res.status(400).json({ message: "Todos los datos son necesarios" });
-      return;
-    }
-
-    if (!Array.isArray(permissions)) {
-      res.status(400).json({ message: "permissions debe ser un array" });
-      return;
-    }
+    const { name, description, is_active } = req.body as IRegisterRoleDTO;
     //ejecuto el caso de uso registrarRol
     try {
+      if (!name || !description) {
+        res.status(400).json({ message: "todos los campos necesarios" });
+        return;
+      }
       const rol = await this.registerRole.execute({
         name,
-        permissions,
         description,
         is_active,
       });
-
       res.status(201).json({ message: "nuevo rol registrado", rol });
+      return;
     } catch (error) {
       if (error instanceof DuplicateNameError) {
         res.status(409).json({ message: error.message });
+        return;
       }
       if (error instanceof RegisterRoleError) {
         res.status(500).json({ message: error.message });
+        return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
   async update(req: Request, res: Response) {
