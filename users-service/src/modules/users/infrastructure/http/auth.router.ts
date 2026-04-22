@@ -21,13 +21,12 @@ const tokenService = new JwtTokenService();
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
 const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHash, roleQueryRepository);
-///////////////////////////////
 const loginUseCase = new LoginUseCase(userRepository, passwordHash, tokenService);
-const refreshToken = new RefreshTokenUseCase();
-const validateToken = new ValidateTokenUseCase();
+const refreshTokenService = new RefreshTokenUseCase(tokenService);
+const validateToken = new ValidateTokenUseCase(tokenService);
 //capa de interfaz
 //se inyectan las dependencias
-const authController = new AuthController(registerUserUseCase, loginUseCase, refreshToken, validateToken);
+const authController = new AuthController(registerUserUseCase, loginUseCase, refreshTokenService, validateToken);
 
 /**
  * @swagger
