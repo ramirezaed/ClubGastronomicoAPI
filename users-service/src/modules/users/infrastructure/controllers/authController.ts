@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { RegisterUser } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
+import { RegisterUserUseCase } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
 import { IRegisterUserDTO } from "@/modules/users/application/dtos/user/RegisterUserDTO";
 import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
 import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError";
@@ -10,10 +10,11 @@ import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/
 import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
 import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
+import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 
 export class AuthController {
   constructor(
-    private readonly registerUser: RegisterUser,
+    private readonly registerUser: RegisterUserUseCase,
     private readonly loginUser: LoginUseCase,
     private readonly refreshToken: RefreshTokenUseCase,
     private readonly validateToken: ValidateTokenUseCase,
@@ -111,6 +112,10 @@ export class AuthController {
         res.status(500).json({ message: error.message });
         return;
       }
+      if (error instanceof RolesNotFoundError) {
+        res.status(404).json({ message: error.message });
+      }
+      console.log(error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }

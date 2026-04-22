@@ -28,7 +28,7 @@ export class MongooseUserRepository implements IUserRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  async save(user: User): Promise<User | null> {
+  async save(user: User): Promise<User> {
     const doc = new UserModel({
       company_id: user.company_id,
       branch_id: user.branch_id,
@@ -41,7 +41,6 @@ export class MongooseUserRepository implements IUserRepository {
       deleted_at: user.deleted_at,
     });
 
-    if (!doc) return null;
     const saved = await doc.save();
     return this.toEntity(saved); //
   }

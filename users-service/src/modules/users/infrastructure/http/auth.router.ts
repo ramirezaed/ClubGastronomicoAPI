@@ -1,21 +1,26 @@
 import { Router } from "express";
 import { MongooseUserRepository } from "@/modules/users/infrastructure/persistence/user/MongooseUserRepository";
-import { RegisterUser } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
+import { RegisterUserUseCase } from "@/modules/users/application/use-cases/auth/RegisterUserUseCase";
 import { LoginUseCase } from "@/modules/users/application/use-cases/auth/LoginUserUseCase";
 import { RefreshTokenUseCase } from "@/modules/users/application/use-cases/auth/RefreshTokenUseCase";
 import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
+import { PasswordHasher } from "@/modules/users/infrastructure/services/PasswordHash";
+import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
 
 const router = Router();
 //inyeccion de dependencias
 // capa de Infraestructura (Adaptadores de salida)
 //Instancia del repositorio basada en Mongoose */
 const userRepository = new MongooseUserRepository();
+const roleQueryRepository = new MongooseRoleQueryRepository();
+const passwordHash = new PasswordHasher();
+
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
-const registerUserUseCase = new RegisterUser(userRepository);
+const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHash, roleQueryRepository);
 ///////////////////////////////
-const loginUseCase = new LoginUseCase(userRepository);
+const loginUseCase = new LoginUseCase(userRepository, passwordHash);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
 //capa de interfaz
