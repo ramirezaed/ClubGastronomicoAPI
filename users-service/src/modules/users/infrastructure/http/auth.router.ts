@@ -7,6 +7,7 @@ import { AuthController } from "@/modules/users/infrastructure/controllers/authC
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
 import { PasswordHasher } from "@/modules/users/infrastructure/services/PasswordHash";
 import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
+import { JwtTokenService } from "@/modules/users/infrastructure/services/JwtTokenService";
 
 const router = Router();
 //inyeccion de dependencias
@@ -15,12 +16,13 @@ const router = Router();
 const userRepository = new MongooseUserRepository();
 const roleQueryRepository = new MongooseRoleQueryRepository();
 const passwordHash = new PasswordHasher();
+const tokenService = new JwtTokenService();
 
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
 const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHash, roleQueryRepository);
 ///////////////////////////////
-const loginUseCase = new LoginUseCase(userRepository, passwordHash);
+const loginUseCase = new LoginUseCase(userRepository, passwordHash, tokenService);
 const refreshToken = new RefreshTokenUseCase();
 const validateToken = new ValidateTokenUseCase();
 //capa de interfaz

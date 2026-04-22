@@ -1,6 +1,8 @@
 //es una clase, defino que es un usuario (id, nombre apellido email etc etc)
 //se puede validar la logica  , como por ejemplo user.isValidEmail() que cumpla con nombre@nombre.com
 
+import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
+import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
 import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
 import { UserAlreadyActiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyActiveError";
 import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
@@ -39,7 +41,11 @@ export class User {
     }
     return new User("", company_id, branch_id, name, lastname, email, hashedPassword, role_id, false, null);
   }
-
+  verifyIsActive(): void {
+    if (!this.is_active) {
+      throw new InactiveUserError();
+    }
+  }
   update(name: string, lastname: string): void {
     if (!this.is_active) {
       throw new UserInactiveError();

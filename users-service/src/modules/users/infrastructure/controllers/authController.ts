@@ -115,7 +115,6 @@ export class AuthController {
       if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
       }
-      console.log(error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
