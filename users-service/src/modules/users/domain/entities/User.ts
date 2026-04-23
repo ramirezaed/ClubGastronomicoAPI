@@ -23,6 +23,7 @@ export class User {
     public is_active: boolean,
     public deleted_at: Date | null,
   ) {}
+
   update(name: string, lastname: string): void {
     if (!this.is_active) {
       throw new UserInactiveError();
@@ -30,6 +31,7 @@ export class User {
     this.name = name ?? this.name;
     this.lastname = lastname ?? this.lastname;
   }
+
   activate(): void {
     if (this.is_active) {
       throw new UserAlreadyActiveError();
@@ -60,4 +62,3 @@ export class User {
     this.role_id = idRole;
   }
 }
- 

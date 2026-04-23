@@ -6,12 +6,15 @@ import { IRegisterRoleDTO } from "@/modules/users/application/dtos/role/Register
 import { IUpdateRoleDTO } from "@/modules/users/application/dtos/role/UpdateRoleDTO";
 import { RegisterRoleError } from "@/modules/users/domain/exceptions/role/RegisterRoleError";
 import { DuplicateNameError } from "@/modules/users/domain/exceptions/role/DuplicateNameError";
-import { RoleNotExistsError } from "@/modules/users/domain/exceptions/role/RoleNotExistsError";
 import { UpdateRoleError } from "@/modules/users/domain/exceptions/role/UpdateRoleError";
 import { GetRoleById } from "@/modules/users/application/use-cases/role/GetRoleById";
 import { GetAllRoles } from "@/modules/users/application/use-cases/role/GetAllRoles";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRole";
+import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
+import { RoleAlreadyActivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyActiveError";
+import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
+import { RoleAlreadyDeactivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyDeactivateError";
 
 export class RoleController {
   constructor(
@@ -20,64 +23,62 @@ export class RoleController {
     private readonly getRoleByid: GetRoleById,
     private readonly getAllRoles: GetAllRoles,
     private readonly deleteRole: DeleteRole,
+    private readonly activateRole: ActivateRoleUseCase,
+    private readonly deactivateRole: DeactivateRoleUserUseCase,
   ) {}
 
   async register(req: Request, res: Response) {
     //en lugar de hacer const data = req.body as IRegisterRoleDTO;
     //se tipa como el RoleDTO para asugurar la forma esperada
-    const { name, permissions, description, is_active } = req.body as IRegisterRoleDTO;
-    if (!name || !permissions || !description) {
-      res.status(400).json({ message: "Todos los datos son necesarios" });
-      return;
-    }
-
-    if (!Array.isArray(permissions)) {
-      res.status(400).json({ message: "permissions debe ser un array" });
-      return;
-    }
+    const { name, description, is_active } = req.body as IRegisterRoleDTO;
     //ejecuto el caso de uso registrarRol
     try {
+      if (!name || !description) {
+        res.status(400).json({ message: "todos los campos necesarios" });
+        return;
+      }
       const rol = await this.registerRole.execute({
         name,
-        permissions,
         description,
         is_active,
       });
-
       res.status(201).json({ message: "nuevo rol registrado", rol });
+      return;
     } catch (error) {
       if (error instanceof DuplicateNameError) {
         res.status(409).json({ message: error.message });
+        return;
       }
       if (error instanceof RegisterRoleError) {
         res.status(500).json({ message: error.message });
+        return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
   async update(req: Request, res: Response) {
     const id = req.params.id as string;
-    const { permissions, description, is_active } = req.body as IUpdateRoleDTO;
-    if (!permissions || !description) {
-      res.status(400).json({ message: "Todos los datos son necesarios" });
-      return;
-    }
+    const { description } = req.body as IUpdateRoleDTO;
+
     try {
       const rolActualizado = await this.updateRole.execute(id, {
-        permissions,
         description,
-        is_active,
       });
       res.status(200).json({ message: "rol actualizado", rolActualizado });
+      return;
     } catch (error) {
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
+        console.log("error de update role", error);
         return;
       }
       if (error instanceof UpdateRoleError) {
         res.status(500).json({ message: error.message });
+        return;
       }
       res.status(500).json({ message: "Error interno del servidor" });
+      return;
     }
   }
   async getRoleByID(req: Request, res: Response) {
@@ -87,7 +88,7 @@ export class RoleController {
       const rol = await this.getRoleByid.execute(id);
       return res.status(200).json({ message: "Rol", rol });
     } catch (error) {
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
       }
       res.status(500).json({ message: "Error interno del servidor" });
@@ -111,7 +112,46 @@ export class RoleController {
       res.status(204).json({ meesage: "Rol eliminado" });
       return;
     } catch (error) {
-      if (error instanceof RoleNotExistsError) {
+      if (error instanceof RolesNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async activate(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    try {
+      const response = await this.activateRole.execute(id);
+      res.status(200).json({ message: "Rol Activado: ", response });
+      return;
+    } catch (error) {
+      if (error instanceof RolesNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RoleAlreadyActivateError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+
+  async deactivate(req: Request, res: Response): Promise<void> {
+    const id = req.params.id as string;
+    try {
+      const response = await this.deactivateRole.exectute(id);
+      res.status(200).json({ message: "Rol Desactivado", response });
+      return;
+    } catch (error) {
+      if (error instanceof RoleAlreadyDeactivateError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
         return;
       }

@@ -7,10 +7,8 @@
 import { Role } from "@/modules/users/domain/entities/Role";
 
 export interface IRoleRepository {
+  findById(id: string): Promise<Role | null>;
   save(role: Role): Promise<Role>;
   update(role: Role): Promise<Role>;
   delete(id: string): Promise<void>;
-  findById(id: string): Promise<Role | null>;
-  findByName(name: string): Promise<Role | null>;
-  findAll(): Promise<Role[] | null>;
 }
