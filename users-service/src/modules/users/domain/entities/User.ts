@@ -2,7 +2,6 @@
 //se puede validar la logica  , como por ejemplo user.isValidEmail() que cumpla con nombre@nombre.com
 
 import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
-import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
 import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
 import { UserAlreadyActiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyActiveError";
 import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
@@ -81,5 +80,9 @@ export class User {
       throw new Error("todos los campos son necesrio");
     }
     this.role_id = idRole;
+  }
+  resetPassword(hashedPassword: string): void {
+    if (!hashedPassword) throw new RegisterUserError();
+    this.password = hashedPassword;
   }
 }

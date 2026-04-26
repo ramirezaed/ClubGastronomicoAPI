@@ -1,8 +1,9 @@
+// import { config } from "dotenv";
+import "dotenv/config"; // 👈 PRIMERA LINEA SIEMPRE
 import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
-import { config } from "dotenv";
 import { connectDB } from "@/config/db";
 import { swaggerSpec } from "@/config/swagger";
 import { seedRoles } from "@/config/roleSeeder";
@@ -10,7 +11,7 @@ import router from "@/modules/users/infrastructure/http/auth.router";
 import RoleRouter from "@/modules/users/infrastructure/http/role.router";
 import UserRouter from "@/modules/users/infrastructure/http/user.router";
 
-config();
+// config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;

@@ -3,6 +3,8 @@ export interface ITokenService {
   generateRefreshToken(payload: TokenPayload): string;
   verifyRefreshToken(token: string): TokenPayload;
   verifyAccessToken(token: string): TokenPayload;
+  generateResetToken(payload: ResetTokenPayload): string;
+  verifyResetToken(token: string): ResetTokenPayload; // ← nuevo
 }
 
 export interface TokenPayload {
@@ -11,4 +13,8 @@ export interface TokenPayload {
   role_id: string;
   company_id: string | null;
   branch_id: string | null;
+}
+export interface ResetTokenPayload {
+  id: string;
+  email: string;
 }

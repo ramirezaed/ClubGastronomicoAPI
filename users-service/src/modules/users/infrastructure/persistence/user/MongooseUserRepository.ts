@@ -54,6 +54,7 @@ export class MongooseUserRepository implements IUserRepository {
         $set: {
           name: user.name, // para el update
           lastname: user.lastname, // para el update
+          password: user.password, //para el reset password
           is_active: user.is_active, // para activate/deactivate
           role_id: user.role_id, //para cambiar el rol
           deleted_at: user.deleted_at, // para la eliminacion logica

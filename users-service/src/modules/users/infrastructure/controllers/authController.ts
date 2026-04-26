@@ -11,6 +11,9 @@ import { InactiveUserError } from "@/modules/users/domain/exceptions/user/Inacti
 import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth/ValidateTokenUseCase";
 import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
+import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/auth/ForgotPasswordUseCase";
+import { ResetPasswordUseCase } from "@/modules/users/application/use-cases/auth/ResetPasswordUseCase";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 
 export class AuthController {
   constructor(
@@ -18,6 +21,8 @@ export class AuthController {
     private readonly loginUser: LoginUseCase,
     private readonly refreshToken: RefreshTokenUseCase,
     private readonly validateToken: ValidateTokenUseCase,
+    private readonly forgot: ForgotPasswordUseCase,
+    private readonly reset: ResetPasswordUseCase,
   ) {}
 
   async login(req: Request, res: Response): Promise<void> {
@@ -117,6 +122,41 @@ export class AuthController {
       }
       res.status(500).json({ message: "Error interno del servidor" });
       return;
+    }
+  }
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+      await this.forgot.execute(email);
+      // siempre 200 aunque el email no exista, por seguridad
+      res
+        .status(200)
+        .json({ message: "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña." });
+    } catch (error) {
+      if (error instanceof InactiveUserError) {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
+      return;
+    }
+  }
+
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { token, newPassword } = req.body;
+      await this.reset.execute(token, newPassword);
+      res.status(200).json({ message: "Contraseña actualizada correctamente" });
+    } catch (error) {
+      if (error instanceof InvalidtokenError) {
+        res.status(401).json({ message: error.message });
+        return;
+      }
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   }
 }

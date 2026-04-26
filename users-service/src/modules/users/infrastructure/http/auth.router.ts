@@ -8,6 +8,9 @@ import { ValidateTokenUseCase } from "@/modules/users/application/use-cases/auth
 import { PasswordHasher } from "@/modules/users/infrastructure/services/PasswordHash";
 import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
 import { JwtTokenService } from "@/modules/users/infrastructure/services/JwtTokenService";
+import { ResetPasswordUseCase } from "@/modules/users/application/use-cases/auth/ResetPasswordUseCase";
+import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/auth/ForgotPasswordUseCase";
+import { NodemailerEmailService } from "@/modules/users/infrastructure/services/emailService";
 
 const router = Router();
 //inyeccion de dependencias
@@ -17,6 +20,7 @@ const userRepository = new MongooseUserRepository();
 const roleQueryRepository = new MongooseRoleQueryRepository();
 const passwordHash = new PasswordHasher();
 const tokenService = new JwtTokenService();
+const emailService = new NodemailerEmailService();
 
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
@@ -24,9 +28,18 @@ const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHash
 const loginUseCase = new LoginUseCase(userRepository, passwordHash, tokenService);
 const refreshTokenService = new RefreshTokenUseCase(tokenService);
 const validateToken = new ValidateTokenUseCase(tokenService);
+const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, tokenService, emailService);
+const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, tokenService, passwordHash);
 //capa de interfaz
 //se inyectan las dependencias
-const authController = new AuthController(registerUserUseCase, loginUseCase, refreshTokenService, validateToken);
+const authController = new AuthController(
+  registerUserUseCase,
+  loginUseCase,
+  refreshTokenService,
+  validateToken,
+  forgotPasswordUseCase,
+  resetPasswordUseCase,
+);
 
 /**
  * @swagger
@@ -234,5 +247,9 @@ router.post("/refreshToken", (req, res) => authController.TokenRefresh(req, res)
 router.get("/validate", (req, res) => authController.tokenValidate(req, res));
 //crea cuenta de usuario con role owner y is_active=false
 router.post("/register", (req, res) => authController.register(req, res));
+
+router.post("/forgot-password", (req, res) => authController.forgotPassword(req, res));
+
+router.post("/reset-password", (req, res) => authController.resetPassword(req, res));
 
 export default router;
