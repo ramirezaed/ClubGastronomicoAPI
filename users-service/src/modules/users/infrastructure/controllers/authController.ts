@@ -14,6 +14,9 @@ import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/Roles
 import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/auth/ForgotPasswordUseCase";
 import { ResetPasswordUseCase } from "@/modules/users/application/use-cases/auth/ResetPasswordUseCase";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { ChangePasswordDTO } from "@/modules/users/application/dtos/user/ChangePasswordDTO";
+import { ChangePasswordUseCase } from "@/modules/users/application/use-cases/user/ChangePasswordUseCase";
+import { promises } from "node:dns";
 
 export class AuthController {
   constructor(
@@ -23,6 +26,7 @@ export class AuthController {
     private readonly validateToken: ValidateTokenUseCase,
     private readonly forgot: ForgotPasswordUseCase,
     private readonly reset: ResetPasswordUseCase,
+    private readonly changePass: ChangePasswordUseCase,
   ) {}
 
   async login(req: Request, res: Response): Promise<void> {
@@ -141,7 +145,6 @@ export class AuthController {
       return;
     }
   }
-
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { token, newPassword } = req.body;
@@ -156,6 +159,29 @@ export class AuthController {
         res.status(404).json({ message: error.message });
         return;
       }
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async changePassword(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.user.id; // viene del middleware auth.middleware
+      const { currentPassword, newPassword } = req.body;
+      const newPass = await this.changePass.execute(id, { currentPassword, newPassword });
+      res.status(200).json({ message: "La contraseña se actualizo Correctamente", newPass });
+      return;
+    } catch (error) {
+      if (error instanceof InvalidCreedentialError) {
+        res.status(401).json({ message: "La contraseña actual es incorrecta" });
+        return;
+      }
+      if (error instanceof InactiveUserError) {
+        res.status(403).json({ message: error.message });
+      }
+      if (error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+      }
+      console.log("erro change passwor ", error);
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
