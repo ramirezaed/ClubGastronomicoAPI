@@ -30,7 +30,6 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
         : null,
     };
   }
-
   async findAll(
     filter?: { is_active?: boolean; roleName?: string },
     pagination?: IPaginationDTO,
@@ -128,6 +127,11 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
       // .populate("branch_id", "name")
       .lean();
 
+    if (!doc) return null;
+    return this.toDTO(doc);
+  }
+  async findByName(name: string): Promise<GetUserResponseDTO | null> {
+    const doc = await UserModel.findOne({ name });
     if (!doc) return null;
     return this.toDTO(doc);
   }

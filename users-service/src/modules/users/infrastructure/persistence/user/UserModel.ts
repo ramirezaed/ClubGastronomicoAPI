@@ -57,14 +57,5 @@ const UsersSchema = new Schema<IUserDocument>(
   },
 );
 
-UsersSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
-  try {
-    this.password = await bcrypt.hash(this.password ?? "", 10);
-  } catch (error) {
-    console.log("error al hashear");
-  }
-});
-
 const UserModel = model<IUserDocument>("Users", UsersSchema);
 export default UserModel;

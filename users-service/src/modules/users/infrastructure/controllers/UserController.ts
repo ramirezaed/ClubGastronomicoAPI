@@ -43,7 +43,6 @@ export class UserController {
       return;
     }
   }
-
   async update(req: Request, res: Response): Promise<void> {
     const id = req.user.id as string;
     const { name, lastname } = req.body as IUpdateUserDTO;
@@ -97,7 +96,6 @@ export class UserController {
       return;
     }
   }
-
   async softDelete(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
@@ -113,7 +111,6 @@ export class UserController {
       return;
     }
   }
-
   async activate(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {

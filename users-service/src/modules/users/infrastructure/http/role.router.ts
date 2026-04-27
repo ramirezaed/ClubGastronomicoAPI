@@ -9,6 +9,8 @@ import { DeleteRole } from "@/modules/users/application/use-cases/role/DeleteRol
 import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/ActivcateRoleUseCase";
 import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
 import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
+import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
+import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
 
 const RoleRouter = Router();
 //inyeccion de dependencias
@@ -369,17 +371,25 @@ const roleController = new RoleController(
  */
 
 //registrar nuevo Rol
-RoleRouter.post("/", (req, res) => roleController.register(req, res));
+RoleRouter.post("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.register(req, res));
 // obtener todos los roles
-RoleRouter.get("/", (req, res) => roleController.getAll(req, res));
+RoleRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.getAll(req, res));
 // obtener rol por id
-RoleRouter.get("/:id", (req, res) => roleController.getRoleByID(req, res));
+RoleRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+  roleController.getRoleByID(req, res),
+);
 // actualizar rol
-RoleRouter.patch("/:id", (req, res) => roleController.update(req, res));
+RoleRouter.patch("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.update(req, res));
 //activar rol
-RoleRouter.patch("/activate/:id", (req, res) => roleController.activate(req, res));
+RoleRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+  roleController.activate(req, res),
+);
 //desactivar rol
-RoleRouter.patch("/deactivate/:id", (req, res) => roleController.deactivate(req, res));
+RoleRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+  roleController.deactivate(req, res),
+);
 // eliminar rol
-RoleRouter.delete("/:id", (req, res) => roleController.softDelete(req, res));
+RoleRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+  roleController.softDelete(req, res),
+);
 export default RoleRouter;

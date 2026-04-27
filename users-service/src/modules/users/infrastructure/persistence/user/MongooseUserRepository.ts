@@ -12,23 +12,26 @@ export class MongooseUserRepository implements IUserRepository {
       doc.lastname,
       doc.email,
       doc.password,
-      doc.role_id,
+      // doc.role_id,
+      // doc.role_name,
+      doc.role_id?._id?.toString() ?? doc.role_id, // soporta populate o no populate
+      doc.role_id?.name ?? doc.role_name ?? null, // nombre del rol plano
       doc.is_active,
       doc.deleted_at,
     );
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const doc = await UserModel.findOne({ email });
+    const doc = await UserModel.findOne({ email }).populate("role_id", "name");
     if (!doc) return null;
     return this.toEntity(doc); //
   }
   async findById(id: string): Promise<User | null> {
-    const doc = await UserModel.findOne({ _id: id, delete_at: null });
+    const doc = await UserModel.findOne({ _id: id, delete_at: null }).populate("role_id", "name");
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  async save(user: User): Promise<User | null> {
+  async save(user: User): Promise<User> {
     const doc = new UserModel({
       company_id: user.company_id,
       branch_id: user.branch_id,
@@ -41,7 +44,6 @@ export class MongooseUserRepository implements IUserRepository {
       deleted_at: user.deleted_at,
     });
 
-    if (!doc) return null;
     const saved = await doc.save();
     return this.toEntity(saved); //
   }
@@ -55,6 +57,7 @@ export class MongooseUserRepository implements IUserRepository {
         $set: {
           name: user.name, // para el update
           lastname: user.lastname, // para el update
+          password: user.password, //para el reset password
           is_active: user.is_active, // para activate/deactivate
           role_id: user.role_id, //para cambiar el rol
           deleted_at: user.deleted_at, // para la eliminacion logica

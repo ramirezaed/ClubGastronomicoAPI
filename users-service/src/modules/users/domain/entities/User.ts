@@ -1,6 +1,9 @@
 //es una clase, defino que es un usuario (id, nombre apellido email etc etc)
 //se puede validar la logica  , como por ejemplo user.isValidEmail() que cumpla con nombre@nombre.com
 
+import { InactiveUserError } from "@/modules/users/domain/exceptions/user/InactiveUser";
+import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
+import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
 import { UserAlreadyActiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyActiveError";
 import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
 import { UserInactiveError } from "@/modules/users/domain/exceptions/user/UserInactiveError";
@@ -20,10 +23,31 @@ export class User {
     public email: string,
     public password: string,
     public role_id: string,
+    public role_name: string,
     public is_active: boolean,
     public deleted_at: Date | null,
   ) {}
 
+  static create(
+    name: string,
+    lastname: string,
+    email: string,
+    hashedPassword: string, // ya viene hasheado del caso de uso
+    role_id: string,
+    role_name: string,
+    company_id: string | null,
+    branch_id: string | null,
+  ): User {
+    if (!name || !lastname || !email || !hashedPassword || !role_id) {
+      throw new RegisterUserError();
+    }
+    return new User("", company_id, branch_id, name, lastname, email, hashedPassword, role_id, role_name, false, null);
+  }
+  verifyIsActive(): void {
+    if (!this.is_active) {
+      throw new InactiveUserError();
+    }
+  }
   update(name: string, lastname: string): void {
     if (!this.is_active) {
       throw new UserInactiveError();
@@ -31,7 +55,6 @@ export class User {
     this.name = name ?? this.name;
     this.lastname = lastname ?? this.lastname;
   }
-
   activate(): void {
     if (this.is_active) {
       throw new UserAlreadyActiveError();
@@ -52,7 +75,7 @@ export class User {
     this.deleted_at = new Date();
     this.is_active = false;
   }
-  updateRole(idRole: string): void {
+  updateRole(idRole: string, roleName: string): void {
     if (!this.is_active) {
       throw new UserInactiveError();
     }
@@ -60,5 +83,15 @@ export class User {
       throw new Error("todos los campos son necesrio");
     }
     this.role_id = idRole;
+    this.role_name = roleName;
+  }
+  resetPassword(hashedPassword: string): void {
+    if (!hashedPassword) throw new RegisterUserError();
+    this.password = hashedPassword;
+  }
+  verifyPassword(isMatch: boolean): void {
+    if (!isMatch) {
+      throw new InvalidCreedentialError();
+    }
   }
 }
