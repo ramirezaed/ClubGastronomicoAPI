@@ -315,7 +315,7 @@ UserRouter.patch("/me", authMiddleware, (req, res) => userController.update(req,
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+UserRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
   userController.activate(req, res),
 );
 
@@ -355,7 +355,7 @@ UserRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), 
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+UserRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
   userController.deactivate(req, res),
 );
 /**
@@ -405,10 +405,9 @@ UserRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin")
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.patch("/role/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+UserRouter.patch("/role/:id", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
   userController.updateRole(req, res),
 );
-
 /**
  * @swagger
  * /api/user/{id}:
