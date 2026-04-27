@@ -12,8 +12,8 @@ import { ResetPasswordUseCase } from "@/modules/users/application/use-cases/auth
 import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/auth/ForgotPasswordUseCase";
 import { NodemailerEmailService } from "@/modules/users/infrastructure/services/emailService";
 import { ChangePasswordUseCase } from "@/modules/users/application/use-cases/user/ChangePasswordUseCase";
-import path from "node:path";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
+import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
 
 const router = Router();
 //inyeccion de dependencias

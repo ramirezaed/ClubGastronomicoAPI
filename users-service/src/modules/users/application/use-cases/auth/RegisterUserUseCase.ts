@@ -30,6 +30,7 @@ export class RegisterUserUseCase {
       dto.email,
       hashedPassword,
       ownerRole.id, // rol owner por defecto
+      ownerRole.name,
       dto.company_id ?? null,
       dto.branch_id ?? null,
     );
@@ -42,6 +43,7 @@ export class RegisterUserUseCase {
       lastname: saved.lastname,
       email: saved.email,
       role_id: saved.role_id,
+      role_name: saved.role_name,
       company_id: saved.company_id,
       branch_id: saved.branch_id,
       is_active: saved.is_active,

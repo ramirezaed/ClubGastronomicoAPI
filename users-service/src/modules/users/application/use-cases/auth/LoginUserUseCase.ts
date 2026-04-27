@@ -25,6 +25,7 @@ export class LoginUseCase {
       id: user.id,
       email: user.email,
       role_id: user.role_id,
+      role_name: user.role_name,
       company_id: user.company_id,
       branch_id: user.branch_id,
     };
@@ -37,6 +38,7 @@ export class LoginUseCase {
         name: user.name,
         email: user.email,
         role_id: user.role_id,
+        role_name: user.role_name,
         company_id: user.company_id,
         branch_id: user.branch_id,
       },

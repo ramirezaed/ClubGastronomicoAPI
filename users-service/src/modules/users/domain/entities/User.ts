@@ -23,6 +23,7 @@ export class User {
     public email: string,
     public password: string,
     public role_id: string,
+    public role_name: string,
     public is_active: boolean,
     public deleted_at: Date | null,
   ) {}
@@ -33,13 +34,14 @@ export class User {
     email: string,
     hashedPassword: string, // ya viene hasheado del caso de uso
     role_id: string,
+    role_name: string,
     company_id: string | null,
     branch_id: string | null,
   ): User {
     if (!name || !lastname || !email || !hashedPassword || !role_id) {
       throw new RegisterUserError();
     }
-    return new User("", company_id, branch_id, name, lastname, email, hashedPassword, role_id, false, null);
+    return new User("", company_id, branch_id, name, lastname, email, hashedPassword, role_id, role_name, false, null);
   }
   verifyIsActive(): void {
     if (!this.is_active) {
@@ -73,7 +75,7 @@ export class User {
     this.deleted_at = new Date();
     this.is_active = false;
   }
-  updateRole(idRole: string): void {
+  updateRole(idRole: string, roleName: string): void {
     if (!this.is_active) {
       throw new UserInactiveError();
     }
@@ -81,6 +83,7 @@ export class User {
       throw new Error("todos los campos son necesrio");
     }
     this.role_id = idRole;
+    this.role_name = roleName;
   }
   resetPassword(hashedPassword: string): void {
     if (!hashedPassword) throw new RegisterUserError();

@@ -22,14 +22,6 @@ export class MongooseRoleRepository implements IRoleRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
-  // async findAll(): Promise<Role[] | null> {
-  //   const doc = await RoleModel.find({ deleted_at: null });
-  //   // Mongo devuelve Document[] , el dominio necesita Role[]
-  //   // se aplica el mapper toEntity() a cada documento.
-  //   if (!doc) return null;
-  //   return doc.map((doc) => this.toEntity(doc));
-  // }
-
   async update(role: Role): Promise<Role> {
     const doc = await RoleModel.findByIdAndUpdate(
       {

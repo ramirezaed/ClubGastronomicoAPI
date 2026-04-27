@@ -8,5 +8,6 @@ export interface ILoginResponseDTO {
     name: string;
     email: string;
     role_id: string;
+    role_name: string;
   };
 }

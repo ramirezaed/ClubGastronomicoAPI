@@ -12,19 +12,22 @@ export class MongooseUserRepository implements IUserRepository {
       doc.lastname,
       doc.email,
       doc.password,
-      doc.role_id,
+      // doc.role_id,
+      // doc.role_name,
+      doc.role_id?._id?.toString() ?? doc.role_id, // soporta populate o no populate
+      doc.role_id?.name ?? doc.role_name ?? null, // nombre del rol plano
       doc.is_active,
       doc.deleted_at,
     );
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const doc = await UserModel.findOne({ email });
+    const doc = await UserModel.findOne({ email }).populate("role_id", "name");
     if (!doc) return null;
     return this.toEntity(doc); //
   }
   async findById(id: string): Promise<User | null> {
-    const doc = await UserModel.findOne({ _id: id, delete_at: null });
+    const doc = await UserModel.findOne({ _id: id, delete_at: null }).populate("role_id", "name");
     if (!doc) return null;
     return this.toEntity(doc);
   }
