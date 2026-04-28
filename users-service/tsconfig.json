@@ -1,0 +1,53 @@
+// {
+//   "compilerOptions": {
+//     "rootDir": "./src",
+//     "outDir": "./dist",
+//     "baseUrl": ".",
+//     "paths": {
+//       "@/*": ["src/*"],
+//       "@domain/*": ["src/modules/users/domain/*"],
+//       "@application/*": ["src/modules/users/application/*"],
+//       "@infra/*": ["src/modules/users/infrastructure/*"]
+//     },
+
+//     "ignoreDeprecations": "5.0",
+
+//     "module": "commonjs",
+//     "target": "es2019",
+//     "lib": ["es2019"],
+//   "types": ["node", "express"],
+//     "esModuleInterop": true,
+//     "resolveJsonModule": true,
+//     "strict": true,
+//     "skipLibCheck": true,
+//     "sourceMap": true
+//   }
+// }
+
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@domain/*": ["src/modules/users/domain/*"],
+      "@application/*": ["src/modules/users/application/*"],
+      "@infra/*": ["src/modules/users/infrastructure/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"
+    ],
+    "ignoreDeprecations": "5.0",
+    "module": "commonjs",
+    "target": "es2019",
+    "lib": ["es2019"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"] 
+}
