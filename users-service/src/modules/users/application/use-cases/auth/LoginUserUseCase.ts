@@ -1,8 +1,8 @@
 import { ILoginDTO } from "@/modules/users/application/dtos/user/LoginDTO.ts";
 import { ILoginResponseDTO } from "@/modules/users/application/dtos/user/ILoginResponseDTO";
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
-import { IPasswordHash } from "@/modules/users/domain/services/IpasswordHash";
-import { ITokenService } from "@/modules/users/domain/services/ItokenService";
+import { IPasswordHash } from "@/modules/users/domain/ports/IpasswordHash";
+import { ITokenService } from "@/modules/users/domain/ports/ItokenService";
 import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/InvalidCreedentialError";
 
 export class LoginUseCase {

@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { IPasswordHash } from "@/modules/users/domain/services/IpasswordHash";
+import { IPasswordHash } from "@/modules/users/domain/ports/IpasswordHash";
 export class PasswordHasher implements IPasswordHash {
   private readonly saltRounds = 10;
 

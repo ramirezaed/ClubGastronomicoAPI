@@ -13,7 +13,7 @@ import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/aut
 import { NodemailerEmailService } from "@/modules/users/infrastructure/services/emailService";
 import { ChangePasswordUseCase } from "@/modules/users/application/use-cases/user/ChangePasswordUseCase";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
-import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
+import { n8nRegisterNotifier } from "@/modules/users/infrastructure/services/n8nRegisterNotifier";
 
 const router = Router();
 //inyeccion de dependencias
@@ -24,10 +24,11 @@ const roleQueryRepository = new MongooseRoleQueryRepository();
 const passwordHash = new PasswordHasher();
 const tokenService = new JwtTokenService();
 const emailService = new NodemailerEmailService();
+const notifier = new n8nRegisterNotifier();
 
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
-const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHash, roleQueryRepository);
+const registerUserUseCase = new RegisterUserUseCase(userRepository, passwordHash, roleQueryRepository, notifier);
 const loginUseCase = new LoginUseCase(userRepository, passwordHash, tokenService);
 const refreshTokenService = new RefreshTokenUseCase(tokenService);
 const validateToken = new ValidateTokenUseCase(tokenService);
@@ -46,60 +47,6 @@ const authController = new AuthController(
   changePassworduseCase,
 );
 
-/**
- * @swagger
- * /api/auth/register:
- *   post:
- *     summary: Registrar un nuevo usuario
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name, lastname, email, password, role_id]
- *             properties:
- *               company_id:
- *                 type: string
- *                 nullable: true
- *                 example: "64f1a2b3c4d5e6f7a8b9c0d1"
- *                 description: ID de la empresa (opcional)
- *               branch_id:
- *                 type: string
- *                 nullable: true
- *                 example: "64f1a2b3c4d5e6f7a8b9c0d2"
- *                 description: ID de la sucursal (opcional)
- *               name:
- *                 type: string
- *                 example: Alejandro
- *                 description: Nombre del usuario
- *               lastname:
- *                 type: string
- *                 example: Ramirez
- *                 description: Apellido del usuario
- *               email:
- *                 type: string
- *                 example: ale@gmail.com
- *                 description: Correo electrónico del usuario
- *               password:
- *                 type: string
- *                 example: "123456"
- *                 description: Contraseña del usuario
- *               role_id:
- *                 type: string
- *                 example: "64f1a2b3c4d5e6f7a8b9c0d3"
- *                 description: ID del rol del usuario
- *     responses:
- *       201:
- *         description: Usuario registrado exitosamente
- *       400:
- *         description: Todos los campos son requeridos
- *       409:
- *         description: El correo ya está registrado
- *       500:
- *         description: No se pudo completar el registro de usuario
- */
 /**
  * @swagger
  * /api/auth/login:

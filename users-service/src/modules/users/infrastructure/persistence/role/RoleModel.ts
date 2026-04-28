@@ -8,10 +8,10 @@ const RoleSchema = new Schema<IRoleDocument>(
       required: true,
       unique: true,
     },
-    permissions: {
-      type: [String],
-      default: [],
-    },
+    // permissions: {
+    //   type: [String],
+    //   default: [],
+    // },
     description: {
       type: String,
       required: true,

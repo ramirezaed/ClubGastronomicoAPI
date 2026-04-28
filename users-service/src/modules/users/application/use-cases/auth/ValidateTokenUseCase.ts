@@ -1,4 +1,4 @@
-import { ITokenService, TokenPayload } from "@/modules/users/domain/services/ItokenService";
+import { ITokenService, TokenPayload } from "@/modules/users/domain/ports/ItokenService";
 
 export class ValidateTokenUseCase {
   constructor(private readonly tokenService: ITokenService) {}

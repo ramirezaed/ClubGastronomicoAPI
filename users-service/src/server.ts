@@ -1,5 +1,4 @@
-// import { config } from "dotenv";
-import "dotenv/config"; // 👈 PRIMERA LINEA SIEMPRE
+import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -10,8 +9,6 @@ import { seedRoles } from "@/config/roleSeeder";
 import router from "@/modules/users/infrastructure/http/auth.router";
 import RoleRouter from "@/modules/users/infrastructure/http/role.router";
 import UserRouter from "@/modules/users/infrastructure/http/user.router";
-
-// config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;

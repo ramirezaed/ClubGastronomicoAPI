@@ -1,6 +1,6 @@
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
-import { ITokenService } from "@/modules/users/domain/services/ItokenService";
-import { IPasswordHash } from "@/modules/users/domain/services/IpasswordHash";
+import { ITokenService } from "@/modules/users/domain/ports/ItokenService";
+import { IPasswordHash } from "@/modules/users/domain/ports/IpasswordHash";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 
 export class ResetPasswordUseCase {

@@ -1,4 +1,4 @@
-import { ITokenService } from "@/modules/users/domain/services/ItokenService";
+import { ITokenService } from "@/modules/users/domain/ports/ItokenService";
 
 export class RefreshTokenUseCase {
   constructor(private readonly tokenService: ITokenService) {}
