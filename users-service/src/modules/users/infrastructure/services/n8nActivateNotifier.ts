@@ -1,6 +1,6 @@
-import { UserRegisterNotifier } from "@/modules/users/domain/ports/UserResgisterNotifier";
+import { UserActivateNotifier } from "@/modules/users/domain/ports/UserAcivateNotifier";
 
-export class N8nWebhookNotifier implements UserRegisterNotifier {
+export class n8nActivateNotifier implements UserActivateNotifier {
   async notify(data: { id: string; name: string; lastname: string; email: string }): Promise<void> {
     const url = process.env.N8N_WEBHOOK_URL;
 
@@ -13,8 +13,8 @@ export class N8nWebhookNotifier implements UserRegisterNotifier {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        event: "user.registered",
-        payload: data,
+        event: "user.activate",
+        data,
       }),
     });
 

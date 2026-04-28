@@ -13,18 +13,20 @@ import { UpdateRoleUserUseCase } from "@/modules/users/application/use-cases/use
 import { MongooseUserQueryRepository } from "@/modules/users/infrastructure/persistence/user/MongooseUserQueryRepository";
 import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
 import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
+import { n8nActivateNotifier } from "@/modules/users/infrastructure/services/n8nActivateNotifier";
 
 const UserRouter = Router();
 
 const userRepository = new MongooseUserRepository();
 const userQueryRepository = new MongooseUserQueryRepository();
 const roleRepository = new MongooseRoleRepository();
+const notifier = new n8nActivateNotifier();
 
 const meUserUseCase = new MeUserUseCase(userQueryRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
 const getAllUserUseCase = new GetAllUsersUseCase(userQueryRepository, roleRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
-const activateUserUseCase = new ActivateUserUseCase(userRepository);
+const activateUserUseCase = new ActivateUserUseCase(userRepository, notifier);
 const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
 const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
 const findByIdUserUseCase = new findByIdUseCase(userQueryRepository);

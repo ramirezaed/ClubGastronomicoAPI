@@ -13,8 +13,7 @@ import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/aut
 import { NodemailerEmailService } from "@/modules/users/infrastructure/services/emailService";
 import { ChangePasswordUseCase } from "@/modules/users/application/use-cases/user/ChangePasswordUseCase";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
-import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
-import { N8nWebhookNotifier } from "@/modules/users/infrastructure/services/n8nWebHookNotifier";
+import { n8nRegisterNotifier } from "@/modules/users/infrastructure/services/n8nRegisterNotifier";
 
 const router = Router();
 //inyeccion de dependencias
@@ -25,7 +24,7 @@ const roleQueryRepository = new MongooseRoleQueryRepository();
 const passwordHash = new PasswordHasher();
 const tokenService = new JwtTokenService();
 const emailService = new NodemailerEmailService();
-const notifier = new N8nWebhookNotifier();
+const notifier = new n8nRegisterNotifier();
 
 //capa de aplicacion (Casos de Uso)
 //aca se define que hace
