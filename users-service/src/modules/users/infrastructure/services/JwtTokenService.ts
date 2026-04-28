@@ -1,14 +1,17 @@
 import jwt from "jsonwebtoken";
-import { ITokenService, TokenPayload } from "@/modules/users/domain/services/ItokenService";
+import { ITokenService, TokenPayload } from "@/modules/users/domain/ports/ItokenService";
 import { InvalidtokenError } from "@/modules/users/domain/exceptions/user/invalidToken";
-import { ResetTokenPayload } from "@/modules/users/domain/services/ItokenService";
+import { ResetTokenPayload } from "@/modules/users/domain/ports/ItokenService";
 export class JwtTokenService implements ITokenService {
+  //genera el token de acceso
   generateAccessToken(payload: TokenPayload): string {
     return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: "15m" });
   }
+  //genera el refresh token
   generateRefreshToken(payload: TokenPayload): string {
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
   }
+
   verifyRefreshToken(token: string): TokenPayload {
     try {
       return jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as TokenPayload;
@@ -16,6 +19,7 @@ export class JwtTokenService implements ITokenService {
       throw new InvalidtokenError();
     }
   }
+
   verifyAccessToken(token: string): TokenPayload {
     try {
       return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;

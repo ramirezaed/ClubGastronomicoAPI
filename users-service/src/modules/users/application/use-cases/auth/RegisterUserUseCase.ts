@@ -1,17 +1,19 @@
 import { User } from "@/modules/users/domain/entities/User";
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
-import { IPasswordHash } from "@/modules/users/domain/services/IpasswordHash";
+import { IPasswordHash } from "@/modules/users/domain/ports/IpasswordHash";
 import { IRegisterUserDTO } from "@/modules/users/application/dtos/user/RegisterUserDTO";
 import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError";
 import { ResponseUserDTO } from "@/modules/users/application/dtos/user/ResponseUserDTO";
 import { IRoleQueryRepository } from "@/modules/users/domain/repositories/role/IRoleQueryRepository";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
+import { UserRegisterNotifier } from "@/modules/users/domain/ports/UserResgisterNotifier";
 
 export class RegisterUserUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly passwordHash: IPasswordHash,
     private readonly roleRepository: IRoleQueryRepository,
+    private readonly registerNotifier: UserRegisterNotifier,
   ) {}
 
   async execute(dto: IRegisterUserDTO): Promise<ResponseUserDTO> {
@@ -36,6 +38,13 @@ export class RegisterUserUseCase {
     );
 
     const saved = await this.userRepository.save(user);
+    //llama al evento externo "n8n"
+    await this.registerNotifier.notify({
+      id: user.id,
+      name: user.name,
+      lastname: user.lastname,
+      email: user.email,
+    });
 
     return {
       id: saved.id,

@@ -1,6 +1,6 @@
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
-import { ITokenService } from "@/modules/users/domain/services/ItokenService";
-import { IEmailService } from "@/modules/users/domain/services/IEmailService";
+import { ITokenService } from "@/modules/users/domain/ports/ItokenService";
+import { IEmailService } from "@/modules/users/domain/ports/IEmailService";
 
 export class ForgotPasswordUseCase {
   constructor(

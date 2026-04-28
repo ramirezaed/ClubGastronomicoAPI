@@ -68,6 +68,7 @@ const roleController = new RoleController(
  *           example: true
  */
 
+//registrar nuevo Rol
 /**
  * @swagger
  * /api/roles:
@@ -120,6 +121,8 @@ const roleController = new RoleController(
  *       500:
  *         description: No se pudo registrar el rol
  */
+RoleRouter.post("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.register(req, res));
+// obtener todos los roles
 /**
  * @swagger
  * /api/roles:
@@ -146,6 +149,8 @@ const roleController = new RoleController(
  *       500:
  *         description: Error interno del servidor
  */
+RoleRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.getAll(req, res));
+// obtener rol por id
 /**
  * @swagger
  * /api/roles/{id}:
@@ -178,6 +183,10 @@ const roleController = new RoleController(
  *       500:
  *         description: Error interno del servidor
  */
+RoleRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+  roleController.getRoleByID(req, res),
+);
+// actualizar rol
 /**
  * @swagger
  * /api/roles/{id}:
@@ -232,27 +241,8 @@ const roleController = new RoleController(
  *       500:
  *         description: No se pudo actualizar el rol
  */
-/**
- * @swagger
- * /api/roles/{id}:
- *   delete:
- *     summary: Eliminar rol (Soft delete)
- *     description: Marca el rol con deleted_at sin eliminarlo físicamente.
- *     tags: [Roles]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       204:
- *         description: Rol eliminado correctamente
- *       404:
- *         description: El rol no existe
- *       500:
- *         description: Error interno
- */
+RoleRouter.patch("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.update(req, res));
+//activar rol
 /**
  * @swagger
  * /api/roles/activate/{id}:
@@ -311,6 +301,10 @@ const roleController = new RoleController(
  *                   type: string
  *                   example: error interno del servidor
  */
+RoleRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
+  roleController.activate(req, res),
+);
+//desactivar rol
 /**
  * @swagger
  * /api/roles/deactivate/{id}:
@@ -369,26 +363,31 @@ const roleController = new RoleController(
  *                   type: string
  *                   example: error interno del servidor
  */
-
-//registrar nuevo Rol
-RoleRouter.post("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.register(req, res));
-// obtener todos los roles
-RoleRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.getAll(req, res));
-// obtener rol por id
-RoleRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  roleController.getRoleByID(req, res),
-);
-// actualizar rol
-RoleRouter.patch("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.update(req, res));
-//activar rol
-RoleRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  roleController.activate(req, res),
-);
-//desactivar rol
 RoleRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
   roleController.deactivate(req, res),
 );
 // eliminar rol
+/**
+ * @swagger
+ * /api/roles/{id}:
+ *   delete:
+ *     summary: Eliminar rol (Soft delete)
+ *     description: Marca el rol con deleted_at sin eliminarlo físicamente.
+ *     tags: [Roles]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Rol eliminado correctamente
+ *       404:
+ *         description: El rol no existe
+ *       500:
+ *         description: Error interno
+ */
 RoleRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
   roleController.softDelete(req, res),
 );
