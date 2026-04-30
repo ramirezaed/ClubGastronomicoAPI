@@ -39,12 +39,16 @@ export class RegisterUserUseCase {
 
     const saved = await this.userRepository.save(user);
     //llama al evento externo "n8n"
-    await this.registerNotifier.notify({
-      id: user.id,
-      name: user.name,
-      lastname: user.lastname,
-      email: user.email,
-    });
+    try {
+      await this.registerNotifier.notify({
+        id: user.id,
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+      });
+    } catch (error) {
+      console.error(error);
+    }
 
     return {
       id: saved.id,

@@ -14,9 +14,8 @@ import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/Roles
 import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/auth/ForgotPasswordUseCase";
 import { ResetPasswordUseCase } from "@/modules/users/application/use-cases/auth/ResetPasswordUseCase";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
-import { ChangePasswordDTO } from "@/modules/users/application/dtos/user/ChangePasswordDTO";
 import { ChangePasswordUseCase } from "@/modules/users/application/use-cases/user/ChangePasswordUseCase";
-import { promises } from "node:dns";
+import { N8nServiceInactiveError } from "@/modules/users/domain/exceptions/auth/n8nserviceInactiveError";
 
 export class AuthController {
   constructor(
@@ -101,7 +100,6 @@ export class AuthController {
       res.status(400).json({ message: "Todos los campos son requeridos" });
       return;
     }
-    // ejecuta el caso de uso RegisterUser
     try {
       const user = await this.registerUser.execute({
         name,
@@ -141,6 +139,10 @@ export class AuthController {
         res.status(403).json({ message: error.message });
         return;
       }
+      if (error instanceof N8nServiceInactiveError) {
+        res.status(503).json({ message: error.message });
+        return;
+      }
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
@@ -162,7 +164,6 @@ export class AuthController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
-
   async changePassword(req: Request, res: Response): Promise<void> {
     try {
       const id = req.user.id; // viene del middleware auth.middleware

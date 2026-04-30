@@ -1,3 +1,3 @@
-export interface IEmailService {
-  sendPasswordReset(to: string, resetToken: string): Promise<void>;
+export interface PasswordResetNotifier {
+  notify(data: { email: string; resetToken: string }): Promise<void>;
 }
