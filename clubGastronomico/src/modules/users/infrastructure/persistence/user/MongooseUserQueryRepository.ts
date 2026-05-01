@@ -81,8 +81,8 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     }
 
     const companyFilter = [
-      user.company && { company_id: user.company },
-      user.branch && { branch_id: user.branch },
+      user.company_id && { company_id: user.company_id },
+      user.branch_id && { branch_id: user.branch_id },
     ].filter(Boolean);
 
     if (!companyFilter.length) {

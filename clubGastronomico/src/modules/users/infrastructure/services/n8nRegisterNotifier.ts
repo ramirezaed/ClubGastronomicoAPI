@@ -22,7 +22,11 @@ export class n8nRegisterNotifier implements UserRegisterNotifier {
 
       if (!response.ok) {
         const text = await response.text();
-        throw new Error(`Error calling n8n webhook: ${response.status} - ${text}`);
+        console.error("Error al llamar al servicio de n8n (user.registered):", {
+          status: response.status,
+          body: text,
+        });
+        throw new N8nServiceNotFound();
       }
     } catch (error) {
       throw new N8nServiceNotFound();
