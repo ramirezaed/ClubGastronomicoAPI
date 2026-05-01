@@ -1,6 +1,6 @@
 export interface CurrentUserDto {
   id: string;
   role_id: string;
-  company: string | null;
-  branch: string | null;
+  company_id: string | null;
+  branch_id: string | null;
 }

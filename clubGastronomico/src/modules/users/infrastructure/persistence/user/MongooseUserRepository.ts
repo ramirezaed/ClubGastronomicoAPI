@@ -31,6 +31,7 @@ export class MongooseUserRepository implements IUserRepository {
     if (!doc) return null;
     return this.toEntity(doc);
   }
+
   async save(user: User): Promise<User> {
     const doc = new UserModel({
       company_id: user.company_id,

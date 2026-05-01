@@ -1,10 +1,10 @@
 export interface ITokenService {
   generateAccessToken(payload: TokenPayload): string;
   generateRefreshToken(payload: TokenPayload): string;
+  generateResetToken(payload: ResetTokenPayload): string;
   verifyRefreshToken(token: string): TokenPayload;
   verifyAccessToken(token: string): TokenPayload;
-  generateResetToken(payload: ResetTokenPayload): string;
-  verifyResetToken(token: string): ResetTokenPayload; // ← nuevo
+  verifyResetToken(token: string): ResetTokenPayload;
 }
 
 export interface TokenPayload {
