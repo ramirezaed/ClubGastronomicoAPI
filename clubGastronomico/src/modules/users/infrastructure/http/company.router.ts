@@ -2,6 +2,7 @@ import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/co
 import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/company/getAllCompanyUseCase";
 import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/meCompanyUseCase";
 import { RegisterCompanyUseCase } from "@/modules/users/application/use-cases/company/registerCompanyUseCase";
+import { UpdateCompanyUseCase } from "@/modules/users/application/use-cases/company/updateCompanyUseCase";
 import { CompanyController } from "@/modules/users/infrastructure/controllers/companyController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
 import { CompanyRepository } from "@/modules/users/infrastructure/persistence/company/CompanyRepository";
@@ -26,7 +27,7 @@ const registercompanyUseCase = new RegisterCompanyUseCase(companyRepository, sub
 const getAllCompanyUseCase = new GetAllCompanyUseCase(companyQueryRepository);
 const findByIdCompany = new findByIdCompanyUseCase(companyQueryRepository);
 const meCompany = new meCompanyUseCase(companyQueryRepository);
-
+const updateCompany = new UpdateCompanyUseCase(companyRepository);
 //capa de interfaz
 //se inyectan las dependencias
 const companyController = new CompanyController(
@@ -34,6 +35,7 @@ const companyController = new CompanyController(
   getAllCompanyUseCase,
   findByIdCompany,
   meCompany,
+  updateCompany,
 );
 
 CompanyRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) => companyController.register(req, res));
@@ -41,6 +43,9 @@ CompanyRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) 
 CompanyRouter.get("/me", authMiddleware, (req, res) => companyController.MeCompany(req, res));
 CompanyRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
   companyController.findById(req, res),
+);
+CompanyRouter.patch("/update", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  companyController.update(req, res),
 );
 
 export default CompanyRouter;

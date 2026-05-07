@@ -1,4 +1,6 @@
+import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
 import { RegisterCompanyError } from "@/modules/users/domain/exceptions/Company/registerCompanyError";
+import { promises } from "node:dns";
 
 export class Company {
   constructor(
@@ -16,5 +18,12 @@ export class Company {
       throw new RegisterCompanyError();
     }
     return new Company("", owner_id, subscription_plan_id, name, phone, true, null);
+  }
+  update(name: string, phone: string): void {
+    if (!this.is_active) {
+      throw new CompanyInactiveError();
+    }
+    this.name = name ?? this.name;
+    this.phone = phone ?? this.phone;
   }
 }

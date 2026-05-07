@@ -14,7 +14,7 @@ export class CompanyRepository implements ICompanyRepository {
       doc.deleted_at,
     );
   }
-
+  //registra la nueva compania,
   async save(company: Company): Promise<Company> {
     const doc = new CompanyModel({
       owner_id: company.owner_id,
@@ -26,9 +26,39 @@ export class CompanyRepository implements ICompanyRepository {
     const saved = await doc.save();
     return this.toEntity(saved);
   }
+  async findById(id: string): Promise<Company | null> {
+    try {
+      const doc = await CompanyModel.findOne({ _id: id, deleted_at: null });
+      if (!doc) return null;
+      return this.toEntity(doc);
+    } catch (error) {
+      // este error no se muestra al usujario final, se muestra con los logs del servidor
+      throw new Error("error en la bd al buscar la compañia");
+    }
+  }
   async findByOwnerId(ownerID: string): Promise<Company | null> {
     const doc = await CompanyModel.findOne({ owner_id: ownerID, deleted_at: null });
     if (!doc) return null;
     return this.toEntity(doc);
+  }
+  async update(company: Company): Promise<Company | null> {
+    try {
+      const doc = await CompanyModel.findOneAndUpdate(
+        { _id: company.id, deleted_at: null }, //filtro
+        {
+          $set: {
+            //datos que se peuden modificar
+            name: company.name,
+            phone: company.phone,
+          },
+        },
+        { returnDocument: "after" }, //devvuelve el documento actualizado {new:true}
+      );
+      if (!doc) return null;
+      return this.toEntity(doc);
+    } catch (error) {
+      // este error no se muestra al usujario final, se muestra con los logs del servidor
+      throw new Error("error en la bd al modificar la compañia");
+    }
   }
 }

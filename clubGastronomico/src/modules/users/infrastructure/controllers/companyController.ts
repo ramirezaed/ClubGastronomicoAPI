@@ -8,6 +8,9 @@ import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/comp
 import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/company/findByIdCompanyUseCase";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/meCompanyUseCase";
+import { UpdateCompanyUseCase } from "@/modules/users/application/use-cases/company/updateCompanyUseCase";
+import { UpdateCompanyDTO } from "@/modules/users/application/dtos/company/updateCompanyDTO";
+import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
 
 export class CompanyController {
   constructor(
@@ -15,6 +18,7 @@ export class CompanyController {
     private readonly getAllCompany: GetAllCompanyUseCase,
     private readonly findByIdCompany: findByIdCompanyUseCase,
     private readonly meCompany: meCompanyUseCase,
+    private readonly updateCompany: UpdateCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -77,6 +81,28 @@ export class CompanyController {
     } catch (error) {
       if (error instanceof CompanyNotFoundError) {
         res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.user.company_id as string;
+      const data = req.body as UpdateCompanyDTO;
+
+      const companyUpdate = await this.updateCompany.execute(id, data);
+      res.status(200).json({ companyUpdate });
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof CompanyInactiveError) {
+        res.status(403).json({ message: error.message });
         return;
       }
       console.error(error);

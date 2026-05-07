@@ -67,6 +67,7 @@ export class CompanyQueryRepository {
       if (!doc) return null;
       return this.toDTO(doc);
     } catch (error) {
+      // este error no se muestra al usujario final, se muestra con los logs del servidor
       throw new Error("error en la bd al obtener datos de MeCompany");
     }
   }
