@@ -50,7 +50,7 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
         select: "name",
         match: filter?.roleName ? { name: filter.roleName } : {},
       })
-      // .populate("company_id", "name") //habilitar cunado esten los modelo de branch y company
+      .populate("company_id", "name") //habilitar cunado esten los modelo de branch y company
       // .populate("branch_id", "name")
       .skip(skip)
       .limit(limit)
@@ -81,8 +81,8 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     }
 
     const companyFilter = [
-      user.company && { company_id: user.company },
-      user.branch && { branch_id: user.branch },
+      user.company_id && { company_id: user.company_id },
+      user.branch_id && { branch_id: user.branch_id },
     ].filter(Boolean);
 
     if (!companyFilter.length) {

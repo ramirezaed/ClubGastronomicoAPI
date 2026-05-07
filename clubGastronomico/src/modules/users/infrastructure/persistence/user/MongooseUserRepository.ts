@@ -61,6 +61,7 @@ export class MongooseUserRepository implements IUserRepository {
           is_active: user.is_active, // para activate/deactivate
           role_id: user.role_id, //para cambiar el rol
           deleted_at: user.deleted_at, // para la eliminacion logica
+          company_id: user.company_id, // para agregar compañias
         },
       },
       { returnDocument: "after" }, //antes era {new:true}

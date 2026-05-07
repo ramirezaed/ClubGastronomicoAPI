@@ -94,4 +94,7 @@ export class User {
       throw new InvalidCreedentialError();
     }
   }
+  assingCompany(companyID: string): void {
+    this.company_id = companyID;
+  }
 }
