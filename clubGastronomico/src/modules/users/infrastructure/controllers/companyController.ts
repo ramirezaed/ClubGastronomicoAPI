@@ -5,11 +5,14 @@ import { CompanyAlreadyExistsError } from "@/modules/users/domain/exceptions/Com
 import { SubscriptionPlanNotFoundError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanNotFoundError";
 import { RegisterCompanyError } from "@/modules/users/domain/exceptions/Company/registerCompanyError";
 import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/company/getAllCompanyUseCase";
+import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/company/findByIdCompanyUseCase";
+import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 
 export class CompanyController {
   constructor(
     private readonly registerCompany: RegisterCompanyUseCase,
     private readonly getAllCompany: GetAllCompanyUseCase,
+    private readonly findByIdCompany: findByIdCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -45,6 +48,21 @@ export class CompanyController {
     } catch (error) {
       console.log("error get", error);
       res.status(500).json({ messsage: "error interno del servidor" });
+    }
+  }
+  async findById(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const company = await this.findByIdCompany.execute(id);
+      res.status(200).json({ company });
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
     }
   }
 }

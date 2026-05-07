@@ -43,4 +43,18 @@ export class CompanyQueryRepository {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  async findById(id: string): Promise<ICompanyGetResponseDTO | null> {
+    try {
+      const doc = await CompanyModel.findOne({ _id: id, deleted_at: null })
+        .populate("subscription_plan_id", "name")
+        .populate("owner_id", "email")
+        .lean();
+      if (!doc) return null;
+      return this.toDTO(doc);
+    } catch (error) {
+      // este error no se muestra al usujario final, se muestra con los logs del servidor
+      throw new Error("error en la bd al obtener informacion de la empresa");
+    }
+  }
 }
