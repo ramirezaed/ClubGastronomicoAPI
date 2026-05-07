@@ -5,7 +5,6 @@ export const authorizeRoles = (...allowedRoles: string[]) => {
     const userRole = req.user?.role_name;
 
     if (!userRole || !allowedRoles.includes(userRole)) {
-      console.log("datos del ususario", userRole);
       res.status(403).json({ message: "No tenés permisos para realizar esta acción" });
       return;
     }

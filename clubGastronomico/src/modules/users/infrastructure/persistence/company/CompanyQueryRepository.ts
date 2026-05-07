@@ -57,4 +57,17 @@ export class CompanyQueryRepository {
       throw new Error("error en la bd al obtener informacion de la empresa");
     }
   }
+  async meCompany(id: string): Promise<ICompanyGetResponseDTO | null> {
+    try {
+      const doc = await CompanyModel.findOne({ _id: id, deleted_at: null })
+        .populate("subscription_plan_id", "name")
+        // .populate("branch_id", "name") //habilitar cuando este implementado branch
+        .populate("owner_id", "email");
+
+      if (!doc) return null;
+      return this.toDTO(doc);
+    } catch (error) {
+      throw new Error("error en la bd al obtener datos de MeCompany");
+    }
+  }
 }

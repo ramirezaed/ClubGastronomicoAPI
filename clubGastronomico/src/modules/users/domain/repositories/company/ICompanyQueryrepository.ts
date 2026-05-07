@@ -3,4 +3,5 @@ import { IPaginatedResponseDTO, IPaginationDTO } from "@/modules/users/applicati
 export interface ICompanyQueryRepository {
   getAll(pagination: IPaginationDTO): Promise<IPaginatedResponseDTO<ICompanyGetResponseDTO>>;
   findById(id: string): Promise<ICompanyGetResponseDTO | null>;
+  meCompany(id: string): Promise<ICompanyGetResponseDTO | null>;
 }

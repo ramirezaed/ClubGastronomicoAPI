@@ -7,12 +7,14 @@ import { RegisterCompanyError } from "@/modules/users/domain/exceptions/Company/
 import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/company/getAllCompanyUseCase";
 import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/company/findByIdCompanyUseCase";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
+import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/meCompanyUseCase";
 
 export class CompanyController {
   constructor(
     private readonly registerCompany: RegisterCompanyUseCase,
     private readonly getAllCompany: GetAllCompanyUseCase,
     private readonly findByIdCompany: findByIdCompanyUseCase,
+    private readonly meCompany: meCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -55,6 +57,23 @@ export class CompanyController {
       const id = req.params.id as string;
       const company = await this.findByIdCompany.execute(id);
       res.status(200).json({ company });
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async MeCompany(req: Request, res: Response): Promise<void> {
+    try {
+      // const id = req.params.id as string;
+      const id = req.user.company_id as string;
+      const company = await this.meCompany.excute(id);
+      res.status(200).json(company);
+      return;
     } catch (error) {
       if (error instanceof CompanyNotFoundError) {
         res.status(404).json({ message: error.message });

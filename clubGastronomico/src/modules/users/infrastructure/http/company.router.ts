@@ -1,5 +1,6 @@
 import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/company/findByIdCompanyUseCase";
 import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/company/getAllCompanyUseCase";
+import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/meCompanyUseCase";
 import { RegisterCompanyUseCase } from "@/modules/users/application/use-cases/company/registerCompanyUseCase";
 import { CompanyController } from "@/modules/users/infrastructure/controllers/companyController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
@@ -24,14 +25,22 @@ const userRepository = new MongooseUserRepository();
 const registercompanyUseCase = new RegisterCompanyUseCase(companyRepository, subscription, userRepository);
 const getAllCompanyUseCase = new GetAllCompanyUseCase(companyQueryRepository);
 const findByIdCompany = new findByIdCompanyUseCase(companyQueryRepository);
+const meCompany = new meCompanyUseCase(companyQueryRepository);
 
 //capa de interfaz
 //se inyectan las dependencias
-const companyController = new CompanyController(registercompanyUseCase, getAllCompanyUseCase, findByIdCompany);
+const companyController = new CompanyController(
+  registercompanyUseCase,
+  getAllCompanyUseCase,
+  findByIdCompany,
+  meCompany,
+);
 
 CompanyRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) => companyController.register(req, res));
 CompanyRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => companyController.getAll(req, res));
+CompanyRouter.get("/me", authMiddleware, (req, res) => companyController.MeCompany(req, res));
 CompanyRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
   companyController.findById(req, res),
 );
+
 export default CompanyRouter;

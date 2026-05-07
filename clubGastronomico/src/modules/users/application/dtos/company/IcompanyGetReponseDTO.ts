@@ -4,7 +4,6 @@ export interface ICompanyGetResponseDTO {
     id: string;
     name: string;
   };
-  // owner_id: string;
   owner: {
     id: string;
     email: string;

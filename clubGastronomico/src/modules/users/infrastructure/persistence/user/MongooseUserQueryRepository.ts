@@ -123,7 +123,7 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     const doc = await UserModel.findOne({ _id: id, deleted_at: null })
       .populate("role_id", "name")
       //habilitar cuando este el modelo de branch y company
-      // .populate("company_id", "name")
+      .populate("company_id", "name")
       // .populate("branch_id", "name")
       .lean();
 
@@ -140,8 +140,8 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     const doc = await UserModel.findOne({ _id: id, delete_at: null })
       .populate("role_id", "name")
       //habiliar los populate companu y branch id cuando esten sus modelos
-      // .populate("company_id")
-      // .populate("branch_id")
+      .populate("company_id, name")
+      // .populate("branch_id, name")
       .lean();
     if (!doc) return null;
     return this.toDTO(doc);
