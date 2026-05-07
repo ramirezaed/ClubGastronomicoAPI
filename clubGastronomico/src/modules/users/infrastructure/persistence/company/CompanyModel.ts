@@ -4,7 +4,7 @@ const CompanySchema = new Schema<ICompanyDocument>(
   {
     owner_id: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
       required: true,
     },
     subscription_plan_id: {
