@@ -1,5 +1,7 @@
+import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
 import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
+import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/Company/CompayAlreadyActivateError";
 import { RegisterCompanyError } from "@/modules/users/domain/exceptions/Company/registerCompanyError";
 
 export class Company {
@@ -31,6 +33,18 @@ export class Company {
       throw new CompanyNotFoundError();
     }
     this.deleted_at = new Date();
+    this.is_active = false;
+  }
+  activate(id: string): void {
+    if (this.is_active) {
+      throw new CompanyAlreadyActivateError();
+    }
+    this.is_active = true;
+  }
+  deactivate(id: string): void {
+    if (!this.is_active) {
+      throw new CompanyAlreadyDeactivateError();
+    }
     this.is_active = false;
   }
 }

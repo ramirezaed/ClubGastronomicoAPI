@@ -12,6 +12,11 @@ import { UpdateCompanyUseCase } from "@/modules/users/application/use-cases/comp
 import { UpdateCompanyDTO } from "@/modules/users/application/dtos/company/updateCompanyDTO";
 import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
 import { SoftDeleteCompanyUseCase } from "@/modules/users/application/use-cases/company/softDeleteCompanyUseCase";
+import { ActivateCompanyUseCase } from "@/modules/users/application/use-cases/company/activateCompanyUseCase";
+import { DeactivateCompanyUseCase } from "@/modules/users/application/use-cases/company/deactivateCompanyUseCase";
+import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/Company/CompayAlreadyActivateError";
+import { ReadPosition } from "node:fs";
+import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
 
 export class CompanyController {
   constructor(
@@ -21,6 +26,8 @@ export class CompanyController {
     private readonly meCompany: meCompanyUseCase,
     private readonly updateCompany: UpdateCompanyUseCase,
     private readonly softdelete: SoftDeleteCompanyUseCase,
+    private readonly activate: ActivateCompanyUseCase,
+    private readonly deactivate: DeactivateCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -121,6 +128,46 @@ export class CompanyController {
     } catch (error) {
       if (error instanceof CompanyNotFoundError) {
         res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async Activate(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const companyActiva = await this.activate.execute(id);
+      res.status(200).json(companyActiva);
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof CompanyAlreadyActivateError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async Deactivate(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const companyDeactivate = await this.deactivate.execute(id);
+      res.status(200).json(companyDeactivate);
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof CompanyAlreadyDeactivateError) {
+        res.status(409).json({ message: error.message });
         return;
       }
       console.error(error);
