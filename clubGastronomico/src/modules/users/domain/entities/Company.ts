@@ -1,6 +1,6 @@
 import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
+import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { RegisterCompanyError } from "@/modules/users/domain/exceptions/Company/registerCompanyError";
-import { promises } from "node:dns";
 
 export class Company {
   constructor(
@@ -25,5 +25,12 @@ export class Company {
     }
     this.name = name ?? this.name;
     this.phone = phone ?? this.phone;
+  }
+  softdelete(id: string): void {
+    if (!this.deleted_at) {
+      throw new CompanyNotFoundError();
+    }
+    this.deleted_at = new Date();
+    this.is_active = false;
   }
 }

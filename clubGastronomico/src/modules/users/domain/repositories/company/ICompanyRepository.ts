@@ -1,4 +1,3 @@
-import { ICompanyGetResponseDTO } from "@/modules/users/application/dtos/company/IcompanyGetReponseDTO";
 import { Company } from "@/modules/users/domain/entities/Company";
 
 export interface ICompanyRepository {
@@ -6,4 +5,5 @@ export interface ICompanyRepository {
   findByOwnerId(ownerID: string): Promise<Company | null>; //verifica si ya tiene compañias registradas
   findById(id: string): Promise<Company | null>;
   update(company: Company): Promise<Company | null>;
+  softDelete(id: string): Promise<void>;
 }

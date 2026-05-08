@@ -11,6 +11,7 @@ import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/
 import { UpdateCompanyUseCase } from "@/modules/users/application/use-cases/company/updateCompanyUseCase";
 import { UpdateCompanyDTO } from "@/modules/users/application/dtos/company/updateCompanyDTO";
 import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
+import { SoftDeleteCompanyUseCase } from "@/modules/users/application/use-cases/company/softDeleteCompanyUseCase";
 
 export class CompanyController {
   constructor(
@@ -19,6 +20,7 @@ export class CompanyController {
     private readonly findByIdCompany: findByIdCompanyUseCase,
     private readonly meCompany: meCompanyUseCase,
     private readonly updateCompany: UpdateCompanyUseCase,
+    private readonly softdelete: SoftDeleteCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -103,6 +105,22 @@ export class CompanyController {
       }
       if (error instanceof CompanyInactiveError) {
         res.status(403).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async Softdelete(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      await this.softdelete.execute(id);
+      res.status(200).json({ message: "Compañia Eliminada" });
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
         return;
       }
       console.error(error);

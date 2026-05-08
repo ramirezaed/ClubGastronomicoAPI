@@ -50,12 +50,21 @@ export class CompanyRepository implements ICompanyRepository {
             //datos que se peuden modificar
             name: company.name,
             phone: company.phone,
+            deleted_at: company.deleted_at,
           },
         },
         { returnDocument: "after" }, //devvuelve el documento actualizado {new:true}
       );
       if (!doc) return null;
       return this.toEntity(doc);
+    } catch (error) {
+      // este error no se muestra al usujario final, se muestra con los logs del servidor
+      throw new Error("error en la bd al modificar la compañia");
+    }
+  }
+  async softDelete(id: string): Promise<void> {
+    try {
+      const doc = CompanyModel.findOneAndDelete({ _id: id, deleted_at: null });
     } catch (error) {
       // este error no se muestra al usujario final, se muestra con los logs del servidor
       throw new Error("error en la bd al modificar la compañia");

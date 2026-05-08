@@ -7,7 +7,6 @@ import { SubscriptionPlanNotFoundError } from "@/modules/users/domain/exceptions
 import { subscriptionQueryRepository } from "@/modules/users/infrastructure/persistence/subscription/subscriptionQueryRepository";
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
-import { UpdateRole } from "@/modules/users/application/use-cases/role/updateRole";
 
 export class RegisterCompanyUseCase {
   constructor(

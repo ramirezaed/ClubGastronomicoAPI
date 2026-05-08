@@ -2,6 +2,7 @@ import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/co
 import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/company/getAllCompanyUseCase";
 import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/meCompanyUseCase";
 import { RegisterCompanyUseCase } from "@/modules/users/application/use-cases/company/registerCompanyUseCase";
+import { SoftDeleteCompanyUseCase } from "@/modules/users/application/use-cases/company/softDeleteCompanyUseCase";
 import { UpdateCompanyUseCase } from "@/modules/users/application/use-cases/company/updateCompanyUseCase";
 import { CompanyController } from "@/modules/users/infrastructure/controllers/companyController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
@@ -28,6 +29,7 @@ const getAllCompanyUseCase = new GetAllCompanyUseCase(companyQueryRepository);
 const findByIdCompany = new findByIdCompanyUseCase(companyQueryRepository);
 const meCompany = new meCompanyUseCase(companyQueryRepository);
 const updateCompany = new UpdateCompanyUseCase(companyRepository);
+const softdeleteCompany = new SoftDeleteCompanyUseCase(companyRepository);
 //capa de interfaz
 //se inyectan las dependencias
 const companyController = new CompanyController(
@@ -36,6 +38,7 @@ const companyController = new CompanyController(
   findByIdCompany,
   meCompany,
   updateCompany,
+  softdeleteCompany,
 );
 
 CompanyRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) => companyController.register(req, res));
@@ -46,6 +49,9 @@ CompanyRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, re
 );
 CompanyRouter.patch("/update", authMiddleware, authorizeRoles("owner"), (req, res) =>
   companyController.update(req, res),
+);
+CompanyRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
+  companyController.Softdelete(req, res),
 );
 
 export default CompanyRouter;
