@@ -17,6 +17,8 @@ import { DeactivateCompanyUseCase } from "@/modules/users/application/use-cases/
 import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/Company/CompayAlreadyActivateError";
 import { ReadPosition } from "node:fs";
 import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
+import { changePlanCompanyUseCase } from "@/modules/users/application/use-cases/company/changePlanCompanyUseCase";
+import { CompanyAlreadyHasThisPlanError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyHasThisPlanError";
 
 export class CompanyController {
   constructor(
@@ -28,6 +30,7 @@ export class CompanyController {
     private readonly softdelete: SoftDeleteCompanyUseCase,
     private readonly activate: ActivateCompanyUseCase,
     private readonly deactivate: DeactivateCompanyUseCase,
+    private readonly changePlan: changePlanCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -171,6 +174,30 @@ export class CompanyController {
         return;
       }
       console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async ChangePlan(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const namePlan = req.body;
+      const companyActualizada = await this.changePlan.execute(id, namePlan);
+      res.status(200).json(companyActualizada);
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ meessage: error.message });
+        return;
+      }
+      if (error instanceof SubscriptionPlanNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof CompanyAlreadyHasThisPlanError) {
+        res.status(403).json({ message: error.message });
+        return;
+      }
       res.status(500).json({ message: "error interno del servidor" });
       return;
     }

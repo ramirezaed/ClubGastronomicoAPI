@@ -52,6 +52,7 @@ export class CompanyRepository implements ICompanyRepository {
             phone: company.phone,
             deleted_at: company.deleted_at, //para el softdelete
             is_active: company.is_active, // para el activte/deactivate
+            subscription_plan_id: company.subscription_plan_id, // para cambiar el plan
           },
         },
         { returnDocument: "after" }, //devvuelve el documento actualizado {new:true}

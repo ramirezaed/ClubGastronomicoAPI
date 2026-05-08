@@ -1,4 +1,5 @@
 import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
+import { CompanyAlreadyHasThisPlanError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyHasThisPlanError";
 import { CompanyInactiveError } from "@/modules/users/domain/exceptions/Company/CompanyInactiveError";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/Company/CompayAlreadyActivateError";
@@ -46,5 +47,11 @@ export class Company {
       throw new CompanyAlreadyDeactivateError();
     }
     this.is_active = false;
+  }
+  changePlan(planId: string): void {
+    if (this.subscription_plan_id === planId) {
+      throw new CompanyAlreadyHasThisPlanError();
+    }
+    this.subscription_plan_id = planId;
   }
 }

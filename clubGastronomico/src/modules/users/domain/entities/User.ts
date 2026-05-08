@@ -95,6 +95,7 @@ export class User {
     }
   }
   assingCompany(companyID: string): void {
+    //asigna compañia al usuario
     this.company_id = companyID;
   }
 }
