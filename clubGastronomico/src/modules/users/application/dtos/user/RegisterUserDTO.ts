@@ -9,5 +9,4 @@ export interface IRegisterUserDTO {
   email: string;
   password: string;
   role_id: string;
-  role_name: string;
 }

@@ -75,7 +75,8 @@ export class User {
     this.deleted_at = new Date();
     this.is_active = false;
   }
-  updateRole(idRole: string, roleName: string): void {
+  // updateRole(idRole: string, roleName: string): void {
+  updateRole(idRole: string): void {
     if (!this.is_active) {
       throw new UserInactiveError();
     }
@@ -83,8 +84,9 @@ export class User {
       throw new Error("todos los campos son necesrio");
     }
     this.role_id = idRole;
-    this.role_name = roleName;
+    // this.role_name = roleName;
   }
+
   resetPassword(hashedPassword: string): void {
     if (!hashedPassword) throw new RegisterUserError();
     this.password = hashedPassword;

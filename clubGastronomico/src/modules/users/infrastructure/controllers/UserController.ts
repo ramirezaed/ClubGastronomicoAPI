@@ -96,6 +96,7 @@ export class UserController {
       return;
     }
   }
+
   async softDelete(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {

@@ -10,7 +10,7 @@ import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/pers
 import { JwtTokenService } from "@/modules/users/infrastructure/services/JwtTokenService";
 import { ResetPasswordUseCase } from "@/modules/users/application/use-cases/auth/ResetPasswordUseCase";
 import { ForgotPasswordUseCase } from "@/modules/users/application/use-cases/auth/ForgotPasswordUseCase";
-import { NodemailerEmailService } from "@/modules/users/infrastructure/services/emailService";
+import { n8nPasswordReset } from "@/modules/users/infrastructure/services/n8nPasswordReset";
 import { ChangePasswordUseCase } from "@/modules/users/application/use-cases/user/ChangePasswordUseCase";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
 import { n8nRegisterNotifier } from "@/modules/users/infrastructure/services/n8nRegisterNotifier";
@@ -23,7 +23,7 @@ const userRepository = new MongooseUserRepository();
 const roleQueryRepository = new MongooseRoleQueryRepository();
 const passwordHash = new PasswordHasher();
 const tokenService = new JwtTokenService();
-const emailService = new NodemailerEmailService();
+const emailService = new n8nPasswordReset();
 const notifier = new n8nRegisterNotifier();
 
 //capa de aplicacion (Casos de Uso)

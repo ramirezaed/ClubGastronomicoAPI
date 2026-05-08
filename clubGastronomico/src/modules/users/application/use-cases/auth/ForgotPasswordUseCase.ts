@@ -1,12 +1,12 @@
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { ITokenService } from "@/modules/users/domain/ports/ItokenService";
-import { IEmailService } from "@/modules/users/domain/ports/IEmailService";
+import { n8nPasswordReset } from "@/modules/users/infrastructure/services/n8nPasswordReset";
 
 export class ForgotPasswordUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly tokenService: ITokenService,
-    private readonly emailService: IEmailService,
+    private readonly n8nPasswordReset: n8nPasswordReset,
   ) {}
 
   async execute(email: string): Promise<void> {
@@ -20,6 +20,6 @@ export class ForgotPasswordUseCase {
       email: user.email,
     });
 
-    await this.emailService.sendPasswordReset(user.email, resetToken);
+    await this.n8nPasswordReset.notify({ email: user.email, resetToken });
   }
 }
