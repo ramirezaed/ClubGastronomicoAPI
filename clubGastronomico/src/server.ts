@@ -10,6 +10,7 @@ import router from "@/modules/users/infrastructure/http/auth.router";
 import RoleRouter from "@/modules/users/infrastructure/http/role.router";
 import UserRouter from "@/modules/users/infrastructure/http/user.router";
 import CompanyRouter from "@/modules/users/infrastructure/http/company.router";
+import PlansRouter from "@/modules/users/infrastructure/http/plans.router";
 import { seedSubscriptionPlans } from "@/config/subscriptionPlanSeeder";
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/auth", router);
 app.use("/api/user", UserRouter);
 app.use("/api/roles", RoleRouter);
 app.use("/api/company", CompanyRouter);
+app.use("/api/plans", PlansRouter);
 
 const startServer = async () => {
   try {
