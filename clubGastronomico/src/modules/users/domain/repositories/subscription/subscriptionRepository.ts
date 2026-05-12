@@ -1,0 +1,6 @@
+import { SubscriptionPlan } from "@/modules/users/domain/entities/SubscriptionPlan";
+
+export interface ISubscriptionRepository {
+  findByName(name: string): Promise<SubscriptionPlan | null>;
+  findById(id: string): Promise<SubscriptionPlan | null>;
+}
