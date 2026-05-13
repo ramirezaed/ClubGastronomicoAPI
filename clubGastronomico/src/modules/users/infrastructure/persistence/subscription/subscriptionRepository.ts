@@ -38,4 +38,24 @@ export class SubscriptionPlanRepository implements ISubscriptionRepository {
       throw new Error("error al crear un nuevo plan");
     }
   }
+  async update(plan: SubscriptionPlan): Promise<SubscriptionPlan | null> {
+    try {
+      const doc = await SubscriptionModel.findByIdAndUpdate(
+        { _id: plan.id, deleted_at: null },
+        {
+          $set: {
+            name: plan.name,
+            price: plan.price,
+            is_active: plan.is_active, // para cambiar el estado
+            deleted_at: plan.deleted_at, //para softdelete
+          },
+        },
+        { returnDocument: "after" },
+      );
+      if (!doc) return null;
+      return this.toEntity(doc);
+    } catch (error) {
+      throw new Error("error al intentar actualizar el plan");
+    }
+  }
 }

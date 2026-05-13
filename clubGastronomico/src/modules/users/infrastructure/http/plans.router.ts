@@ -1,6 +1,8 @@
+import { UpdatePlanUseCase } from "@/modules/users/application/use-cases/company/updatePlanUseCase";
 import { findByIdPlansUseCase } from "@/modules/users/application/use-cases/plan/findByIdPlansUseCase";
 import { getAllPlansUseCase } from "@/modules/users/application/use-cases/plan/getAllPlansUseCase";
 import { registerPlanUseCase } from "@/modules/users/application/use-cases/plan/registerPlanUseCase";
+import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
 import { PlanController } from "@/modules/users/infrastructure/controllers/plansCotroller";
 import { subscriptionQueryRepository } from "@/modules/users/infrastructure/persistence/subscription/subscriptionQueryRepository";
 import { SubscriptionPlanRepository } from "@/modules/users/infrastructure/persistence/subscription/subscriptionRepository";
@@ -17,12 +19,14 @@ const planRepository = new SubscriptionPlanRepository();
 const getAllUseCase = new getAllPlansUseCase(planQueryRepository);
 const findByIdPlanUseCase = new findByIdPlansUseCase(planQueryRepository);
 const registerPlan = new registerPlanUseCase(planRepository);
+const updatePlan = new UpdatePlanUseCase(planRepository);
 
 //capa de interfaz, se inyectan las dependencias
 
-const plansController = new PlanController(getAllUseCase, findByIdPlanUseCase, registerPlan);
+const plansController = new PlanController(getAllUseCase, findByIdPlanUseCase, registerPlan, updatePlan);
 
 PlansRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) => plansController.getAll(req, res));
 PlansRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => plansController.findById(req, res));
 PlansRouter.post("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => plansController.register(req, res));
+PlansRouter.patch("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => plansController.update(req, res));
 export default PlansRouter;

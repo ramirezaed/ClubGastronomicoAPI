@@ -15,4 +15,10 @@ export class SubscriptionPlan {
     }
     return new SubscriptionPlan("", name, price, true, null);
   }
+  update(newPrice: string): void {
+    if (this.deleted_at) {
+      throw new SubscriptionPlanNotFoundError();
+    }
+    this.price = newPrice ?? this.price;
+  }
 }

@@ -23,6 +23,7 @@ export class Role {
     }
     this.description = description ?? this.description;
   }
+
   activate(): void {
     if (this.is_active) {
       throw new RoleAlreadyActivateError(); //si el rol ya esta activado lanza error

@@ -5,6 +5,7 @@ const SubscriptionPlanSchema = new Schema<IsubscriptionPlanDocument>(
   {
     name: {
       type: String,
+      unique: true,
       required: true,
     },
     price: {
