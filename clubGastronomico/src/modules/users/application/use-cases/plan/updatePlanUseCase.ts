@@ -12,7 +12,6 @@ export class UpdatePlanUseCase {
       throw new SubscriptionPlanNotFoundError();
     }
     plan.update(dto.price);
-    const planName = await this.iplanRepository.findByName(dto.name);
     await this.iplanRepository.update(plan);
 
     return {

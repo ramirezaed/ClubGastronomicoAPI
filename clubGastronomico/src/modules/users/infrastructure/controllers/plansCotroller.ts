@@ -5,7 +5,8 @@ import { findByIdPlansUseCase } from "@/modules/users/application/use-cases/plan
 import { registerPlanUseCase } from "@/modules/users/application/use-cases/plan/registerPlanUseCase";
 import { SubscriptionPlanAlreadyExistsError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanAlreadyExistsError";
 import { SubscriptionPlanRegisterError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanRegisterError";
-import { UpdatePlanUseCase } from "@/modules/users/application/use-cases/company/updatePlanUseCase";
+import { UpdatePlanUseCase } from "@/modules/users/application/use-cases/plan/updatePlanUseCase";
+import { softdeletePlanUseCase } from "@/modules/users/application/use-cases/plan/deletePlanUseCase";
 
 export class PlanController {
   constructor(
@@ -13,6 +14,7 @@ export class PlanController {
     private readonly findByIdPlan: findByIdPlansUseCase,
     private readonly registerPlan: registerPlanUseCase,
     private readonly updatePlan: UpdatePlanUseCase,
+    private readonly softDeletePlan: softdeletePlanUseCase,
   ) {}
 
   async getAll(req: Request, res: Response): Promise<void> {
@@ -82,6 +84,21 @@ export class PlanController {
       }
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async softdelete(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      await this.softDeletePlan.execute(id);
+      res.status(200).json({ message: "Plan Eliminado con exito" });
+      return;
+    } catch (error) {
+      if (error instanceof SubscriptionPlanNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno en el servidor" });
       return;
     }
   }

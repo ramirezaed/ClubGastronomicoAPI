@@ -21,4 +21,11 @@ export class SubscriptionPlan {
     }
     this.price = newPrice ?? this.price;
   }
+  softdelete(): void {
+    if (this.deleted_at) {
+      throw new SubscriptionPlanNotFoundError();
+    }
+    this.is_active = false;
+    this.deleted_at = new Date();
+  }
 }
