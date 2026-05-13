@@ -3,4 +3,5 @@ import { SubscriptionPlan } from "@/modules/users/domain/entities/SubscriptionPl
 export interface ISubscriptionRepository {
   findByName(name: string): Promise<SubscriptionPlan | null>;
   findById(id: string): Promise<SubscriptionPlan | null>;
+  save(plan: SubscriptionPlan): Promise<SubscriptionPlan>;
 }
