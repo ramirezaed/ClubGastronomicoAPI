@@ -24,6 +24,7 @@ export class changePlanCompanyUseCase {
       company_id: company.id,
       company_name: company.name,
       plan_name: newPlan.name,
+      plan_description: newPlan.description,
     };
   }
 }

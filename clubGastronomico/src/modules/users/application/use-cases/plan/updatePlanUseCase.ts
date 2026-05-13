@@ -11,13 +11,14 @@ export class UpdatePlanUseCase {
     if (!plan) {
       throw new SubscriptionPlanNotFoundError();
     }
-    plan.update(dto.price);
+    plan.update(dto.price, dto.description);
     await this.iplanRepository.update(plan);
 
     return {
       id: plan.id,
       name: plan.name,
       price: plan.price,
+      description: plan.description,
     };
   }
 }

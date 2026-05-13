@@ -51,8 +51,8 @@ export class PlanController {
   }
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { name, price } = req.body;
-      const plan = await this.registerPlan.execute({ name, price });
+      const { name, price, description } = req.body;
+      const plan = await this.registerPlan.execute({ name, price, description });
       res.status(201).json(plan);
       return;
     } catch (error) {
@@ -72,8 +72,8 @@ export class PlanController {
   async update(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const { name, price } = req.body;
-      const newPlan = await this.updatePlan.execute(id, { name, price });
+      const { price, description } = req.body;
+      const newPlan = await this.updatePlan.execute(id, { price, description });
       res.status(200).json(newPlan);
       return;
     } catch (error) {

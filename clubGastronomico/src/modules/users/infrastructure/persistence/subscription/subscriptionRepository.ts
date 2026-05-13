@@ -4,7 +4,7 @@ import SubscriptionModel from "@/modules/users/infrastructure/persistence/subscr
 
 export class SubscriptionPlanRepository implements ISubscriptionRepository {
   private toEntity(doc: any): SubscriptionPlan {
-    return new SubscriptionPlan(doc._id.toString(), doc.name, doc.price, doc.is_active, doc.deleted_at);
+    return new SubscriptionPlan(doc._id.toString(), doc.name, doc.price, doc.description, doc.is_active, doc.deleted_at);
   }
   async findById(id: string): Promise<SubscriptionPlan | null> {
     try {
@@ -46,6 +46,7 @@ export class SubscriptionPlanRepository implements ISubscriptionRepository {
           $set: {
             name: plan.name,
             price: plan.price,
+            description: plan.description,
             is_active: plan.is_active, // para cambiar el estado
             deleted_at: plan.deleted_at, //para softdelete
           },

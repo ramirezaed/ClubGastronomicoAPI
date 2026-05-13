@@ -12,6 +12,10 @@ const SubscriptionPlanSchema = new Schema<IsubscriptionPlanDocument>(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
     is_active: {
       type: Boolean,
       required: true,

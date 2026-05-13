@@ -11,12 +11,13 @@ export class registerPlanUseCase {
     if (planName) {
       throw new SubscriptionPlanAlreadyExistsError();
     }
-    const plan = SubscriptionPlan.create(dto.name, dto.price);
+    const plan = SubscriptionPlan.create(dto.name, dto.price, dto.descrition);
     const saved = await this.iplanRepository.save(plan);
     return {
       id: saved.id,
       name: saved.name,
       price: saved.price,
+      description: saved.description,
       is_active: saved.is_active,
     };
   }
