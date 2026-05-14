@@ -1,7 +1,6 @@
-export interface subscriptionResponseDTO {
+export interface updatePlanResponseDTO {
   id: string;
   name: string;
   price: string;
   description: string;
-  is_active: boolean;
 }

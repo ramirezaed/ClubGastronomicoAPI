@@ -50,7 +50,6 @@ export class UserController {
       res.status(400).json({ message: "Todos los datos son necesarios" });
       return;
     }
-
     try {
       const userActualizado = await this.updateUser.execute(id, {
         name,

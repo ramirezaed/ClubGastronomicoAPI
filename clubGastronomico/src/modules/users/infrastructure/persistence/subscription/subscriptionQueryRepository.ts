@@ -1,7 +1,5 @@
 import { subscriptionResponseDTO } from "@/modules/users/application/dtos/subscription/subscriptionResponseDTO";
-import { SubscriptionPlan } from "@/modules/users/domain/entities/SubscriptionPlan";
 import { ISubscriptionQueryRepository } from "@/modules/users/domain/repositories/subscription/subscriptionQueryRepository";
-import { IsubscriptionPlanDocument } from "@/modules/users/infrastructure/persistence/subscription/IsubscriptioDocument";
 import SubscriptionModel from "@/modules/users/infrastructure/persistence/subscription/subscriptionModel";
 
 export class subscriptionQueryRepository implements ISubscriptionQueryRepository {
@@ -23,7 +21,6 @@ export class subscriptionQueryRepository implements ISubscriptionQueryRepository
       throw new Error("error en db al buscar plan ");
     }
   }
-
   async findById(id: string): Promise<subscriptionResponseDTO | null> {
     try {
       const doc = await SubscriptionModel.findOne({ _id: id, deleted_at: null });
@@ -31,6 +28,16 @@ export class subscriptionQueryRepository implements ISubscriptionQueryRepository
       return this.toDTO(doc);
     } catch (error) {
       throw new Error(" error a buscar plan por id");
+    }
+  }
+  async getall(): Promise<subscriptionResponseDTO[] | null> {
+    try {
+      const doc = await SubscriptionModel.find({ deleted_at: null });
+      if (!doc) return null;
+      return doc.map((doc) => this.toDTO(doc));
+    } catch (error) {
+      //este error solo se ve en la consola, no lo ve el usuario final
+      throw new Error("error al obtener la lista de planes en la db");
     }
   }
 }
