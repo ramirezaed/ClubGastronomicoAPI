@@ -37,11 +37,12 @@ const MenuItemSchema = new Schema(
       type: Number,
       required: true,
       default: 15,
+      min: 0,
     },
     stock: {
       type: Number,
-      default: 0,
-      requiered: false,
+      default: null,
+      required: false,
       min: 0,
     },
 
