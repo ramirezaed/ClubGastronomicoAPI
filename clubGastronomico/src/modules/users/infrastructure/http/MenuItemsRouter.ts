@@ -1,5 +1,6 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
+import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getByIdMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
@@ -25,9 +26,17 @@ const updateMenu = new UpdateMenuItemsUseCase(menuRepository);
 const activateMenu = new ActivateMenuItemsUseCase(menuRepository);
 const deactivateMenu = new deactivaMenuItemsUseCase(menuRepository);
 const softDelete = new softDeleteMenuItemsUseCase(menuRepository);
+const getByIdMenu = new getByIdMenuItemsUseCase(menuQueryRepository, categoryQueryRepository);
 //capa de interfaz
 
-const menuItemsController = new MenuItemsController(registerMenu, updateMenu, activateMenu, deactivateMenu, softDelete);
+const menuItemsController = new MenuItemsController(
+  registerMenu,
+  updateMenu,
+  activateMenu,
+  deactivateMenu,
+  softDelete,
+  getByIdMenu,
+);
 
 /**
  * @swagger
@@ -86,6 +95,40 @@ const menuItemsController = new MenuItemsController(registerMenu, updateMenu, ac
  *           type: string
  *           example: "2026-05-19T10:00:00.000Z"
  */
+
+/**
+ * @swagger
+ * /api/menu-items/{id}:
+ *   get:
+ *     summary: Obtener un item del menú por ID
+ *     tags: [MenuItems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del item del menú
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Item del menú obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MenuItem'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Item del menú o categoría no encontrada
+ *       500:
+ *         description: Error interno del servidor
+ */
+MenuItemsRouter.get("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.getById(req, res));
 
 /**
  * @swagger

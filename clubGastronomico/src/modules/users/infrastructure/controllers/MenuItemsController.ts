@@ -1,5 +1,6 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
+import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getByIdMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
@@ -18,7 +19,28 @@ export class MenuItemsController {
     private readonly activateMenuItems: ActivateMenuItemsUseCase,
     private readonly deactivateMenuItems: deactivaMenuItemsUseCase,
     private readonly softDeleteMenuItems: softDeleteMenuItemsUseCase,
+    private readonly getByIdMenuItems: getByIdMenuItemsUseCase,
   ) {}
+  async getById(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const items = await this.getByIdMenuItems.execute(id);
+      res.status(200).json(items);
+      return;
+    } catch (error) {
+      if (error instanceof MenuItemsNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof CategoryNotFound) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
   async register(req: Request, res: Response): Promise<void> {
     try {
       const company = req.user.company_id as string;
