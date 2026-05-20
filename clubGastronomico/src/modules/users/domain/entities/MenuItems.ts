@@ -1,6 +1,7 @@
 import { InactiveMenuItems } from "@/modules/users/domain/exceptions/MenuItems/InactiveMenuError";
 import { MenuAlreadyActivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyActiveError";
 import { MenuAlreadyDeactivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyDeactivateError";
+import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
 import { RegisterMenuError } from "@/modules/users/domain/exceptions/MenuItems/RegisterMenuError";
 
 export class MenuItems {
@@ -63,6 +64,13 @@ export class MenuItems {
     if (!this.is_active) {
       throw new MenuAlreadyDeactivateError();
     }
+    this.is_active = false;
+  }
+  softDelete(): void {
+    if (this.deleted_at) {
+      throw new MenuItemsNotFoundError();
+    }
+    this.deleted_at = new Date();
     this.is_active = false;
   }
 }

@@ -1,6 +1,7 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
+import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
 import { MenuItemsController } from "@/modules/users/infrastructure/controllers/MenuItemsController";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
@@ -23,9 +24,10 @@ const registerMenu = new RegisterMenuItemsUseCase(menuRepository, menuQueryRepos
 const updateMenu = new UpdateMenuItemsUseCase(menuRepository);
 const activateMenu = new ActivateMenuItemsUseCase(menuRepository);
 const deactivateMenu = new deactivaMenuItemsUseCase(menuRepository);
+const softDelete = new softDeleteMenuItemsUseCase(menuRepository);
 //capa de interfaz
 
-const menuItemsController = new MenuItemsController(registerMenu, updateMenu, activateMenu, deactivateMenu);
+const menuItemsController = new MenuItemsController(registerMenu, updateMenu, activateMenu, deactivateMenu, softDelete);
 
 /**
  * @swagger
@@ -302,7 +304,46 @@ MenuItemsRouter.patch("/activate/:id", authMiddleware, authorizeRoles("owner"), 
  *       500:
  *         description: Error interno del servidor
  */
-MenuItemsRouter.patch("/deactiate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
+MenuItemsRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
   menuItemsController.deactivate(req, res),
 );
+/**
+ * @swagger
+ * /api/menu-items/{id}:
+ *   delete:
+ *     summary: Eliminar (soft delete) un item del menú
+ *     description: Marca el item como eliminado seteando el campo deleted_at sin borrarlo físicamente.
+ *     tags: [MenuItems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del item del menú
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Item eliminado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: items eliminado con exito
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Item del menú no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
+MenuItemsRouter.delete("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.softDelete(req, res));
+
 export default MenuItemsRouter;
