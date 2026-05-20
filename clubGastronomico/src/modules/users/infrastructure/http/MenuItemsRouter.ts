@@ -1,9 +1,11 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
+import { getAllMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getAllMenuItemsUseCase";
 import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getByIdMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
+import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
 import { MenuItemsController } from "@/modules/users/infrastructure/controllers/MenuItemsController";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
@@ -26,7 +28,9 @@ const updateMenu = new UpdateMenuItemsUseCase(menuRepository);
 const activateMenu = new ActivateMenuItemsUseCase(menuRepository);
 const deactivateMenu = new deactivaMenuItemsUseCase(menuRepository);
 const softDelete = new softDeleteMenuItemsUseCase(menuRepository);
-const getByIdMenu = new getByIdMenuItemsUseCase(menuQueryRepository, categoryQueryRepository);
+const getByIdMenu = new getByIdMenuItemsUseCase(menuQueryRepository);
+const getAllMenu = new getAllMenuItemsUseCase(menuQueryRepository);
+
 //capa de interfaz
 
 const menuItemsController = new MenuItemsController(
@@ -36,6 +40,7 @@ const menuItemsController = new MenuItemsController(
   deactivateMenu,
   softDelete,
   getByIdMenu,
+  getAllMenu,
 );
 
 /**
@@ -129,6 +134,79 @@ const menuItemsController = new MenuItemsController(
  *         description: Error interno del servidor
  */
 MenuItemsRouter.get("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.getById(req, res));
+
+/**
+ * @swagger
+ * /api/menu-items:
+ *   get:
+ *     summary: Obtener lista de items del menú con filtros y paginación
+ *     tags: [MenuItems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: is_active
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *         description: Filtrar por estado activo/inactivo
+ *
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *           example: "hamburguesa"
+ *         description: Filtrar por nombre (búsqueda parcial)
+ *
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Número de página (por defecto 1)
+ *
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: Cantidad de resultados por página (por defecto 10)
+ *
+ *     responses:
+ *       200:
+ *         description: Lista de items del menú obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MenuItem'
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 10
+ *                     total:
+ *                       type: integer
+ *                       example: 42
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 5
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       500:
+ *         description: Error interno del servidor
+ */
+MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.getAll(req, res));
 
 /**
  * @swagger

@@ -21,7 +21,7 @@ export class MenuItemsRepository implements IMenuRepository {
   }
   async findById(id: string): Promise<MenuItems | null> {
     try {
-      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null });
+      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null }).populate("categoy_id", "name");
       if (!doc) return null;
       return this.toEntity(doc);
     } catch (error) {

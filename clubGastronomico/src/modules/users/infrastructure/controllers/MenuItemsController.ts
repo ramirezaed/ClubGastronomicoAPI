@@ -1,5 +1,6 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
+import { getAllMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getAllMenuItemsUseCase";
 import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getByIdMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
@@ -20,6 +21,7 @@ export class MenuItemsController {
     private readonly deactivateMenuItems: deactivaMenuItemsUseCase,
     private readonly softDeleteMenuItems: softDeleteMenuItemsUseCase,
     private readonly getByIdMenuItems: getByIdMenuItemsUseCase,
+    private readonly getAllMenuItems: getAllMenuItemsUseCase,
   ) {}
   async getById(req: Request, res: Response): Promise<void> {
     try {
@@ -41,6 +43,32 @@ export class MenuItemsController {
       return;
     }
   }
+
+  async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      let is_active: boolean | undefined;
+      let name: string | undefined;
+      // parse boolean
+      if (req.query.is_active === "true") is_active = true;
+      else if (req.query.is_active === "false") is_active = false;
+
+      // parse string safely
+      if (typeof req.query.name === "string") {
+        name = req.query.name;
+      }
+      //paginacion
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const items = await this.getAllMenuItems.execute({ is_active, name }, { page, limit });
+      res.status(200).json(items);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+    }
+  }
+
   async register(req: Request, res: Response): Promise<void> {
     try {
       const company = req.user.company_id as string;

@@ -43,7 +43,7 @@ export class RegisterMenuItemsUseCase {
       id: saved.id,
       category: {
         id: saved.category_id,
-        name: category.name,
+        name: saved.name,
       },
       name: saved.name,
       description: saved.description,

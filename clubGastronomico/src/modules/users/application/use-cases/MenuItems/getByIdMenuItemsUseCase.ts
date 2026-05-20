@@ -6,22 +6,22 @@ import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persist
 export class getByIdMenuItemsUseCase {
   constructor(
     private readonly imenuQueryrepository: MenuItemsQueryRepository,
-    private readonly IcategoryRepository: CategoryItemsRepository,
+    // private readonly IcategoryRepository: CategoryItemsRepository,
   ) {}
   async execute(id: string): Promise<ResponseMenuDTO> {
     const items = await this.imenuQueryrepository.findById(id);
     if (!items) {
       throw new MenuItemsNotFoundError();
     }
-    const category = await this.IcategoryRepository.findById(id);
-    if (!category) {
-      throw new CategoryNotFound();
-    }
+    // const category = await this.IcategoryRepository.findById(id);
+    // if (!category) {
+    //   throw new CategoryNotFound();
+    // }
     return {
       id: items.id,
       category: {
         id: items.id,
-        name: category.name,
+        name: items.name,
       },
       name: items.name,
       description: items.description,
