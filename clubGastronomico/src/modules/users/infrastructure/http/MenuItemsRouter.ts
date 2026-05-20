@@ -1,3 +1,5 @@
+import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
+import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
 import { MenuItemsController } from "@/modules/users/infrastructure/controllers/MenuItemsController";
@@ -19,9 +21,11 @@ const categoryQueryRepository = new CategoryItemsQueryRepository();
 
 const registerMenu = new RegisterMenuItemsUseCase(menuRepository, menuQueryRepository, categoryQueryRepository);
 const updateMenu = new UpdateMenuItemsUseCase(menuRepository);
+const activateMenu = new ActivateMenuItemsUseCase(menuRepository);
+const deactivateMenu = new deactivaMenuItemsUseCase(menuRepository);
 //capa de interfaz
 
-const menuItemsController = new MenuItemsController(registerMenu, updateMenu);
+const menuItemsController = new MenuItemsController(registerMenu, updateMenu, activateMenu, deactivateMenu);
 
 /**
  * @swagger
@@ -225,4 +229,80 @@ MenuItemsRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) =>
  *         description: Error interno del servidor
  */
 MenuItemsRouter.patch("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.update(req, res));
+
+/**
+ * @swagger
+ * /api/menu-items/activate/{id}:
+ *   patch:
+ *     summary: Activar un item del menú
+ *     tags: [MenuItems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del item del menú
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Item del menú activado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MenuItem'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Item del menú no encontrado
+ *       409:
+ *         description: El item ya se encuentra activo
+ *       500:
+ *         description: Error interno del servidor
+ */
+MenuItemsRouter.patch("/activate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  menuItemsController.activate(req, res),
+);
+
+/**
+ * @swagger
+ * /api/menu-items/deactiate/{id}:
+ *   patch:
+ *     summary: Desactivar un item del menú
+ *     tags: [MenuItems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del item del menú
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Item del menú desactivado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MenuItem'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Item del menú no encontrado
+ *       409:
+ *         description: El item ya se encuentra inactivo
+ *       500:
+ *         description: Error interno del servidor
+ */
+MenuItemsRouter.patch("/deactiate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  menuItemsController.deactivate(req, res),
+);
 export default MenuItemsRouter;

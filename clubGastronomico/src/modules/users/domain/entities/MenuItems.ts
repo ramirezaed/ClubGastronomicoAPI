@@ -1,4 +1,6 @@
 import { InactiveMenuItems } from "@/modules/users/domain/exceptions/MenuItems/InactiveMenuError";
+import { MenuAlreadyActivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyActiveError";
+import { MenuAlreadyDeactivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyDeactivateError";
 import { RegisterMenuError } from "@/modules/users/domain/exceptions/MenuItems/RegisterMenuError";
 
 export class MenuItems {
@@ -50,5 +52,17 @@ export class MenuItems {
     this.preparation_time_minutes = preparation_time_minutes ?? this.preparation_time_minutes;
     this.stock = stock ?? this.stock;
     this.daily_stock = daily_stock ?? this.daily_stock;
+  }
+  activate(): void {
+    if (this.is_active) {
+      throw new MenuAlreadyActivateError();
+    }
+    this.is_active = true;
+  }
+  deactivate(): void {
+    if (!this.is_active) {
+      throw new MenuAlreadyDeactivateError();
+    }
+    this.is_active = false;
   }
 }
