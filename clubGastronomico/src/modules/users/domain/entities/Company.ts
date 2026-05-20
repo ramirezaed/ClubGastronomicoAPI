@@ -29,20 +29,20 @@ export class Company {
     this.name = name ?? this.name;
     this.phone = phone ?? this.phone;
   }
-  softdelete(id: string): void {
+  softdelete(): void {
     if (!this.deleted_at) {
       throw new CompanyNotFoundError();
     }
     this.deleted_at = new Date();
     this.is_active = false;
   }
-  activate(id: string): void {
+  activate(): void {
     if (this.is_active) {
       throw new CompanyAlreadyActivateError();
     }
     this.is_active = true;
   }
-  deactivate(id: string): void {
+  deactivate(): void {
     if (!this.is_active) {
       throw new CompanyAlreadyDeactivateError();
     }

@@ -15,7 +15,6 @@ import { SoftDeleteCompanyUseCase } from "@/modules/users/application/use-cases/
 import { ActivateCompanyUseCase } from "@/modules/users/application/use-cases/company/activateCompanyUseCase";
 import { DeactivateCompanyUseCase } from "@/modules/users/application/use-cases/company/deactivateCompanyUseCase";
 import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/Company/CompayAlreadyActivateError";
-import { ReadPosition } from "node:fs";
 import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
 import { changePlanCompanyUseCase } from "@/modules/users/application/use-cases/company/changePlanCompanyUseCase";
 import { CompanyAlreadyHasThisPlanError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyHasThisPlanError";

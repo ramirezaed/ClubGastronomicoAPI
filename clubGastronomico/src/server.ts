@@ -32,7 +32,7 @@ app.use("/api/user", UserRouter);
 app.use("/api/roles", RoleRouter);
 app.use("/api/company", CompanyRouter);
 app.use("/api/plans", PlansRouter);
-app.use("/api/menuItems", MenuItemsRouter);
+app.use("/api/menu-items", MenuItemsRouter);
 
 const startServer = async () => {
   try {

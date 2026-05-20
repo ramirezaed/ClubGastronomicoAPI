@@ -2,4 +2,5 @@ import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/Resp
 
 export interface IMenuQueryRepository {
   findByName(category_id: string, company_id: string, name: string): Promise<ResponseMenuDTO | null>;
+  findById(id: string): Promise<ResponseMenuDTO | null>;
 }

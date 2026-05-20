@@ -1,4 +1,5 @@
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
+import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
 import { MenuItemsController } from "@/modules/users/infrastructure/controllers/MenuItemsController";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
@@ -17,10 +18,10 @@ const categoryQueryRepository = new CategoryItemsQueryRepository();
 //capa de apliacion (casos de uso)
 
 const registerMenu = new RegisterMenuItemsUseCase(menuRepository, menuQueryRepository, categoryQueryRepository);
-
+const updateMenu = new UpdateMenuItemsUseCase(menuRepository);
 //capa de interfaz
 
-const menuItemsController = new MenuItemsController(registerMenu);
+const menuItemsController = new MenuItemsController(registerMenu, updateMenu);
 
 /**
  * @swagger
@@ -150,4 +151,78 @@ const menuItemsController = new MenuItemsController(registerMenu);
  */
 MenuItemsRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.register(req, res));
 
+/**
+ * @swagger
+ * /api/menu-items/{id}:
+ *   patch:
+ *     summary: Actualizar un item del menú
+ *     tags: [MenuItems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del item del menú a actualizar
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             description: Se pueden enviar solo los campos a modificar
+ *             properties:
+ *               category_id:
+ *                 type: string
+ *                 example: "665e0d3b5c9a1c0012f1a888"
+ *               branch_id:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "665e0d3b5c9a1c0012f1a666"
+ *               name:
+ *                 type: string
+ *                 example: "Hamburguesa Doble"
+ *               description:
+ *                 type: string
+ *                 example: "Hamburguesa doble carne con cheddar"
+ *               price:
+ *                 type: number
+ *                 example: 3200
+ *               preparation_time_minutes:
+ *                 type: number
+ *                 example: 20
+ *               stock:
+ *                 type: number
+ *                 example: 25
+ *               daily_stock:
+ *                 type: number
+ *                 nullable: true
+ *                 example: 50
+ *               image_url:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "https://miapp.com/images/hamburguesa-doble.png"
+ *               is_active:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Item del menú actualizado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MenuItem'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Item del menú no encontrado o inactivo
+ *       500:
+ *         description: Error interno del servidor
+ */
+MenuItemsRouter.patch("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.update(req, res));
 export default MenuItemsRouter;

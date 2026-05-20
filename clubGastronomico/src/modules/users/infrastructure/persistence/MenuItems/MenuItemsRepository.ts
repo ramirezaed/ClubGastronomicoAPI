@@ -8,7 +8,6 @@ export class MenuItemsRepository implements IMenuRepository {
       doc.id.toString(),
       doc.category_id.toString(),
       doc.company_id.toString(),
-      doc.branch_id?.toString() ?? null,
       doc.name,
       doc.description,
       doc.price,
@@ -20,13 +19,19 @@ export class MenuItemsRepository implements IMenuRepository {
       doc.deleted_at,
     );
   }
-
+  async findById(id: string): Promise<MenuItems | null> {
+    try {
+      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null });
+      if (!doc) return null;
+      return this.toEntity(doc);
+    } catch (error) {
+      throw new Error("error al buscar menuItems por id");
+    }
+  }
   async save(menuItems: MenuItems): Promise<MenuItems> {
     try {
       const doc = new MenuItemModel({
         category_id: menuItems.category_id,
-        company_id: menuItems.company_id,
-        branch_id: menuItems.branch_id,
         name: menuItems.name,
         description: menuItems.description,
         price: menuItems.price,
@@ -41,6 +46,30 @@ export class MenuItemsRepository implements IMenuRepository {
       return this.toEntity(saved);
     } catch (error) {
       throw new Error("error al registar MenuItems");
+    }
+  }
+  async update(menuItems: MenuItems): Promise<MenuItems | null> {
+    try {
+      const doc = await MenuItemModel.findOneAndUpdate(
+        { _id: menuItems.id, deletet_at: null },
+        {
+          $set: {
+            name: menuItems.name,
+            description: menuItems.description,
+            price: menuItems.price,
+            preparation_time_minutes: menuItems.preparation_time_minutes,
+            stock: menuItems.stock,
+            daily_stock: menuItems.daily_stock,
+
+            is_active: menuItems.is_active, //para activate deactivate
+            deleted_at: menuItems.deleted_at, // para soft delete
+          },
+        },
+      );
+      if (!doc) return null;
+      return this.toEntity(doc);
+    } catch (error) {
+      throw new Error("Error al actualizar datos del items");
     }
   }
 }

@@ -31,4 +31,13 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       throw new Error("error al buscar menuItems por nombre");
     }
   }
+  async findById(id: string): Promise<ResponseMenuDTO | null> {
+    try {
+      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null });
+      if (!doc) return null;
+      return this.toDTO(doc);
+    } catch (error) {
+      throw new Error("error al buscar menuItems por id");
+    }
+  }
 }

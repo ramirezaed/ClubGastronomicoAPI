@@ -1,3 +1,4 @@
+import { InactiveMenuItems } from "@/modules/users/domain/exceptions/MenuItems/InactiveMenuError";
 import { RegisterMenuError } from "@/modules/users/domain/exceptions/MenuItems/RegisterMenuError";
 
 export class MenuItems {
@@ -31,5 +32,23 @@ export class MenuItems {
       throw new RegisterMenuError();
     }
     return new MenuItems("", category_id, company_id, name, description, price, 15, stock, 100, image_url, true, null);
+  }
+  update(
+    name: string,
+    description: string,
+    price: number,
+    preparation_time_minutes: number,
+    stock: number,
+    daily_stock: number,
+  ): void {
+    if (!this.is_active) {
+      throw new InactiveMenuItems();
+    }
+    this.name = name ?? this.name;
+    this.description = description ?? this.description;
+    this.price = price ?? this.price;
+    this.preparation_time_minutes = preparation_time_minutes ?? this.preparation_time_minutes;
+    this.stock = stock ?? this.stock;
+    this.daily_stock = daily_stock ?? this.daily_stock;
   }
 }
