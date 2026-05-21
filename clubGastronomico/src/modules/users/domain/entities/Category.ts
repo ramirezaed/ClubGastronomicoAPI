@@ -1,3 +1,5 @@
+import { categoryAlreadyActiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyActive";
+import { categoryAlreadyInactiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyInactive";
 import { RegisterCategoryError } from "@/modules/users/domain/exceptions/category/registerCategoryError";
 
 export class Category {
@@ -13,5 +15,17 @@ export class Category {
       throw new RegisterCategoryError();
     }
     return new Category("", name, true, null); // is_active true por default, deleted_at null por defecto
+  }
+  activate(): void {
+    if (this.is_active) {
+      throw new categoryAlreadyActiveError();
+    }
+    this.is_active = true;
+  }
+  deactivate(): void {
+    if (!this.is_active) {
+      throw new categoryAlreadyInactiveError();
+    }
+    this.is_active = false;
   }
 }

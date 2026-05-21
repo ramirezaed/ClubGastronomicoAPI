@@ -1,3 +1,5 @@
+import { activateCategoryUseCase } from "@/modules/users/application/use-cases/category/activatecategoryUseCase";
+import { deactivateCategoryUseCase } from "@/modules/users/application/use-cases/category/deactivateCategoryUseCase";
 import { RegisterCategoryUseCase } from "@/modules/users/application/use-cases/category/registerCategoryUseCase";
 import { CategoryController } from "@/modules/users/infrastructure/controllers/categoryController";
 import { CategoryQueryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryQueryRepository";
@@ -14,9 +16,11 @@ const categoryQueryRepository = new CategoryQueryRepository();
 
 // capa de aplicacion, caso de uso
 const registerCategory = new RegisterCategoryUseCase(categoryRepository, categoryQueryRepository);
+const activateCategory = new activateCategoryUseCase(categoryRepository);
+const deactivateCategory = new deactivateCategoryUseCase(categoryRepository);
 
 //capa de interfaz, se inyectan las dependencias
-const categoryController = new CategoryController(registerCategory);
+const categoryController = new CategoryController(registerCategory, activateCategory, deactivateCategory);
 
 /**
  * @swagger
@@ -101,3 +105,79 @@ const categoryController = new CategoryController(registerCategory);
  *         description: Error interno del servidor
  */
 categoryRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) => categoryController.register(req, res));
+
+/**
+ * @swagger
+ * /api/categories/activate/{id}:
+ *   patch:
+ *     summary: Activar una categoría
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la categoría
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Categoría activada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Category'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Categoría no encontrada
+ *       409:
+ *         description: La categoría ya se encuentra activa
+ *       500:
+ *         description: Error interno del servidor
+ */
+categoryRouter.patch("/activate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  categoryController.activate(req, res),
+);
+
+/**
+ * @swagger
+ * /api/categories/deactivate/{id}:
+ *   patch:
+ *     summary: Desactivar una categoría
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la categoría
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Categoría desactivada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Category'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Categoría no encontrada
+ *       409:
+ *         description: La categoría ya se encuentra inactiva
+ *       500:
+ *         description: Error interno del servidor
+ */
+categoryRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  categoryController.deactivate(req, res),
+);
