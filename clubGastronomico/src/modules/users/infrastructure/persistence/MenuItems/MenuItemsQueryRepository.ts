@@ -45,6 +45,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
 
   async getAll(
+    company_id: string,
     filter?: { is_active?: boolean; name?: string },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<ResponseMenuDTO>> {
@@ -64,7 +65,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
 
     const [docs, total] = await Promise.all([
       //busca los registros aplicando los filtros
-      MenuItemModel.find(query).skip(skip).limit(limit).lean(),
+      MenuItemModel.find({ company_id: company_id, query }).skip(skip).limit(limit).lean(),
       //cuenta el total de registros que cumplen los filtros
       MenuItemModel.countDocuments(query),
     ]);

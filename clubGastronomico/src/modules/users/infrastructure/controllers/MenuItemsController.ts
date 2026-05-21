@@ -43,9 +43,10 @@ export class MenuItemsController {
       return;
     }
   }
-
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      const company_id = req.user.company_id as string;
+
       let is_active: boolean | undefined;
       let name: string | undefined;
       // parse boolean
@@ -60,7 +61,7 @@ export class MenuItemsController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      const items = await this.getAllMenuItems.execute({ is_active, name }, { page, limit });
+      const items = await this.getAllMenuItems.execute(company_id, { is_active, name }, { page, limit });
       res.status(200).json(items);
       return;
     } catch (error) {
@@ -68,7 +69,6 @@ export class MenuItemsController {
       res.status(500).json({ message: "error interno del servidor" });
     }
   }
-
   async register(req: Request, res: Response): Promise<void> {
     try {
       const company = req.user.company_id as string;
