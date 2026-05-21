@@ -5,7 +5,7 @@ export interface IcategoryQueryRepository {
   findByName(name: string): Promise<categoryResponseDTO | null>;
   getAll(
     company_id: string,
-    filter?: { is_active?: boolean; name: string },
+    filter?: { is_active?: boolean; name?: string },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<categoryResponseDTO>>;
   findById(id: string): Promise<categoryResponseDTO | null>;

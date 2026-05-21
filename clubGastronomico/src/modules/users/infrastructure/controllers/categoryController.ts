@@ -1,6 +1,7 @@
 import { activateCategoryUseCase } from "@/modules/users/application/use-cases/category/activatecategoryUseCase";
 import { deactivateCategoryUseCase } from "@/modules/users/application/use-cases/category/deactivateCategoryUseCase";
 import { findByIdCategoryUseCase } from "@/modules/users/application/use-cases/category/findByIdUseCase";
+import { getAllCategoryUseCase } from "@/modules/users/application/use-cases/category/getAllCategoryUseCase";
 import { RegisterCategoryUseCase } from "@/modules/users/application/use-cases/category/registerCategoryUseCase";
 import { softdeleteCategoryUseCase } from "@/modules/users/application/use-cases/category/softdeleteCategoryUseCase";
 import { categoryAlreadyActiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyActive";
@@ -16,6 +17,7 @@ export class CategoryController {
     private readonly deactivateCategory: deactivateCategoryUseCase,
     private readonly softDeleteCategory: softdeleteCategoryUseCase,
     private readonly findByIdCategory: findByIdCategoryUseCase,
+    private readonly getAllCategory: getAllCategoryUseCase,
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
@@ -105,6 +107,25 @@ export class CategoryController {
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
       return;
+    }
+  }
+
+  async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+
+      let is_active: boolean | undefined;
+      let name: string | undefined;
+      // parse boolean
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const items = await this.getAllCategory.execute(company_id, { is_active, name }, { page, limit });
+      res.status(200).json(items);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
     }
   }
 }
