@@ -49,33 +49,38 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
     filter?: { is_active?: boolean; name?: string },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<ResponseMenuDTO>> {
-    const query: QueryFilter<IMenuItemsDocument> = { deleted_at: null };
-    //si no es indefinido el filtro es is_active
-    if (filter?.is_active !== undefined) query.is_active = filter.is_active;
-    //si no es indefinido el filtro es name
-    //regex para busquedas parciales, "i" para busqueda insensitiva (mayusculas o minusculas)
-    if (filter?.name) query.name = { $regex: filter.name, $options: "i" };
-    //obtiene el numero de paginas enviadas, por defecto usa 1
-    const page = pagination?.page ?? 1;
-    // lmite de registros por pagina, por defecto son 10
-    const limit = pagination?.limit ?? 10;
-    //calcula los registros que debe saltar
-    // ejemplo pag 1 skip 0, pag 2 skip 10, pag3 skip 20
-    const skip = (page - 1) * limit;
+    try {
+      const query: QueryFilter<IMenuItemsDocument> = { deleted_at: null };
 
-    const [docs, total] = await Promise.all([
-      //busca los registros aplicando los filtros
-      MenuItemModel.find({ company_id: company_id, query }).skip(skip).limit(limit).lean(),
-      //cuenta el total de registros que cumplen los filtros
-      MenuItemModel.countDocuments(query),
-    ]);
+      //si no es indefinido el filtro es is_active
+      if (filter?.is_active !== undefined) query.is_active = filter.is_active;
+      //si no es indefinido el filtro es name
+      //regex para busquedas parciales, "i" para busqueda insensitiva (mayusculas o minusculas)
+      if (filter?.name) query.name = { $regex: filter.name, $options: "i" };
+      //obtiene el numero de paginas enviadas, por defecto usa 1
+      const page = pagination?.page ?? 1;
+      // lmite de registros por pagina, por defecto son 10
+      const limit = pagination?.limit ?? 10;
+      //calcula los registros que debe saltar
+      // ejemplo pag 1 skip 0, pag 2 skip 10, pag3 skip 20
+      const skip = (page - 1) * limit;
 
-    return {
-      data: docs.map(this.toDTO),
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+      const [docs, total] = await Promise.all([
+        //busca los registros aplicando los filtros
+        MenuItemModel.find({ company_id, query }).skip(skip).limit(limit).lean(),
+        //cuenta el total de registros que cumplen los filtros
+        MenuItemModel.countDocuments(query),
+      ]);
+
+      return {
+        data: docs.map(this.toDTO),
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    } catch (error) {
+      throw new Error("error al buscar items");
+    }
   }
 }

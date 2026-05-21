@@ -4,7 +4,7 @@ const MenuItemSchema = new Schema(
   {
     category_id: {
       type: Types.ObjectId,
-      ref: "ProductCategory",
+      ref: "Category",
       required: true,
     },
     company_id: {
