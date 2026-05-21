@@ -1,6 +1,7 @@
 import { activateCategoryUseCase } from "@/modules/users/application/use-cases/category/activatecategoryUseCase";
 import { deactivateCategoryUseCase } from "@/modules/users/application/use-cases/category/deactivateCategoryUseCase";
 import { RegisterCategoryUseCase } from "@/modules/users/application/use-cases/category/registerCategoryUseCase";
+import { softdeleteCategoryUseCase } from "@/modules/users/application/use-cases/category/softdeleteCategoryUseCase";
 import { CategoryController } from "@/modules/users/infrastructure/controllers/categoryController";
 import { CategoryQueryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryQueryRepository";
 import { CategoryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryRepository";
@@ -18,9 +19,10 @@ const categoryQueryRepository = new CategoryQueryRepository();
 const registerCategory = new RegisterCategoryUseCase(categoryRepository, categoryQueryRepository);
 const activateCategory = new activateCategoryUseCase(categoryRepository);
 const deactivateCategory = new deactivateCategoryUseCase(categoryRepository);
+const softdelete = new softdeleteCategoryUseCase(categoryRepository);
 
 //capa de interfaz, se inyectan las dependencias
-const categoryController = new CategoryController(registerCategory, activateCategory, deactivateCategory);
+const categoryController = new CategoryController(registerCategory, activateCategory, deactivateCategory, softdelete);
 
 /**
  * @swagger
@@ -181,3 +183,42 @@ categoryRouter.patch("/activate/:id", authMiddleware, authorizeRoles("owner"), (
 categoryRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("owner"), (req, res) =>
   categoryController.deactivate(req, res),
 );
+
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   delete:
+ *     summary: Eliminar una categoría (soft delete)
+ *     description: Marca la categoría como eliminada seteando el campo deleted_at sin eliminarla físicamente.
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la categoría
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Categoría eliminada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: categoria eliminada exitosamente
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Categoría no encontrada
+ *       500:
+ *         description: Error interno del servidor
+ */
+categoryRouter.delete("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => categoryController.softdelete(req, res));

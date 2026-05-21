@@ -1,6 +1,7 @@
 import { activateCategoryUseCase } from "@/modules/users/application/use-cases/category/activatecategoryUseCase";
 import { deactivateCategoryUseCase } from "@/modules/users/application/use-cases/category/deactivateCategoryUseCase";
 import { RegisterCategoryUseCase } from "@/modules/users/application/use-cases/category/registerCategoryUseCase";
+import { softdeleteCategoryUseCase } from "@/modules/users/application/use-cases/category/softdeleteCategoryUseCase";
 import { categoryAlreadyActiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyActive";
 import { categoryAlreadyInactiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyInactive";
 import { categoryDuplicateNameError } from "@/modules/users/domain/exceptions/category/categoryDuplicateNameError";
@@ -12,6 +13,7 @@ export class CategoryController {
     private readonly registerCategory: RegisterCategoryUseCase,
     private readonly activateCategory: activateCategoryUseCase,
     private readonly deactivateCategory: deactivateCategoryUseCase,
+    private readonly softDeleteCategory: softdeleteCategoryUseCase,
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
@@ -71,6 +73,20 @@ export class CategoryController {
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
       return;
+    }
+  }
+  async softdelete(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      await this.softDeleteCategory.execute(id);
+      res.status(200).json({ message: "categoria eliminada exitosamente" });
+    } catch (error) {
+      if (error instanceof categoryNotFound) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
     }
   }
 }
