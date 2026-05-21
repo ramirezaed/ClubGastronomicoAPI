@@ -1,5 +1,6 @@
 import { activateCategoryUseCase } from "@/modules/users/application/use-cases/category/activatecategoryUseCase";
 import { deactivateCategoryUseCase } from "@/modules/users/application/use-cases/category/deactivateCategoryUseCase";
+import { findByIdCategoryUseCase } from "@/modules/users/application/use-cases/category/findByIdUseCase";
 import { RegisterCategoryUseCase } from "@/modules/users/application/use-cases/category/registerCategoryUseCase";
 import { softdeleteCategoryUseCase } from "@/modules/users/application/use-cases/category/softdeleteCategoryUseCase";
 import { CategoryController } from "@/modules/users/infrastructure/controllers/categoryController";
@@ -20,9 +21,10 @@ const registerCategory = new RegisterCategoryUseCase(categoryRepository, categor
 const activateCategory = new activateCategoryUseCase(categoryRepository);
 const deactivateCategory = new deactivateCategoryUseCase(categoryRepository);
 const softdelete = new softdeleteCategoryUseCase(categoryRepository);
+const findById = new findByIdCategoryUseCase(categoryQueryRepository);
 
 //capa de interfaz, se inyectan las dependencias
-const categoryController = new CategoryController(registerCategory, activateCategory, deactivateCategory, softdelete);
+const categoryController = new CategoryController(registerCategory, activateCategory, deactivateCategory, softdelete, findById);
 
 /**
  * @swagger
@@ -51,6 +53,40 @@ const categoryController = new CategoryController(registerCategory, activateCate
  *           type: string
  *           example: "2026-05-21T10:00:00.000Z"
  */
+
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   get:
+ *     summary: Obtener una categoría por ID
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la categoría
+ *         example: "665e0d3b5c9a1c0012f1a999"
+ *     responses:
+ *       200:
+ *         description: Categoría obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Category'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No tiene permisos (solo OWNER)
+ *       404:
+ *         description: Categoría no encontrada
+ *       500:
+ *         description: Error interno del servidor
+ */
+categoryRouter.get("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => categoryController.findById(req, res));
 
 /**
  * @swagger

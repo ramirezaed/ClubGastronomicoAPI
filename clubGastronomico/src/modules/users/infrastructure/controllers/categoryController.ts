@@ -1,5 +1,6 @@
 import { activateCategoryUseCase } from "@/modules/users/application/use-cases/category/activatecategoryUseCase";
 import { deactivateCategoryUseCase } from "@/modules/users/application/use-cases/category/deactivateCategoryUseCase";
+import { findByIdCategoryUseCase } from "@/modules/users/application/use-cases/category/findByIdUseCase";
 import { RegisterCategoryUseCase } from "@/modules/users/application/use-cases/category/registerCategoryUseCase";
 import { softdeleteCategoryUseCase } from "@/modules/users/application/use-cases/category/softdeleteCategoryUseCase";
 import { categoryAlreadyActiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyActive";
@@ -14,6 +15,7 @@ export class CategoryController {
     private readonly activateCategory: activateCategoryUseCase,
     private readonly deactivateCategory: deactivateCategoryUseCase,
     private readonly softDeleteCategory: softdeleteCategoryUseCase,
+    private readonly findByIdCategory: findByIdCategoryUseCase,
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
@@ -87,6 +89,22 @@ export class CategoryController {
       }
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
+    }
+  }
+  async findById(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const category = await this.findByIdCategory.execute(id);
+      res.status(200).json(category);
+      return;
+    } catch (error) {
+      if (error instanceof categoryNotFound) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
     }
   }
 }

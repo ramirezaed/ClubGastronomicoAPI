@@ -8,4 +8,5 @@ export interface IcategoryQueryRepository {
     filter?: { is_active?: boolean; name: string },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<categoryResponseDTO>>;
+  findById(id: string): Promise<categoryResponseDTO | null>;
 }
