@@ -7,6 +7,7 @@ export class MongooseRoleRepository implements IRoleRepository {
   private toEntity(doc: any): Role {
     return new Role(doc._id.toString(), doc.name, doc.description, doc.is_active, doc.deleted_at);
   }
+
   async save(role: Role): Promise<Role> {
     const doc = new RoleModel({
       name: role.name,

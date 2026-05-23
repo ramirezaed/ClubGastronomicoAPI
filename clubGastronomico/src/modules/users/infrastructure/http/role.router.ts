@@ -24,8 +24,6 @@ const roleQueryRepository = new MongooseRoleQueryRepository();
 const getAllRolesUseCase = new GetAllRoles(roleQueryRepository);
 const getRoleByIdUseCase = new GetRoleById(roleQueryRepository);
 const registerRoleUseCase = new RegisterRole(roleRepository, roleQueryRepository);
-// const getAllRolesUseCase = new GetAllRoles(roleQueryRepository);
-// const getRoleByIdUseCase = new GetRoleById(roleQueryRepository);
 const updateRoleUseCase = new UpdateRole(roleRepository);
 const deleteRoleUseCase = new DeleteRole(roleRepository);
 const activateRoleUseCase = new ActivateRoleUseCase(roleRepository);
@@ -183,9 +181,7 @@ RoleRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => 
  *       500:
  *         description: Error interno del servidor
  */
-RoleRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  roleController.getRoleByID(req, res),
-);
+RoleRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.getRoleByID(req, res));
 // actualizar rol
 /**
  * @swagger
@@ -301,9 +297,7 @@ RoleRouter.patch("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res
  *                   type: string
  *                   example: error interno del servidor
  */
-RoleRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  roleController.activate(req, res),
-);
+RoleRouter.patch("/activate/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.activate(req, res));
 //desactivar rol
 /**
  * @swagger
@@ -388,7 +382,5 @@ RoleRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin")
  *       500:
  *         description: Error interno
  */
-RoleRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  roleController.softDelete(req, res),
-);
+RoleRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => roleController.softDelete(req, res));
 export default RoleRouter;
