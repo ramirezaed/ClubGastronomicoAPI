@@ -11,6 +11,7 @@ import RoleRouter from "@/modules/users/infrastructure/http/role.router";
 import UserRouter from "@/modules/users/infrastructure/http/user.router";
 import CompanyRouter from "@/modules/users/infrastructure/http/company.router";
 import PlansRouter from "@/modules/users/infrastructure/http/plans.router";
+import categoryRouter from "@/modules/users/infrastructure/http/categoryRouter";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -31,6 +32,7 @@ app.use("/api/user", UserRouter);
 app.use("/api/roles", RoleRouter);
 app.use("/api/company", CompanyRouter);
 app.use("/api/plans", PlansRouter);
+app.use("/api/categories", categoryRouter);
 
 const startServer = async () => {
   try {

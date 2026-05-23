@@ -340,3 +340,5 @@ categoryRouter.patch("/deactivate/:id", authMiddleware, authorizeRoles("owner"),
  *         description: Error interno del servidor
  */
 categoryRouter.delete("/:id", authMiddleware, authorizeRoles("owner"), (req, res) => categoryController.softdelete(req, res));
+
+export default categoryRouter;
