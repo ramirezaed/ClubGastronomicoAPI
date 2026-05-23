@@ -1,6 +1,7 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
 import { getAllMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getAllMenuItemsUseCase";
+import { getAllForBotUseCase } from "@/modules/users/application/use-cases/MenuItems/GetByIdMenuItemsForBotUseCase";
 import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getByIdMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
@@ -30,6 +31,7 @@ const deactivateMenu = new deactivaMenuItemsUseCase(menuRepository);
 const softDelete = new softDeleteMenuItemsUseCase(menuRepository);
 const getByIdMenu = new getByIdMenuItemsUseCase(menuQueryRepository);
 const getAllMenu = new getAllMenuItemsUseCase(menuQueryRepository);
+const getAllForBot = new getAllForBotUseCase(menuQueryRepository);
 
 //capa de interfaz
 
@@ -41,6 +43,7 @@ const menuItemsController = new MenuItemsController(
   softDelete,
   getByIdMenu,
   getAllMenu,
+  getAllForBot,
 );
 
 /**
@@ -206,7 +209,48 @@ MenuItemsRouter.get("/:id", authMiddleware, authorizeRoles("owner"), (req, res) 
  *       500:
  *         description: Error interno del servidor
  */
-MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner"), (req, res) => menuItemsController.getAll(req, res));
+MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner, Employee"), (req, res) => menuItemsController.getAll(req, res));
+
+/**
+ * @swagger
+ * /api/menu-items/bot:
+ *   get:
+ *     summary: Obtener items del menú para el bot
+ *     description: Devuelve todos los items del menú de la compañía autenticada para consumo del bot.
+ *     tags: [MenuItems]
+ *     responses:
+ *       200:
+ *         description: Lista de items del menú obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/MenuItem'
+ *
+ *       404:
+ *         description: No se encontraron items del menú
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Menu items not found"
+ *
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "error interno del servidor"
+ */
+MenuItemsRouter.get("/bot", (req, res) => menuItemsController.getAllforBot(req, res));
 
 /**
  * @swagger

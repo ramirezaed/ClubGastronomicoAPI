@@ -9,4 +9,6 @@ export interface IMenuQueryRepository {
     filter?: { is_active?: boolean; name?: string },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<ResponseMenuDTO>>;
+
+  getAllForBot(company_id: string): Promise<ResponseMenuDTO[]>;
 }

@@ -83,4 +83,26 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       throw new Error("error al buscar items");
     }
   }
+
+  async getAllForBot(company_id: string): Promise<ResponseMenuDTO[]> {
+    try {
+      const query: QueryFilter<IMenuItemsDocument> = {
+        company_id,
+        deleted_at: null, //que no esten eliminados
+        is_active: true, // que se encuentren activos
+        $or: [{ stock: null }, { stock: { $gt: 0 } }], //que su stock sea ilimitado o mayor a 0
+      };
+
+      const docs = await MenuItemModel.find(query)
+        .populate({
+          path: "category_id",
+          match: { is_active: true }, //que su categoria este activa
+        })
+        .lean();
+
+      return docs.map((doc) => this.toDTO(doc));
+    } catch (error) {
+      throw new Error("error al buscar items para el bot");
+    }
+  }
 }

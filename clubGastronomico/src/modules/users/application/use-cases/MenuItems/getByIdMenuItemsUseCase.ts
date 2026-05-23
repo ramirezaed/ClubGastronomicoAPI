@@ -4,19 +4,12 @@ import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuIt
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
 
 export class getByIdMenuItemsUseCase {
-  constructor(
-    private readonly imenuQueryrepository: MenuItemsQueryRepository,
-    // private readonly IcategoryRepository: CategoryItemsRepository,
-  ) {}
+  constructor(private readonly imenuQueryrepository: MenuItemsQueryRepository) {}
   async execute(id: string): Promise<ResponseMenuDTO> {
     const items = await this.imenuQueryrepository.findById(id);
     if (!items) {
       throw new MenuItemsNotFoundError();
     }
-    // const category = await this.IcategoryRepository.findById(id);
-    // if (!category) {
-    //   throw new CategoryNotFound();
-    // }
     return {
       id: items.id,
       category: {

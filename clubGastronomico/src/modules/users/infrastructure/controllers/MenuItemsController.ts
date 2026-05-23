@@ -1,6 +1,7 @@
 import { ActivateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/activateMenuItemsUseCase";
 import { deactivaMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/deactivateMenuItemsUseCase";
 import { getAllMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getAllMenuItemsUseCase";
+import { getAllForBotUseCase } from "@/modules/users/application/use-cases/MenuItems/GetByIdMenuItemsForBotUseCase";
 import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/getByIdMenuItemsUseCase";
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
@@ -22,6 +23,7 @@ export class MenuItemsController {
     private readonly softDeleteMenuItems: softDeleteMenuItemsUseCase,
     private readonly getByIdMenuItems: getByIdMenuItemsUseCase,
     private readonly getAllMenuItems: getAllMenuItemsUseCase,
+    private readonly getAllMenuItemsFotBot: getAllForBotUseCase,
   ) {}
   async getById(req: Request, res: Response): Promise<void> {
     try {
@@ -161,6 +163,22 @@ export class MenuItemsController {
       if (error instanceof MenuItemsNotFoundError) {
         res.status(404).json({ message: error.message });
         return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+
+  async getAllforBot(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+      const menuItems = await this.getAllMenuItemsFotBot.execute(company_id);
+      res.status(200).json(menuItems);
+      return;
+    } catch (error) {
+      if (error instanceof MenuItemsNotFoundError) {
+        res.status(404).json({ message: error.message });
       }
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
