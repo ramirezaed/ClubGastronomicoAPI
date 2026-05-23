@@ -1,4 +1,5 @@
 import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/ResponseMenuDTO";
+import { ResponseMenuForBotDTO } from "@/modules/users/application/dtos/MenuItems/ResponseMenuForBotDTO";
 import { IPaginatedResponseDTO, IPaginationDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
 
 export interface IMenuQueryRepository {
@@ -10,5 +11,5 @@ export interface IMenuQueryRepository {
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<ResponseMenuDTO>>;
 
-  getAllForBot(company_id: string): Promise<ResponseMenuDTO[]>;
+  getAllForBot(company_id: string): Promise<ResponseMenuForBotDTO[]>;
 }

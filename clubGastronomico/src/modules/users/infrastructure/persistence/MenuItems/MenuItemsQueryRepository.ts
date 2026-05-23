@@ -1,4 +1,5 @@
 import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/ResponseMenuDTO";
+import { ResponseMenuForBotDTO } from "@/modules/users/application/dtos/MenuItems/ResponseMenuForBotDTO";
 import { IPaginationDTO, IPaginatedResponseDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
 import { IMenuQueryRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuQueryRepository";
 import { IMenuItemsDocument } from "@/modules/users/infrastructure/persistence/MenuItems/MenuDocuments";
@@ -25,6 +26,17 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       is_active: doc.is_active,
     };
   }
+  private toBotDTO(doc: any): ResponseMenuForBotDTO {
+    return {
+      category: {
+        name: doc.category_id.name,
+      },
+      name: doc.name,
+      description: doc.description,
+      price: doc.price,
+      image_url: doc.image_url,
+    };
+  }
   async findByName(category_id: string, company_id: string, name: string): Promise<ResponseMenuDTO | null> {
     try {
       const doc = await MenuItemModel.findOne({ category_id: category_id, company_id: company_id, name: name, deleted_at: null });
@@ -43,7 +55,6 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       throw new Error("error al buscar menuItems por id");
     }
   }
-
   async getAll(
     company_id: string,
     filter?: { is_active?: boolean; name?: string },
@@ -83,8 +94,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       throw new Error("error al buscar items");
     }
   }
-
-  async getAllForBot(company_id: string): Promise<ResponseMenuDTO[]> {
+  async getAllForBot(company_id: string): Promise<ResponseMenuForBotDTO[]> {
     try {
       const query: QueryFilter<IMenuItemsDocument> = {
         company_id,
@@ -100,7 +110,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
         })
         .lean();
 
-      return docs.map((doc) => this.toDTO(doc));
+      return docs.map((doc) => this.toBotDTO(doc));
     } catch (error) {
       throw new Error("error al buscar items para el bot");
     }
