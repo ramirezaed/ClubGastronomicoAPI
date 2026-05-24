@@ -6,8 +6,8 @@ import { getByIdMenuItemsUseCase } from "@/modules/users/application/use-cases/M
 import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/registerMenuItemsUseCase";
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
-import { AuthController } from "@/modules/users/infrastructure/controllers/authController";
 import { MenuItemsController } from "@/modules/users/infrastructure/controllers/MenuItemsController";
+import { CategoryQueryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryQueryRepository";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
@@ -20,7 +20,7 @@ const MenuItemsRouter = Router();
 
 const menuRepository = new MenuItemsRepository();
 const menuQueryRepository = new MenuItemsQueryRepository();
-const categoryQueryRepository = new CategoryItemsQueryRepository();
+const categoryQueryRepository = new CategoryQueryRepository();
 
 //capa de apliacion (casos de uso)
 
