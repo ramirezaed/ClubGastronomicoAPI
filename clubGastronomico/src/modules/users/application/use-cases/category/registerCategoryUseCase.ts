@@ -1,13 +1,13 @@
 import { categoryResponseDTO } from "@/modules/users/application/dtos/category/categoryResponseDTO";
 import { Category } from "@/modules/users/domain/entities/Category";
 import { categoryDuplicateNameError } from "@/modules/users/domain/exceptions/category/categoryDuplicateNameError";
-import { CategoryQueryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryQueryRepository";
-import { CategoryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryRepository";
+import { IcategoryQueryRepository } from "@/modules/users/domain/repositories/Category/IcategoryQueryRepository";
+import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
 
 export class RegisterCategoryUseCase {
   constructor(
-    private readonly icategoryRepository: CategoryRepository,
-    private readonly icategoryQueryReository: CategoryQueryRepository,
+    private readonly icategoryRepository: IcategoryRepository,
+    private readonly icategoryQueryReository: IcategoryQueryRepository,
   ) {}
   async execute(name: string): Promise<categoryResponseDTO> {
     //verifica que no exista una categoria con el mismo nombre

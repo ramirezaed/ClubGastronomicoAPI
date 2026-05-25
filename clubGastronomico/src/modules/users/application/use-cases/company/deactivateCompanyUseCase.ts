@@ -9,7 +9,7 @@ export class DeactivateCompanyUseCase {
     if (!company) {
       throw new CompanyNotFoundError();
     }
-    company.deactivate;
+    company.deactivate();
     await this.icompanyRepository.update(company);
     return {
       id: company.id,

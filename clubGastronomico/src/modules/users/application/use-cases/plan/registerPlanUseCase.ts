@@ -1,17 +1,18 @@
 import { registerPlanDTO } from "@/modules/users/application/dtos/subscription/RegisterPlanDTO";
 import { subscriptionResponseDTO } from "@/modules/users/application/dtos/subscription/subscriptionResponseDTO";
 import { SubscriptionPlanAlreadyExistsError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanAlreadyExistsError";
-import { SubscriptionPlanRepository } from "@/modules/users/infrastructure/persistence/subscription/subscriptionRepository";
 import { SubscriptionPlan } from "@/modules/users/domain/entities/SubscriptionPlan";
+import { ISubscriptionRepository } from "@/modules/users/domain/repositories/subscription/subscriptionRepository";
+
 export class registerPlanUseCase {
-  constructor(private readonly iplanRepository: SubscriptionPlanRepository) {}
+  constructor(private readonly iplanRepository: ISubscriptionRepository) {}
   async execute(dto: registerPlanDTO): Promise<subscriptionResponseDTO> {
     //verifica que no exista un plan con el mismo nombre
     const planName = await this.iplanRepository.findByName(dto.name);
     if (planName) {
       throw new SubscriptionPlanAlreadyExistsError();
     }
-    const plan = SubscriptionPlan.create(dto.name, dto.price, dto.descrition);
+    const plan = SubscriptionPlan.create(dto.name, dto.price, dto.description);
     const saved = await this.iplanRepository.save(plan);
     return {
       id: saved.id,

@@ -1,9 +1,9 @@
 import { categoryResponseDTO } from "@/modules/users/application/dtos/category/categoryResponseDTO";
 import { categoryNotFound } from "@/modules/users/domain/exceptions/category/categoryNotFound";
-import { CategoryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryRepository";
+import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
 
 export class deactivateCategoryUseCase {
-  constructor(private readonly icategoryRepository: CategoryRepository) {}
+  constructor(private readonly icategoryRepository: IcategoryRepository) {}
   async execute(id: string): Promise<categoryResponseDTO> {
     const category = await this.icategoryRepository.findById(id);
     if (!category) {

@@ -10,7 +10,7 @@ export class deactivaMenuItemsUseCase {
     if (!items) {
       throw new MenuItemsNotFoundError();
     }
-    items.deactivate;
+    items.deactivate();
     await this.imenuRepository.update(items);
     return {
       id: items.id,

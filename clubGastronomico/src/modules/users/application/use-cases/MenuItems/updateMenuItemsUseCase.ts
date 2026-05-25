@@ -1,7 +1,6 @@
 import { UpdateMenuItemsDTO } from "@/modules/users/application/dtos/MenuItems/UpdateMenuDTO";
-import { UpdateResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/updateResponseMenuDTO";
+import { UpdateResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/UpdateResponseMenuDTO";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
-
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 
 export class UpdateMenuItemsUseCase {

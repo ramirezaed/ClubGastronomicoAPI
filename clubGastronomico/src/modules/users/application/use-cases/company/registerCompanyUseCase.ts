@@ -4,14 +4,14 @@ import { IResponseCompanyDTO } from "@/modules/users/application/dtos/company/Ir
 import { Company } from "@/modules/users/domain/entities/Company";
 import { CompanyAlreadyExistsError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyExistsError";
 import { SubscriptionPlanNotFoundError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanNotFoundError";
-import { subscriptionQueryRepository } from "@/modules/users/infrastructure/persistence/subscription/subscriptionQueryRepository";
 import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
+import { ISubscriptionQueryRepository } from "@/modules/users/domain/repositories/subscription/subscriptionQueryRepository";
 
 export class RegisterCompanyUseCase {
   constructor(
     private readonly icompanyRepository: ICompanyRepository,
-    private readonly isubscriptionRepository: subscriptionQueryRepository,
+    private readonly isubscriptionRepository: ISubscriptionQueryRepository,
     private readonly iuserRepository: IUserRepository,
   ) {}
 
