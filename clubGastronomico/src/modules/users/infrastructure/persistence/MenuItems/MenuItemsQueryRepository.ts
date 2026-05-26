@@ -9,7 +9,7 @@ import { QueryFilter } from "mongoose";
 export class MenuItemsQueryRepository implements IMenuQueryRepository {
   private toDTO(doc: any): ResponseMenuDTO {
     return {
-      id: doc.id.toString(),
+      id: doc._id.toString(),
       category: {
         id: doc.category_id._id?.toString() ?? doc.category_id.toString(),
         name: doc.category_id.name, // viene de populate
@@ -61,7 +61,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<ResponseMenuDTO>> {
     try {
-      const query: QueryFilter<IMenuItemsDocument> = { deleted_at: null };
+      const query: QueryFilter<IMenuItemsDocument> = { company_id, deleted_at: null };
 
       //si no es indefinido el filtro es is_active
       if (filter?.is_active !== undefined) query.is_active = filter.is_active;
@@ -78,7 +78,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
 
       const [docs, total] = await Promise.all([
         //busca los registros aplicando los filtros
-        MenuItemModel.find({ company_id, query }).skip(skip).limit(limit).lean(),
+        MenuItemModel.find(query).skip(skip).limit(limit).lean(),
         //cuenta el total de registros que cumplen los filtros
         MenuItemModel.countDocuments(query),
       ]);
@@ -91,6 +91,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
+      console.error(error);
       throw new Error("error al buscar items");
     }
   }

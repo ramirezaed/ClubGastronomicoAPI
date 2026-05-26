@@ -13,6 +13,7 @@ export class CategoryRepository implements IcategoryRepository {
       if (!doc) return null;
       return this.toEntity(doc);
     } catch (error) {
+      console.error(error);
       throw new Error("error al busar categoria por id");
     }
   }
@@ -26,6 +27,7 @@ export class CategoryRepository implements IcategoryRepository {
       const saved = await doc.save();
       return this.toEntity(saved);
     } catch (error) {
+      console.error(error);
       throw new Error("error al crear una nueva categoria");
     }
   }
@@ -44,6 +46,7 @@ export class CategoryRepository implements IcategoryRepository {
       );
       return this.toEntity(doc);
     } catch (error) {
+      console.error(error);
       throw new Error("error al actualizar categoria");
     }
   }
