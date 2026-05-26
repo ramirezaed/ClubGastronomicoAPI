@@ -250,7 +250,7 @@ MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner", "Employee"), (r
  *                   type: string
  *                   example: "error interno del servidor"
  */
-MenuItemsRouter.get("/bot", (req, res) => menuItemsController.getAllforBot(req, res));
+MenuItemsRouter.get("/bot/:id", (req, res) => menuItemsController.getAllforBot(req, res));
 
 /**
  * @swagger
