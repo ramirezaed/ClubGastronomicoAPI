@@ -1,7 +1,6 @@
 import { subscriptionResponseDTO } from "@/modules/users/application/dtos/subscription/subscriptionResponseDTO";
 import { SubscriptionPlanNotFoundError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanNotFoundError";
 import { ISubscriptionQueryRepository } from "@/modules/users/domain/repositories/subscription/subscriptionQueryRepository";
-import { IsubscriptionPlanDocument } from "@/modules/users/infrastructure/persistence/subscription/IsubscriptioDocument";
 
 export class getAllPlansUseCase {
   constructor(private readonly iSubscriptionQueryPlan: ISubscriptionQueryRepository) {}

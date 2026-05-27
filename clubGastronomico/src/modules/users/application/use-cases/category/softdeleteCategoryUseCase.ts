@@ -1,15 +1,15 @@
 import { categoryNotFound } from "@/modules/users/domain/exceptions/category/categoryNotFound";
-import { CategoryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryRepository";
+import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
 
 export class softdeleteCategoryUseCase {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(private readonly categoryRepository: IcategoryRepository) {}
 
   async execute(id: string): Promise<void> {
     const category = await this.categoryRepository.findById(id);
     if (!category) {
       throw new categoryNotFound();
     }
-    category.softdelete;
+    category.softdelete();
     await this.categoryRepository.update(category);
     return;
   }

@@ -20,6 +20,7 @@ export class CategoryQueryRepository implements IcategoryQueryRepository {
       if (!doc) return null;
       return this.toDTO(doc);
     } catch (error) {
+      console.error(error);
       throw new Error("error al buscar categoria por nombre");
     }
   }
@@ -29,6 +30,7 @@ export class CategoryQueryRepository implements IcategoryQueryRepository {
       if (!doc) return null;
       return this.toDTO(doc);
     } catch (error) {
+      console.error(error);
       throw new Error("error al buscar categoria por id");
     }
   }
@@ -66,6 +68,7 @@ export class CategoryQueryRepository implements IcategoryQueryRepository {
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
+      console.error(error);
       throw new Error("error al buscar categorias");
     }
   }

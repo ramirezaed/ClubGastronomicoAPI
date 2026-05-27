@@ -7,7 +7,7 @@ import { RegisterMenuItemsUseCase } from "@/modules/users/application/use-cases/
 import { softDeleteMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/softDeleteMenuItemsUseCase";
 import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/MenuItems/updateMenuItemsUseCase";
 import { MenuItemsController } from "@/modules/users/infrastructure/controllers/MenuItemsController";
-import { CategoryQueryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryQueryRepository";
+import { CategoryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryRepository";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
@@ -20,7 +20,7 @@ const MenuItemsRouter = Router();
 
 const menuRepository = new MenuItemsRepository();
 const menuQueryRepository = new MenuItemsQueryRepository();
-const categoryQueryRepository = new CategoryQueryRepository();
+const categoryQueryRepository = new CategoryRepository();
 
 //capa de apliacion (casos de uso)
 
@@ -209,7 +209,7 @@ MenuItemsRouter.get("/:id", authMiddleware, authorizeRoles("owner"), (req, res) 
  *       500:
  *         description: Error interno del servidor
  */
-MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner, Employee"), (req, res) => menuItemsController.getAll(req, res));
+MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => menuItemsController.getAll(req, res));
 
 /**
  * @swagger
@@ -250,7 +250,7 @@ MenuItemsRouter.get("/", authMiddleware, authorizeRoles("owner, Employee"), (req
  *                   type: string
  *                   example: "error interno del servidor"
  */
-MenuItemsRouter.get("/bot", (req, res) => menuItemsController.getAllforBot(req, res));
+MenuItemsRouter.get("/bot/:id", (req, res) => menuItemsController.getAllforBot(req, res));
 
 /**
  * @swagger

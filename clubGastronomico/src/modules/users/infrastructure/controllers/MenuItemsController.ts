@@ -172,7 +172,7 @@ export class MenuItemsController {
 
   async getAllforBot(req: Request, res: Response): Promise<void> {
     try {
-      const company_id = req.user.company_id as string;
+      const company_id = req.params.id as string;
       const menuItems = await this.getAllMenuItemsFotBot.execute(company_id);
       res.status(200).json(menuItems);
       return;

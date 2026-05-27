@@ -1,18 +1,17 @@
-import { categoryResponseDTO } from "@/modules/users/application/dtos/category/categoryResponseDTO";
+import { categoryUpdateResponseDTO } from "@/modules/users/application/dtos/category/updateCategoryReponseDTO";
 import { categoryNotFound } from "@/modules/users/domain/exceptions/category/categoryNotFound";
-import { CategoryRepository } from "@/modules/users/infrastructure/persistence/categoryItems/categoryRepository";
+import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
 
 export class activateCategoryUseCase {
-  constructor(private readonly icategoryRepository: CategoryRepository) {}
-  async execute(id: string): Promise<categoryResponseDTO> {
+  constructor(private readonly icategoryRepository: IcategoryRepository) {}
+  async execute(id: string): Promise<categoryUpdateResponseDTO> {
     const category = await this.icategoryRepository.findById(id);
     if (!category) {
       throw new categoryNotFound();
     }
-    category.activate;
+    category.activate();
     await this.icategoryRepository.update(category);
     return {
-      id: category.id,
       name: category.name,
       is_active: category.is_active,
     };

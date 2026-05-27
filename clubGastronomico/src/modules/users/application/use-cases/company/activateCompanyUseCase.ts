@@ -10,7 +10,7 @@ export class ActivateCompanyUseCase {
     if (!company) {
       throw new CompanyNotFoundError();
     }
-    company.activate;
+    company.activate();
     await this.icompanyRepository.update(company);
     return {
       id: company.id,

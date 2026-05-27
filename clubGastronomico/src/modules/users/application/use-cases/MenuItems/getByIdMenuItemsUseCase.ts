@@ -1,10 +1,9 @@
 import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/ResponseMenuDTO";
-import { CategoryNotFound } from "@/modules/users/domain/exceptions/CategoryItems/CategoryItemsNoyFoundError";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
-import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
+import { IMenuQueryRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuQueryRepository";
 
 export class getByIdMenuItemsUseCase {
-  constructor(private readonly imenuQueryrepository: MenuItemsQueryRepository) {}
+  constructor(private readonly imenuQueryrepository: IMenuQueryRepository) {}
   async execute(id: string): Promise<ResponseMenuDTO> {
     const items = await this.imenuQueryrepository.findById(id);
     if (!items) {

@@ -3,18 +3,19 @@ import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/Resp
 import { MenuItems } from "@/modules/users/domain/entities/MenuItems";
 import { CategoryNotFound } from "@/modules/users/domain/exceptions/CategoryItems/CategoryItemsNoyFoundError";
 import { DuplicateNameMenuItemsError } from "@/modules/users/domain/exceptions/CategoryItems/DuplicateNameError";
-import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
-import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
+import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
+import { IMenuQueryRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuQueryRepository";
+import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 
 export class RegisterMenuItemsUseCase {
   constructor(
-    private readonly ImenuRepository: MenuItemsRepository,
-    private readonly ImenuQuery: MenuItemsQueryRepository,
-    private readonly IcategoryRepository: CategoryItemsRepository,
+    private readonly ImenuRepository: IMenuRepository,
+    private readonly ImenuQuery: IMenuQueryRepository,
+    private readonly IcategoryRepository: IcategoryRepository,
   ) {}
   async execute(company_id: string, dto: RegisterMenuDTO): Promise<ResponseMenuDTO> {
     //verifica que exista la categoria
-    const category = await this.IcategoryRepository.findbyId(company_id);
+    const category = await this.IcategoryRepository.findById(company_id);
     if (!category) {
       throw new CategoryNotFound();
     }
