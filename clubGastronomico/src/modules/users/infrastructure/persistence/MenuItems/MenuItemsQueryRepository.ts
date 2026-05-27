@@ -14,8 +14,6 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
         id: doc.category_id._id?.toString() ?? doc.category_id.toString(),
         name: doc.category_id.name, // viene de populate
       },
-      // company: doc.company_id.toString(),
-      // branch: doc.branch_id?.toString() ?? null,
       name: doc.name,
       description: doc.description,
       price: doc.price,

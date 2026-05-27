@@ -1,0 +1,114 @@
+import { IorderDocument } from "@/modules/users/infrastructure/persistence/order/IorderDocument";
+import { Schema, model } from "mongoose";
+
+export enum ORDER_STATUS {
+  PENDING = "pending",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+}
+
+const OrderSchema = new Schema<IorderDocument>(
+  {
+    company_id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Company",
+    },
+
+    // branch_id: {
+    //   type: Schema.Types.ObjectId,
+    //   required: true,
+    //   ref: "Branch",
+    // },
+
+    status: {
+      type: String,
+      enum: Object.values(ORDER_STATUS),
+      default: ORDER_STATUS.PENDING,
+      required: true,
+    },
+
+    customer: {
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      address: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      telegram_id: {
+        type: String,
+        required: false,
+      },
+
+      telegram_username: {
+        type: String,
+        required: false,
+      },
+    },
+
+    items: [
+      {
+        menuItems_id: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          ref: "MenuItem",
+        },
+
+        category_id: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          ref: "Category",
+        },
+
+        product_name: {
+          type: String,
+          required: true,
+        },
+
+        category_name: {
+          type: String,
+          required: true,
+        },
+
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+
+        unit_price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+
+        time: {
+          type: Number,
+          //   required: true,
+          min: 0,
+        },
+      },
+    ],
+
+    total_amount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+  },
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  },
+);
+
+const OrderModel = model("Order", OrderSchema);
+export default OrderModel;
