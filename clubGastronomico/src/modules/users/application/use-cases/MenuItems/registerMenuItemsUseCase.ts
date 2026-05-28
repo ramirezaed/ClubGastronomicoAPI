@@ -3,6 +3,7 @@ import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/Resp
 import { MenuItems } from "@/modules/users/domain/entities/MenuItems";
 import { CategoryNotFound } from "@/modules/users/domain/exceptions/CategoryItems/CategoryItemsNoyFoundError";
 import { DuplicateNameMenuItemsError } from "@/modules/users/domain/exceptions/CategoryItems/DuplicateNameError";
+import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
 import { IMenuQueryRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuQueryRepository";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
@@ -15,7 +16,7 @@ export class RegisterMenuItemsUseCase {
   ) {}
   async execute(company_id: string, dto: RegisterMenuDTO): Promise<ResponseMenuDTO> {
     //verifica que exista la categoria
-    const category = await this.IcategoryRepository.findById(company_id);
+    const category = await this.IcategoryRepository.findById(dto.category_id);
     if (!category) {
       throw new CategoryNotFound();
     }
@@ -24,6 +25,13 @@ export class RegisterMenuItemsUseCase {
     const verifyMenuItems = await this.ImenuQuery.findByName(dto.category_id, company_id, dto.name);
     if (verifyMenuItems) {
       throw new DuplicateNameMenuItemsError();
+    }
+    //si stock diario no esta definido, o es 0, es igual que el stock
+    if (dto.daily_stock === undefined || dto.daily_stock === 0) {
+      dto.daily_stock = dto.stock;
+    }
+    if (dto.daily_stock > dto.stock) {
+      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
     }
 
     const newItems = MenuItems.create(

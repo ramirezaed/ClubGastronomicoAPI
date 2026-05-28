@@ -1,8 +1,8 @@
 import { InactiveMenuItems } from "@/modules/users/domain/exceptions/MenuItems/InactiveMenuError";
+import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { MenuAlreadyActivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyActiveError";
 import { MenuAlreadyDeactivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyDeactivateError";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
-import { RegisterMenuError } from "@/modules/users/domain/exceptions/MenuItems/RegisterMenuError";
 
 export class MenuItems {
   constructor(
@@ -31,11 +31,26 @@ export class MenuItems {
     daily_stock: number,
     image_url: string | null,
   ): MenuItems {
-    if (!category_id || !company_id || !name || !description || !price || !preparation_time_minutes || !stock || !daily_stock) {
-      throw new RegisterMenuError();
+    if (!category_id || !company_id || !name || !description || !price) {
+      throw new itemValidationError(`Todos los campos son necesarios`);
     }
-    return new MenuItems("", category_id, company_id, name, description, price, 15, 100, 100, image_url, true, null);
+
+    return new MenuItems(
+      "",
+      category_id,
+      company_id,
+      name,
+      description,
+      price,
+      preparation_time_minutes,
+      stock,
+      daily_stock,
+      image_url,
+      true,
+      null,
+    );
   }
+
   update(
     name: string,
     description: string,

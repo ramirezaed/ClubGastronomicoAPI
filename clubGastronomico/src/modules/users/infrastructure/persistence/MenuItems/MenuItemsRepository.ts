@@ -33,6 +33,7 @@ export class MenuItemsRepository implements IMenuRepository {
     try {
       const doc = new MenuItemModel({
         category_id: menuItems.category_id,
+        company_id: menuItems.company_id,
         name: menuItems.name,
         description: menuItems.description,
         price: menuItems.price,
@@ -46,6 +47,7 @@ export class MenuItemsRepository implements IMenuRepository {
       const saved = await doc.save();
       return this.toEntity(saved);
     } catch (error) {
+      console.error(error);
       throw new Error("error al registar MenuItems");
     }
   }
