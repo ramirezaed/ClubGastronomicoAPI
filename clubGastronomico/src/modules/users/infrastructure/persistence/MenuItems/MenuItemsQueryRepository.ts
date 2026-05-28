@@ -37,7 +37,14 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
   async findByName(category_id: string, company_id: string, name: string): Promise<ResponseMenuDTO | null> {
     try {
-      const doc = await MenuItemModel.findOne({ category_id: category_id, company_id: company_id, name: name, deleted_at: null });
+      const doc = await MenuItemModel.findOne({
+        category_id,
+        company_id,
+        name,
+        deleted_at: null,
+      })
+        .populate("category_id")
+        .lean();
       if (!doc) return null;
       return this.toDTO(doc);
     } catch (error) {
@@ -46,8 +53,14 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
   async findById(id: string): Promise<ResponseMenuDTO | null> {
     try {
-      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null });
+      const doc = await MenuItemModel.findOne({
+        _id: id,
+        deleted_at: null,
+      })
+        .populate("category_id")
+        .lean();
       if (!doc) return null;
+
       return this.toDTO(doc);
     } catch (error) {
       throw new Error("error al buscar menuItems por id");

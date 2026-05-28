@@ -2,9 +2,9 @@ import { IorderDocument } from "@/modules/users/infrastructure/persistence/order
 import { Schema, model } from "mongoose";
 
 export enum ORDER_STATUS {
-  PENDING = "pending",
-  IN_PROGRESS = "in_progress",
-  COMPLETED = "completed",
+  PENDING = "Pendiente",
+  IN_PROGRESS = "En Progreso",
+  COMPLETED = "Completo",
 }
 
 const OrderSchema = new Schema<IorderDocument>(
@@ -40,6 +40,10 @@ const OrderSchema = new Schema<IorderDocument>(
         required: true,
         trim: true,
       },
+      phone: {
+        type: String,
+        required: false,
+      },
 
       telegram_id: {
         type: String,
@@ -66,7 +70,7 @@ const OrderSchema = new Schema<IorderDocument>(
           ref: "Category",
         },
 
-        product_name: {
+        item_name: {
           type: String,
           required: true,
         },
@@ -100,6 +104,10 @@ const OrderSchema = new Schema<IorderDocument>(
       type: Number,
       required: true,
       min: 0,
+    },
+    deleted_at: {
+      type: Date,
+      default: null,
     },
   },
   {

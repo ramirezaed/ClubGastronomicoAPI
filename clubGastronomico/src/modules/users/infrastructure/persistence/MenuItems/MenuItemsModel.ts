@@ -49,6 +49,7 @@ const MenuItemSchema = new Schema(
     daily_stock: {
       type: Number,
       default: null,
+      required: false,
       min: 0,
     },
 
