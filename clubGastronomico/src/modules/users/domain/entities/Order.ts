@@ -1,6 +1,13 @@
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
+import orderRouter from "@/modules/users/infrastructure/http/orderRouter";
 
+//interface parte del dominio
+export enum OrderStatus {
+  PENDING = "Pendiente",
+  IN_PROGRESS = "En Progreso",
+  COMPLETED = "Completo",
+}
 //inteface parte del dominio, no respresenta entrada ni salids, por eso no va en dto
 export interface OrderItem {
   menuItems_id: string;
@@ -25,13 +32,13 @@ export class Order {
     public readonly id: string,
     public readonly company_id: string,
     // public readonly branch_id: string,
-    public readonly status: string,
-    public readonly customer: Customer,
-    public readonly items: OrderItem[],
-    public readonly total_amount: number,
-    public readonly deleted_at: Date | null,
-    public readonly created_at?: Date,
-    public readonly updated_at?: Date,
+    public status: string,
+    public customer: Customer,
+    public items: OrderItem[],
+    public total_amount: number,
+    public deleted_at: Date | null,
+    public created_at?: Date,
+    public updated_at?: Date,
   ) {}
 
   static create(company_id: string, customer: Customer, orderItems: OrderItem[]): Order {
@@ -62,5 +69,25 @@ export class Order {
     // 0 al final indica el inicio del total y el acumulador
     const total_amount = orderItems.reduce((total, item) => total + item.quantity * item.unit_price, 0);
     return new Order("", company_id, "Pendiente", customer, orderItems, total_amount, null, new Date(), new Date());
+  }
+
+  changeStatus(status: OrderStatus): void {
+    //verifica el estado actual con el nuevo estado
+    if (this.status === status) {
+      throw new orderValidationError(`el orden ya se encentra en estado ${status} `);
+    }
+    //una orden con estado pendiente solo puede pasar a en progreso
+    if (this.status === OrderStatus.PENDING && status === OrderStatus.COMPLETED) {
+      throw new orderValidationError(`No se puede pasar de ${this.status} a ${status}`);
+    }
+    //una orden con estado en progreso solo puede pasar a finalizado
+    if (this.status === OrderStatus.IN_PROGRESS && status === OrderStatus.PENDING) {
+      throw new orderValidationError(`No se puede pasar de ${this.status} a ${status}`);
+    }
+    //si ya esta finalizada no puede cambiar de estado
+    if (this.status === OrderStatus.COMPLETED) {
+      throw new orderValidationError(`La orden ya se encuentra finalizada`);
+    }
+    this.status = status;
   }
 }

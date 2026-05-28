@@ -1,3 +1,5 @@
+import { OrderStatus } from "@/modules/users/domain/entities/Order";
+
 export interface ResponseOrderDTO {
   id: string;
   status: string;

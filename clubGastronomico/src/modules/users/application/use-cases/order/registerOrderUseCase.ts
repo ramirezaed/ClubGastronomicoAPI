@@ -1,6 +1,6 @@
 import { registerOrderDTO } from "@/modules/users/application/dtos/order/registerOrderDTO";
 import { ResponseOrderDTO } from "@/modules/users/application/dtos/order/ResponseOrderDTO";
-import { Order } from "@/modules/users/domain/entities/Order";
+import { Order, OrderStatus } from "@/modules/users/domain/entities/Order";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
 import { ICompanyQueryRepository } from "@/modules/users/domain/repositories/company/ICompanyQueryrepository";

@@ -14,13 +14,6 @@ const OrderSchema = new Schema<IorderDocument>(
       required: true,
       ref: "Company",
     },
-
-    // branch_id: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: "Branch",
-    // },
-
     status: {
       type: String,
       enum: Object.values(ORDER_STATUS),

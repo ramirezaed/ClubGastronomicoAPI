@@ -33,9 +33,9 @@ export class OrderRepository implements IorderRepository {
     );
   }
 
-  async findById(id: string): Promise<Order | null> {
+  async findById(id: string, company_id: string): Promise<Order | null> {
     try {
-      const doc = await OrderModel.findOne({ _id: id, deleted_at: null });
+      const doc = await OrderModel.findOne({ _id: id, deleted_at: null, company_id: company_id });
       if (!doc) return null;
       return this.toEntity(doc);
     } catch (error) {
@@ -76,6 +76,24 @@ export class OrderRepository implements IorderRepository {
     } catch (error) {
       console.error(error);
       throw new Error("error al registrar un nuevo pedido");
+    }
+  }
+  async update(order: Order, company_id: string): Promise<Order | null> {
+    try {
+      const doc = await OrderModel.findOneAndUpdate(
+        { _id: order.id, deleted_at: null, company_id: company_id },
+        {
+          $set: {
+            status: order.status,
+          },
+        },
+        { returnDocument: "after" },
+      );
+      if (!doc) return null;
+      return this.toEntity(doc);
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al cambiar de estado la orden");
     }
   }
 }
