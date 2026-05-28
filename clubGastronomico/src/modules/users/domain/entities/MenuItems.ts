@@ -31,8 +31,11 @@ export class MenuItems {
     daily_stock: number,
     image_url: string | null,
   ): MenuItems {
-    if (!category_id || !company_id || !name || !description || !price) {
+    if (!category_id || !company_id || !name || !description || !price || stock || daily_stock) {
       throw new itemValidationError(`Todos los campos son necesarios`);
+    }
+    if (daily_stock > stock) {
+      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
     }
 
     return new MenuItems(
@@ -61,6 +64,9 @@ export class MenuItems {
   ): void {
     if (!this.is_active) {
       throw new InactiveMenuItems();
+    }
+    if (daily_stock > stock) {
+      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
     }
     this.name = name ?? this.name;
     this.description = description ?? this.description;

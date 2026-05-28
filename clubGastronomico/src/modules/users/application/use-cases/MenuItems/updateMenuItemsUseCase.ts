@@ -1,5 +1,6 @@
 import { UpdateMenuItemsDTO } from "@/modules/users/application/dtos/MenuItems/UpdateMenuDTO";
 import { UpdateResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/UpdateResponseMenuDTO";
+import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 

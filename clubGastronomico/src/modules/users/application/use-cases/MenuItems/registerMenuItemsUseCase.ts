@@ -26,13 +26,6 @@ export class RegisterMenuItemsUseCase {
     if (verifyMenuItems) {
       throw new DuplicateNameMenuItemsError();
     }
-    //si stock diario no esta definido, o es 0, es igual que el stock
-    if (dto.daily_stock === undefined || dto.daily_stock === 0) {
-      dto.daily_stock = dto.stock;
-    }
-    if (dto.daily_stock > dto.stock) {
-      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
-    }
 
     const newItems = MenuItems.create(
       dto.category_id,
