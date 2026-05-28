@@ -1,9 +1,14 @@
+import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/order/findByIdOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
+import { OrderNotFoundError } from "@/modules/users/domain/exceptions/order/orderNotFoundError";
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
 import { Request, Response } from "express";
 export class OrderController {
-  constructor(private readonly registerOrder: registerOrderUseCase) {}
+  constructor(
+    private readonly registerOrder: registerOrderUseCase,
+    private readonly findByIdOrder: findByIdOrderUseCase,
+  ) {}
 
   async register(req: Request, res: Response): Promise<void> {
     try {
@@ -25,6 +30,22 @@ export class OrderController {
       console.error(error);
       res.status(504).json({ message: "error interno del servidor" });
       return;
+    }
+  }
+
+  async findById(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+      const order_id = req.params.id as string;
+      const order = await this.findByIdOrder.execute(order_id, company_id);
+      res.status(200).json(order);
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError || error instanceof OrderNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: "error interno del servidor" });
     }
   }
 }

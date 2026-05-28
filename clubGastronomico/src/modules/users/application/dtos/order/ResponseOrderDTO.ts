@@ -1,6 +1,5 @@
-export interface ResponseRegisterOrderDTO {
+export interface ResponseOrderDTO {
   id: string;
-  // company_id: string;
   status: string;
   customer: {
     name: string;
@@ -10,8 +9,6 @@ export interface ResponseRegisterOrderDTO {
     telegram_username?: string;
   };
   items: {
-    // menuItems_id: string;
-    // category_id: string;
     items_name: string;
     category_name: string;
     quantity: number;

@@ -4,7 +4,6 @@ import { IcategoryQueryRepository } from "@/modules/users/domain/repositories/Ca
 import { IcategoryDocument } from "@/modules/users/infrastructure/persistence/categoryItems/categoryDocument";
 import CategoryModel from "@/modules/users/infrastructure/persistence/categoryItems/categoryModel";
 import { QueryFilter } from "mongoose";
-import { todo } from "node:test";
 
 export class CategoryQueryRepository implements IcategoryQueryRepository {
   private toDTO(doc: any): categoryResponseDTO {

@@ -1,5 +1,5 @@
 import { registerOrderDTO } from "@/modules/users/application/dtos/order/registerOrderDTO";
-import { ResponseRegisterOrderDTO } from "@/modules/users/application/dtos/order/ResponseRegisterOrderDTO";
+import { ResponseOrderDTO } from "@/modules/users/application/dtos/order/ResponseOrderDTO";
 import { Order } from "@/modules/users/domain/entities/Order";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
@@ -14,7 +14,7 @@ export class registerOrderUseCase {
     private readonly ImenuItemsRepository: IMenuQueryRepository,
   ) {}
 
-  async execute(company_id: string, dto: registerOrderDTO): Promise<ResponseRegisterOrderDTO> {
+  async execute(company_id: string, dto: registerOrderDTO): Promise<ResponseOrderDTO> {
     const orderItems = [];
     const company = await this.ICompanyRepository.findById(company_id);
     //verifica que la compania exista y si existe que este activa
