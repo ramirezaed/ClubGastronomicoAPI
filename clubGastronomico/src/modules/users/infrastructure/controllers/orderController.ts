@@ -30,7 +30,7 @@ export class OrderController {
         res.status(404).json({ message: error.message });
         return;
       }
-      console.error(error);
+      console.error("error al regisrar ", error);
       res.status(504).json({ message: "error interno del servidor" });
       return;
     }

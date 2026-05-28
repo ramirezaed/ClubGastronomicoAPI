@@ -1,6 +1,7 @@
 import { MenuItems } from "@/modules/users/domain/entities/MenuItems";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 import { MenuItemModel } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsModel";
+import { transcode } from "node:buffer";
 
 export class MenuItemsRepository implements IMenuRepository {
   private toEntity(doc: any): MenuItems {
@@ -21,7 +22,7 @@ export class MenuItemsRepository implements IMenuRepository {
   }
   async findById(id: string): Promise<MenuItems | null> {
     try {
-      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null }).populate("categoy_id", "name");
+      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null }).populate("category_id", "name");
       if (!doc) return null;
       return this.toEntity(doc);
     } catch (error) {
@@ -70,6 +71,22 @@ export class MenuItemsRepository implements IMenuRepository {
       return this.toEntity(doc);
     } catch (error) {
       throw new Error("Error al actualizar datos del items");
+    }
+  }
+  async decreaseStock(menuItems: MenuItems): Promise<void> {
+    try {
+      const doc = await MenuItemModel.findOneAndUpdate(
+        { _id: menuItems.id, deleted_at: null },
+        {
+          $set: {
+            daily_stock: menuItems.daily_stock,
+          },
+        },
+      );
+      return;
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al descontar stock");
     }
   }
 }

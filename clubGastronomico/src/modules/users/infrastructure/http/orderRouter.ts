@@ -4,6 +4,7 @@ import { registerOrderUseCase } from "@/modules/users/application/use-cases/orde
 import { OrderController } from "@/modules/users/infrastructure/controllers/orderController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
+import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 import { OrderQueryRepository } from "@/modules/users/infrastructure/persistence/order/orderQueryRepository";
 import { OrderRepository } from "@/modules/users/infrastructure/persistence/order/orderRepository";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
@@ -17,10 +18,10 @@ const orderRouter = Router();
 const orderRepository = new OrderRepository();
 const orderQueryRepository = new OrderQueryRepository();
 const companyQueryRepository = new CompanyQueryRepository();
-const menuItems = new MenuItemsQueryRepository();
-
+const menuItemsQueryRepository = new MenuItemsQueryRepository();
+const menuItems = new MenuItemsRepository();
 // capa de aplicacion (casos de uso)
-const registerUseCase = new registerOrderUseCase(orderRepository, companyQueryRepository, menuItems);
+const registerUseCase = new registerOrderUseCase(orderRepository, companyQueryRepository, menuItemsQueryRepository, menuItems);
 const findByIdUseCase = new findByIdOrderUseCase(orderQueryRepository, companyQueryRepository);
 const changeStatusUseCase = new changeStatusOrderUsecase(orderRepository, companyQueryRepository);
 

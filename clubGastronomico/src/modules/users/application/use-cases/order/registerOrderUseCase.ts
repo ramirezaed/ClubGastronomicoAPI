@@ -5,13 +5,15 @@ import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
 import { ICompanyQueryRepository } from "@/modules/users/domain/repositories/company/ICompanyQueryrepository";
 import { IMenuQueryRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuQueryRepository";
+import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 import { IorderRepository } from "@/modules/users/domain/repositories/order/IorderRepository";
 
 export class registerOrderUseCase {
   constructor(
     private readonly iregisterOrder: IorderRepository,
     private readonly ICompanyRepository: ICompanyQueryRepository,
-    private readonly ImenuItemsRepository: IMenuQueryRepository,
+    private readonly ImenuItemsQueryRepository: IMenuQueryRepository,
+    private readonly imenuItemRepository: IMenuRepository,
   ) {}
 
   async execute(company_id: string, dto: registerOrderDTO): Promise<ResponseOrderDTO> {
@@ -21,8 +23,9 @@ export class registerOrderUseCase {
     if (!company || !company.is_active) {
       throw new CompanyNotFoundError();
     }
+
     for (const item of dto.items) {
-      const menuItems = await this.ImenuItemsRepository.findById(item.menuItems_id);
+      const menuItems = await this.ImenuItemsQueryRepository.findById(item.menuItems_id);
       //verifica que exista el items y que este activado
       if (!menuItems || !menuItems.is_active) {
         throw new orderValidationError(`el items ${menuItems?.name} no esta disponible`);
@@ -31,6 +34,7 @@ export class registerOrderUseCase {
       if (menuItems.daily_stock === 0 || menuItems.daily_stock < item.quantity) {
         throw new orderValidationError(`Stock insuficiente para ${menuItems.name}`);
       }
+
       //push agrega un nuevo elemento al final del array
       //agrega el item a la order
       orderItems.push({
@@ -50,6 +54,15 @@ export class registerOrderUseCase {
     const saved = await this.iregisterOrder.save(order);
     //la orden se registro con existo, luego
     //se hace un update de los prodcutos para descontar stock
+
+    //una vez que se registro la orden de descuenta el stock de cada item
+    for (const item of dto.items) {
+      const menuItems = await this.imenuItemRepository.findById(item.menuItems_id);
+      if (menuItems) {
+        menuItems.decreaseStock(item.quantity);
+        await this.imenuItemRepository.decreaseStock(menuItems);
+      }
+    }
     return {
       id: saved.id,
       status: saved.status,

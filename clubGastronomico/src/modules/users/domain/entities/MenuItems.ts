@@ -34,7 +34,7 @@ export class MenuItems {
     if (!category_id || !company_id || !name || !description || !price || !preparation_time_minutes || !stock || !daily_stock) {
       throw new RegisterMenuError();
     }
-    return new MenuItems("", category_id, company_id, name, description, price, 15, stock, 100, image_url, true, null);
+    return new MenuItems("", category_id, company_id, name, description, price, 15, 100, 100, image_url, true, null);
   }
   update(
     name: string,
@@ -72,5 +72,16 @@ export class MenuItems {
     }
     this.deleted_at = new Date();
     this.is_active = false;
+  }
+  decreaseStock(quantity: number): void {
+    if (quantity <= 0) {
+      throw new Error("La cantidad debe ser mayor a 0");
+    }
+
+    if (this.daily_stock < quantity) {
+      throw new Error("Stock insuficiente");
+    }
+
+    this.daily_stock -= quantity;
   }
 }
