@@ -26,12 +26,29 @@ const registerUseCase = new registerOrderUseCase(orderRepository, companyQueryRe
 const findByIdUseCase = new findByIdOrderUseCase(orderQueryRepository, companyQueryRepository);
 const changeStatusUseCase = new changeStatusOrderUsecase(orderRepository, companyQueryRepository);
 const getAllOrderUseCase = new getAllOrderUsecase(orderQueryRepository, companyQueryRepository);
+const registerForBOTUseCase = new registerOrderUseCase(
+  orderRepository,
+  companyQueryRepository,
+  menuItemsQueryRepository,
+  menuItems,
+);
 
 //capa de interfaz, se inyectan las dependencias
-const orderController = new OrderController(registerUseCase, findByIdUseCase, changeStatusUseCase, getAllOrderUseCase);
+const orderController = new OrderController(
+  registerUseCase,
+  registerForBOTUseCase,
+  findByIdUseCase,
+  changeStatusUseCase,
+  getAllOrderUseCase,
+);
 
 //registrar una nueva order
 orderRouter.post("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.register(req, res));
+
+//registrar orden desde el bot
+orderRouter.post("/bot/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) =>
+  orderController.register(req, res),
+);
 
 //buscar order por id
 orderRouter.get("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.findById(req, res));

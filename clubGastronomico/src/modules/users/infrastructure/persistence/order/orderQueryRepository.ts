@@ -28,7 +28,6 @@ export class OrderQueryRepository implements IOrderQueryRepository {
       created_at: new Date(),
     };
   }
-
   async findById(order_id: string, company_id: string): Promise<ResponseOrderDTO | null> {
     try {
       const doc = await OrderModel.findOne({ _id: order_id, deleted_at: null, company_id: company_id });
@@ -39,7 +38,6 @@ export class OrderQueryRepository implements IOrderQueryRepository {
       throw new Error("error al buscar orden por id");
     }
   }
-
   async getAll(
     company_id: string,
     filter?: { status?: string },

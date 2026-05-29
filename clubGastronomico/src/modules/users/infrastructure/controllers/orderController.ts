@@ -10,6 +10,7 @@ import { Request, Response } from "express";
 export class OrderController {
   constructor(
     private readonly registerOrder: registerOrderUseCase,
+    private readonly registerOrderForBOT: registerOrderUseCase,
     private readonly findByIdOrder: findByIdOrderUseCase,
     private readonly changeStatusOrder: changeStatusOrderUsecase,
     private readonly getAllOrder: getAllOrderUsecase,
@@ -18,6 +19,29 @@ export class OrderController {
   async register(req: Request, res: Response): Promise<void> {
     try {
       const company_id = req.user.company_id as string;
+      const data = req.body;
+
+      const order = await this.registerOrder.execute(company_id, data);
+      res.status(201).json(order);
+      return;
+    } catch (error) {
+      if (error instanceof orderValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      console.error("error al regisrar ", error);
+      res.status(504).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+
+  async registerForBOT(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.params.id as string;
       const data = req.body;
 
       const order = await this.registerOrder.execute(company_id, data);
