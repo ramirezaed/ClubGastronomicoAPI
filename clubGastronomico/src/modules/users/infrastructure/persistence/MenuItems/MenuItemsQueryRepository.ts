@@ -26,6 +26,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
   private toBotDTO(doc: any): ResponseMenuForBotDTO {
     return {
+      id: doc._id.toString(),
       category: {
         name: doc.category_id.name,
       },
@@ -63,7 +64,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
 
       return this.toDTO(doc);
     } catch (error) {
-      throw new Error("error al buscar menuItems por id");
+      throw new Error("error al buscar menuItems por idbot");
     }
   }
   async getAll(
@@ -106,6 +107,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       throw new Error("error al buscar items");
     }
   }
+
   async getAllForBot(company_id: string): Promise<ResponseMenuForBotDTO[]> {
     try {
       const query: QueryFilter<IMenuItemsDocument> = {

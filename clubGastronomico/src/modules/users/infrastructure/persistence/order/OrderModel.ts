@@ -30,7 +30,7 @@ const OrderSchema = new Schema<IorderDocument>(
 
       address: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
       },
       phone: {
