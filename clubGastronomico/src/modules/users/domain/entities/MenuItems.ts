@@ -94,16 +94,22 @@ export class MenuItems {
     this.deleted_at = new Date();
     this.is_active = false;
   }
+
   decreaseStock(quantity: number): void {
     if (quantity <= 0) {
       throw new Error("La cantidad debe ser mayor a 0");
     }
-
     if (this.daily_stock < quantity) {
       throw new Error("Stock insuficiente");
     }
-
     this.daily_stock -= quantity;
     this.stock -= quantity;
+  }
+  increaseStock(quantity: number): void {
+    if (quantity <= 0) {
+      throw new Error("La cantidad debe ser mayor a 0");
+    }
+    this.daily_stock += quantity;
+    this.stock += quantity;
   }
 }

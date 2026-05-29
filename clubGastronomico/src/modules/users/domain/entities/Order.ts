@@ -37,7 +37,7 @@ export class Order {
     public items: OrderItem[],
     public total_amount: number,
     public deleted_at: Date | null,
-    public created_at?: Date,
+    public created_at: Date,
     public updated_at?: Date,
   ) {}
 
@@ -70,7 +70,6 @@ export class Order {
     const total_amount = orderItems.reduce((total, item) => total + item.quantity * item.unit_price, 0);
     return new Order("", company_id, "Pendiente", customer, orderItems, total_amount, null, new Date(), new Date());
   }
-
   changeStatus(status: OrderStatus): void {
     //verifica el estado actual con el nuevo estado
     if (this.status === status) {
@@ -89,5 +88,20 @@ export class Order {
       throw new orderValidationError(`La orden ya se encuentra finalizada`);
     }
     this.status = status;
+  }
+
+  softdelete(): void {
+    if (this.deleted_at) {
+      throw new orderValidationError(`la orden ya fue cancelada`);
+    }
+    if (this.status === OrderStatus.COMPLETED) {
+      throw new orderValidationError("la orden ya está completa");
+    }
+    const now = new Date();
+    if (this.created_at < new Date(now.setDate(now.getDate() - 1))) {
+      throw new orderValidationError("no se pueden cancelar ordenes de dias anteriores");
+    }
+
+    this.deleted_at = new Date();
   }
 }

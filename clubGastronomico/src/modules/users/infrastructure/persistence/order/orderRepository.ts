@@ -85,6 +85,7 @@ export class OrderRepository implements IorderRepository {
         {
           $set: {
             status: order.status,
+            deleted_at: order.deleted_at,
           },
         },
         { returnDocument: "after" },

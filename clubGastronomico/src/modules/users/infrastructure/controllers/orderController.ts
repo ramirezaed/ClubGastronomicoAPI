@@ -2,6 +2,7 @@ import { changeStatusOrderUsecase } from "@/modules/users/application/use-cases/
 import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/order/findByIdOrderUseCase";
 import { getAllOrderUsecase } from "@/modules/users/application/use-cases/order/getAllOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
+import { softdeleteOrderUseCase } from "@/modules/users/application/use-cases/order/softDeleteOrderUseCase";
 import { OrderStatus } from "@/modules/users/domain/entities/Order";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { OrderNotFoundError } from "@/modules/users/domain/exceptions/order/orderNotFoundError";
@@ -14,6 +15,7 @@ export class OrderController {
     private readonly findByIdOrder: findByIdOrderUseCase,
     private readonly changeStatusOrder: changeStatusOrderUsecase,
     private readonly getAllOrder: getAllOrderUsecase,
+    private readonly softDeleteOrder: softdeleteOrderUseCase,
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
@@ -38,13 +40,12 @@ export class OrderController {
       return;
     }
   }
-
   async registerForBOT(req: Request, res: Response): Promise<void> {
     try {
       const company_id = req.params.id as string;
       const data = req.body;
 
-      const order = await this.registerOrder.execute(company_id, data);
+      const order = await this.registerOrderForBOT.execute(company_id, data);
       res.status(201).json(order);
       return;
     } catch (error) {
@@ -119,6 +120,28 @@ export class OrderController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
+    }
+  }
+  async delete(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+      const id = req.params.id as string;
+      await this.softDeleteOrder.execute(id, company_id);
+
+      res.status(200).json({ message: "orden cancelada" });
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError || error instanceof OrderNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof orderValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
     }
   }
 }

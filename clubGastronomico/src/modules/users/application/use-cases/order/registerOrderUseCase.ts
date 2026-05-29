@@ -60,9 +60,10 @@ export class registerOrderUseCase {
       const menuItems = await this.imenuItemRepository.findById(item.menuItems_id);
       if (menuItems) {
         menuItems.decreaseStock(item.quantity);
-        await this.imenuItemRepository.decreaseStock(menuItems);
+        await this.imenuItemRepository.increaseDecreaseStock(menuItems);
       }
     }
+
     return {
       id: saved.id,
       status: saved.status,

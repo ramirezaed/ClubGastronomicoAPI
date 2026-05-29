@@ -75,7 +75,7 @@ export class MenuItemsRepository implements IMenuRepository {
       throw new Error("Error al actualizar datos del items");
     }
   }
-  async decreaseStock(menuItems: MenuItems): Promise<void> {
+  async increaseDecreaseStock(menuItems: MenuItems): Promise<void> {
     try {
       const doc = await MenuItemModel.findOneAndUpdate(
         { _id: menuItems.id, deleted_at: null },

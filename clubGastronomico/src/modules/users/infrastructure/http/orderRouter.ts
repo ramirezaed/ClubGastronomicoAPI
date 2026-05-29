@@ -2,6 +2,7 @@ import { changeStatusOrderUsecase } from "@/modules/users/application/use-cases/
 import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/order/findByIdOrderUseCase";
 import { getAllOrderUsecase } from "@/modules/users/application/use-cases/order/getAllOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
+import { softdeleteOrderUseCase } from "@/modules/users/application/use-cases/order/softDeleteOrderUseCase";
 import { OrderController } from "@/modules/users/infrastructure/controllers/orderController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
@@ -22,6 +23,7 @@ const companyQueryRepository = new CompanyQueryRepository();
 const menuItemsQueryRepository = new MenuItemsQueryRepository();
 const menuItems = new MenuItemsRepository();
 // capa de aplicacion (casos de uso)
+
 const registerUseCase = new registerOrderUseCase(orderRepository, companyQueryRepository, menuItemsQueryRepository, menuItems);
 const findByIdUseCase = new findByIdOrderUseCase(orderQueryRepository, companyQueryRepository);
 const changeStatusUseCase = new changeStatusOrderUsecase(orderRepository, companyQueryRepository);
@@ -32,6 +34,7 @@ const registerForBOTUseCase = new registerOrderUseCase(
   menuItemsQueryRepository,
   menuItems,
 );
+const softDeleteOrderUseCase = new softdeleteOrderUseCase(orderRepository, companyQueryRepository, menuItems);
 
 //capa de interfaz, se inyectan las dependencias
 const orderController = new OrderController(
@@ -40,6 +43,7 @@ const orderController = new OrderController(
   findByIdUseCase,
   changeStatusUseCase,
   getAllOrderUseCase,
+  softDeleteOrderUseCase,
 );
 
 //registrar una nueva order
@@ -60,4 +64,6 @@ orderRouter.get("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, 
 orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) =>
   orderController.changeStatus(req, res),
 );
+
+orderRouter.delete("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.delete(req, res));
 export default orderRouter;
