@@ -2,8 +2,15 @@ import { MenuItemModel } from "@/modules/users/infrastructure/persistence/MenuIt
 import cron from "node-cron";
 
 export const resetDailyStockJob = cron.schedule("0 0 * * *", async () => {
+  //se resetea cada 10 segundos para probar si funciona
+  //export const resetDailyStockJob = cron.schedule("*/10 * * * * *", async () => {
   try {
-    await MenuItemModel.updateMany({ deleted_at: null }, [{ $set: { daily_stock: "$stock" } }]);
+    const items = await MenuItemModel.find({ deleted_at: null });
+
+    for (const item of items) {
+      item.daily_stock = item.stock;
+      await item.save();
+    }
 
     console.log("Daily stock reseteado correctamente");
   } catch (error) {
