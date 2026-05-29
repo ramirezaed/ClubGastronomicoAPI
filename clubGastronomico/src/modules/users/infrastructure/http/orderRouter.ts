@@ -1,5 +1,6 @@
 import { changeStatusOrderUsecase } from "@/modules/users/application/use-cases/order/changeStatusOrderUseCase";
 import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/order/findByIdOrderUseCase";
+import { getAllOrderUsecase } from "@/modules/users/application/use-cases/order/getAllOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
 import { OrderController } from "@/modules/users/infrastructure/controllers/orderController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
@@ -24,15 +25,19 @@ const menuItems = new MenuItemsRepository();
 const registerUseCase = new registerOrderUseCase(orderRepository, companyQueryRepository, menuItemsQueryRepository, menuItems);
 const findByIdUseCase = new findByIdOrderUseCase(orderQueryRepository, companyQueryRepository);
 const changeStatusUseCase = new changeStatusOrderUsecase(orderRepository, companyQueryRepository);
+const getAllOrderUseCase = new getAllOrderUsecase(orderQueryRepository, companyQueryRepository);
 
 //capa de interfaz, se inyectan las dependencias
-const orderController = new OrderController(registerUseCase, findByIdUseCase, changeStatusUseCase);
+const orderController = new OrderController(registerUseCase, findByIdUseCase, changeStatusUseCase, getAllOrderUseCase);
 
 //registrar una nueva order
 orderRouter.post("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.register(req, res));
 
 //buscar order por id
 orderRouter.get("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.findById(req, res));
+
+//muestra todas las ordenes
+orderRouter.get("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.getAll(req, res));
 
 //cambiar estado de order
 orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) =>

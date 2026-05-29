@@ -104,5 +104,6 @@ export class MenuItems {
     }
 
     this.daily_stock -= quantity;
+    this.stock -= quantity;
   }
 }

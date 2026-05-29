@@ -81,6 +81,7 @@ export class MenuItemsRepository implements IMenuRepository {
         { _id: menuItems.id, deleted_at: null },
         {
           $set: {
+            stock: menuItems.stock,
             daily_stock: menuItems.daily_stock,
           },
         },

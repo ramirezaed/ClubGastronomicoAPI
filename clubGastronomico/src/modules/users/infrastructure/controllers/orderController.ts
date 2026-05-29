@@ -1,5 +1,6 @@
 import { changeStatusOrderUsecase } from "@/modules/users/application/use-cases/order/changeStatusOrderUseCase";
 import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/order/findByIdOrderUseCase";
+import { getAllOrderUsecase } from "@/modules/users/application/use-cases/order/getAllOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
 import { OrderStatus } from "@/modules/users/domain/entities/Order";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
@@ -11,6 +12,7 @@ export class OrderController {
     private readonly registerOrder: registerOrderUseCase,
     private readonly findByIdOrder: findByIdOrderUseCase,
     private readonly changeStatusOrder: changeStatusOrderUsecase,
+    private readonly getAllOrder: getAllOrderUsecase,
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
@@ -35,7 +37,6 @@ export class OrderController {
       return;
     }
   }
-
   async findById(req: Request, res: Response): Promise<void> {
     try {
       const company_id = req.user.company_id as string;
@@ -51,7 +52,6 @@ export class OrderController {
       res.status(500).json({ message: "error interno del servidor" });
     }
   }
-
   async changeStatus(req: Request, res: Response): Promise<void> {
     try {
       const company_id = req.user.company_id as string;
@@ -73,6 +73,28 @@ export class OrderController {
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
       return;
+    }
+  }
+  async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+
+      let status: OrderStatus | undefined;
+
+      // parse string safely
+      if (typeof req.query.status === "string") {
+        status = req.query.status as OrderStatus;
+      }
+      //paginacion
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const items = await this.getAllOrder.execute(company_id, { status }, { page, limit });
+      res.status(200).json(items);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
     }
   }
 }
