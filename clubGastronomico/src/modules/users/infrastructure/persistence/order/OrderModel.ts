@@ -5,6 +5,7 @@ export enum ORDER_STATUS {
   PENDING = "Pendiente",
   IN_PROGRESS = "En Progreso",
   COMPLETED = "Completo",
+  CANCEL = "Cancelada",
 }
 
 const OrderSchema = new Schema<IorderDocument>(

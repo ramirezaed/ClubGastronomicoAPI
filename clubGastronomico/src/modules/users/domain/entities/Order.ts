@@ -1,12 +1,12 @@
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
-import orderRouter from "@/modules/users/infrastructure/http/orderRouter";
 
 //interface parte del dominio
 export enum OrderStatus {
   PENDING = "Pendiente",
   IN_PROGRESS = "En Progreso",
   COMPLETED = "Completo",
+  CANCEL = "Cancelada",
 }
 //inteface parte del dominio, no respresenta entrada ni salids, por eso no va en dto
 export interface OrderItem {
@@ -89,19 +89,14 @@ export class Order {
     }
     this.status = status;
   }
-
-  softdelete(): void {
-    if (this.deleted_at) {
+  cancelOrder(): void {
+    // const now = new Date();
+    // if (this.created_at < new Date(now.setDate(now.getDate() - 1))) {
+    //   throw new orderValidationError("no se pueden cancelar ordenes de dias anteriores");
+    // }
+    if ((this.status = OrderStatus.CANCEL)) {
       throw new orderValidationError(`la orden ya fue cancelada`);
     }
-    if (this.status === OrderStatus.COMPLETED) {
-      throw new orderValidationError("la orden ya está completa");
-    }
-    const now = new Date();
-    if (this.created_at < new Date(now.setDate(now.getDate() - 1))) {
-      throw new orderValidationError("no se pueden cancelar ordenes de dias anteriores");
-    }
-
-    this.deleted_at = new Date();
+    this.status = OrderStatus.CANCEL;
   }
 }
