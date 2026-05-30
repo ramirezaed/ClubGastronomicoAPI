@@ -9,7 +9,6 @@ export interface ResponseMenuDTO {
   price: number;
   preparation_time_minutes: number;
   stock: number;
-  daily_stock: number;
   image_url: string | null;
   is_active: boolean;
 }

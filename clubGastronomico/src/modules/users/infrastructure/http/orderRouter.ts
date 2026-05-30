@@ -1,8 +1,8 @@
+import { cancelOrderUseCase } from "@/modules/users/application/use-cases/order/cancelOrderUseCase";
 import { changeStatusOrderUsecase } from "@/modules/users/application/use-cases/order/changeStatusOrderUseCase";
 import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/order/findByIdOrderUseCase";
 import { getAllOrderUsecase } from "@/modules/users/application/use-cases/order/getAllOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
-import { softdeleteOrderUseCase } from "@/modules/users/application/use-cases/order/softDeleteOrderUseCase";
 import { OrderController } from "@/modules/users/infrastructure/controllers/orderController";
 import { CompanyQueryRepository } from "@/modules/users/infrastructure/persistence/company/CompanyQueryRepository";
 import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsQueryRepository";
@@ -34,7 +34,7 @@ const registerForBOTUseCase = new registerOrderUseCase(
   menuItemsQueryRepository,
   menuItems,
 );
-const softDeleteOrderUseCase = new softdeleteOrderUseCase(orderRepository, companyQueryRepository, menuItems);
+const cancelUseCase = new cancelOrderUseCase(orderRepository, companyQueryRepository, menuItems);
 
 //capa de interfaz, se inyectan las dependencias
 const orderController = new OrderController(
@@ -43,7 +43,7 @@ const orderController = new OrderController(
   findByIdUseCase,
   changeStatusUseCase,
   getAllOrderUseCase,
-  softDeleteOrderUseCase,
+  cancelUseCase,
 );
 
 /**
@@ -404,17 +404,21 @@ orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner",
 
 /**
  * @swagger
- * /api/orders/{id}:
- *   delete:
+ * /api/orders/{id}/cancel:
+ *   patch:
  *     summary: Cancelar una orden
  *     description: |
- *       Realiza una cancelación lógica (soft delete).
+ *       Cancela una orden actualizando su estado a cancelada.
  *
  *       Restricciones:
  *
  *       - Solo pueden cancelarse órdenes creadas en la fecha actual.
- *       - No pueden cancelarse órdenes con estado "Completo".
  *       - No puede cancelarse una orden que ya haya sido cancelada previamente.
+ *
+ *       Reglas de negocio:
+ *
+ *       - Si la orden se encontraba en estado "Pendiente" o "En progreso", el stock de los productos se restaura automáticamente.
+ *       - Si la orden se encontraba en estado "Completo", la orden se cancela pero el stock no se restaura.
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -439,5 +443,5 @@ orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner",
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.delete("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.delete(req, res));
+orderRouter.patch("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.cancel(req, res));
 export default orderRouter;

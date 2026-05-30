@@ -35,7 +35,6 @@ export class RegisterMenuItemsUseCase {
       dto.price,
       dto.preparation_time_minutes,
       dto.stock,
-      dto.daily_stock,
       dto.image_url ?? null,
     );
 
@@ -52,7 +51,6 @@ export class RegisterMenuItemsUseCase {
       price: saved.price,
       preparation_time_minutes: saved.preparation_time_minutes,
       stock: saved.stock,
-      daily_stock: saved.daily_stock,
       image_url: saved.image_url,
       is_active: saved.is_active,
     };

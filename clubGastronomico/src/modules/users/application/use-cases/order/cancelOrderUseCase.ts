@@ -1,10 +1,11 @@
+import { OrderStatus } from "@/modules/users/domain/entities/Order";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { OrderNotFoundError } from "@/modules/users/domain/exceptions/order/orderNotFoundError";
 import { ICompanyQueryRepository } from "@/modules/users/domain/repositories/company/ICompanyQueryrepository";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 import { IorderRepository } from "@/modules/users/domain/repositories/order/IorderRepository";
 
-export class softdeleteOrderUseCase {
+export class cancelOrderUseCase {
   constructor(
     private readonly iorderRepository: IorderRepository,
     private readonly icompanyQuery: ICompanyQueryRepository,
@@ -20,17 +21,22 @@ export class softdeleteOrderUseCase {
     if (!order) {
       throw new OrderNotFoundError();
     }
+    //guarda stado de la orden antes de ser cancelada
+    const status = order.status;
+
     //cancela la orden deleted_ad = new Date()
-    order.softdelete();
+    order.cancelOrder();
     //registra el cambio en la bd
     await this.iorderRepository.update(order, company_id);
 
-    //suma stock que se habia descontado al confirmar la orden
-    for (const item of order.items) {
-      const menuItems = await this.imenuItemRepository.findById(item.menuItems_id);
-      if (menuItems) {
-        menuItems.increaseStock(item.quantity);
-        await this.imenuItemRepository.increaseDecreaseStock(menuItems);
+    //devuelve stock si el estado antes de cancelar la orden era pendiente o en progreso
+    if (status === OrderStatus.PENDING || status === OrderStatus.IN_PROGRESS) {
+      for (const item of order.items) {
+        const menuItems = await this.imenuItemRepository.findById(item.menuItems_id);
+        if (menuItems) {
+          menuItems.increaseStock(item.quantity);
+          await this.imenuItemRepository.increaseDecreaseStock(menuItems);
+        }
       }
     }
   }

@@ -20,7 +20,6 @@ export class getByIdMenuItemsUseCase {
       price: items.price,
       preparation_time_minutes: items.preparation_time_minutes,
       stock: items.stock,
-      daily_stock: items.daily_stock,
       is_active: items.is_active,
       image_url: items.image_url,
     };

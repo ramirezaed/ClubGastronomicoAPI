@@ -31,8 +31,8 @@ export class registerOrderUseCase {
         throw new orderValidationError(`el items ${menuItems?.name} no esta disponible`);
       }
       //verifica stock disponible, que la orden no supere el stock disponible
-      if (menuItems.daily_stock === 0 || menuItems.daily_stock < item.quantity) {
-        throw new orderValidationError(`Stock insuficiente para ${menuItems.name}, solo contamos con ${menuItems.daily_stock}`);
+      if (menuItems.stock === 0 || menuItems.stock < item.quantity) {
+        throw new orderValidationError(`Stock insuficiente para ${menuItems.name}, solo contamos con ${menuItems.stock}`);
       }
 
       //push agrega un nuevo elemento al final del array

@@ -14,7 +14,6 @@ export class MenuItems {
     public price: number,
     public preparation_time_minutes: number,
     public stock: number,
-    public daily_stock: number,
     public image_url: string | null,
     public is_active: boolean,
     public deleted_at: Date | null,
@@ -28,14 +27,15 @@ export class MenuItems {
     price: number,
     preparation_time_minutes: number,
     stock: number,
-    daily_stock: number,
+
     image_url: string | null,
   ): MenuItems {
-    if (!category_id || !company_id || !name || !description || !price || stock || daily_stock) {
+    if (!category_id || !company_id || !name || !description || !price || stock) {
       throw new itemValidationError(`Todos los campos son necesarios`);
     }
-    if (daily_stock > stock) {
-      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
+    //al registrar un producot debe ser mayo a 0
+    if (stock <= 0) {
+      throw new itemValidationError(`el stock debe ser mayor`);
     }
 
     return new MenuItems(
@@ -47,33 +47,24 @@ export class MenuItems {
       price,
       preparation_time_minutes,
       stock,
-      daily_stock,
       image_url,
       true,
       null,
     );
   }
 
-  update(
-    name: string,
-    description: string,
-    price: number,
-    preparation_time_minutes: number,
-    stock: number,
-    daily_stock: number,
-  ): void {
+  update(name: string, description: string, price: number, preparation_time_minutes: number, stock: number): void {
     if (!this.is_active) {
       throw new InactiveMenuItems();
     }
-    if (daily_stock > stock) {
-      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
+    if (stock < 0) {
+      throw new itemValidationError(`el stock no puede tener un valor negativo`);
     }
     this.name = name ?? this.name;
     this.description = description ?? this.description;
     this.price = price ?? this.price;
     this.preparation_time_minutes = preparation_time_minutes ?? this.preparation_time_minutes;
     this.stock = stock ?? this.stock;
-    this.daily_stock = daily_stock ?? this.daily_stock;
   }
   activate(): void {
     if (this.is_active) {
@@ -87,6 +78,7 @@ export class MenuItems {
     }
     this.is_active = false;
   }
+
   softDelete(): void {
     if (this.deleted_at) {
       throw new MenuItemsNotFoundError();
@@ -99,17 +91,16 @@ export class MenuItems {
     if (quantity <= 0) {
       throw new Error("La cantidad debe ser mayor a 0");
     }
-    if (this.daily_stock < quantity) {
+    if (this.stock < quantity) {
       throw new Error("Stock insuficiente");
     }
-    this.daily_stock -= quantity;
     this.stock -= quantity;
   }
+
   increaseStock(quantity: number): void {
     if (quantity <= 0) {
       throw new Error("La cantidad debe ser mayor a 0");
     }
-    this.daily_stock += quantity;
     this.stock += quantity;
   }
 }
