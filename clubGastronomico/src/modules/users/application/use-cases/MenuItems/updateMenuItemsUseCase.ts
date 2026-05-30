@@ -1,6 +1,5 @@
 import { UpdateMenuItemsDTO } from "@/modules/users/application/dtos/MenuItems/UpdateMenuDTO";
 import { UpdateResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/UpdateResponseMenuDTO";
-import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 
@@ -12,7 +11,7 @@ export class UpdateMenuItemsUseCase {
       throw new MenuItemsNotFoundError();
     }
 
-    items.update(dto.name, dto.description, dto.price, dto.preparation_time_minutes, dto.stock, dto.daily_stock);
+    items.update(dto.name, dto.description, dto.price, dto.preparation_time_minutes, dto.stock);
     await this.ImenuItemsRepository.update(items);
     return {
       id: items.id,
@@ -21,7 +20,6 @@ export class UpdateMenuItemsUseCase {
       price: items.price,
       preparation_time_minutes: items.preparation_time_minutes,
       stock: items.stock,
-      daily_stock: items.daily_stock,
       is_active: items.is_active,
     };
   }

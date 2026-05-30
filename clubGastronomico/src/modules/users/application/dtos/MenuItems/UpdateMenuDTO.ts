@@ -4,5 +4,4 @@ export interface UpdateMenuItemsDTO {
   price: number;
   preparation_time_minutes: number;
   stock: number;
-  daily_stock: number;
 }
