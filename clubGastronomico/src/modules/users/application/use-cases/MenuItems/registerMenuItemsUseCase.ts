@@ -3,6 +3,7 @@ import { ResponseMenuDTO } from "@/modules/users/application/dtos/MenuItems/Resp
 import { MenuItems } from "@/modules/users/domain/entities/MenuItems";
 import { CategoryNotFound } from "@/modules/users/domain/exceptions/CategoryItems/CategoryItemsNoyFoundError";
 import { DuplicateNameMenuItemsError } from "@/modules/users/domain/exceptions/CategoryItems/DuplicateNameError";
+import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { IcategoryRepository } from "@/modules/users/domain/repositories/Category/IcategoryRepository";
 import { IMenuQueryRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuQueryRepository";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
@@ -15,7 +16,7 @@ export class RegisterMenuItemsUseCase {
   ) {}
   async execute(company_id: string, dto: RegisterMenuDTO): Promise<ResponseMenuDTO> {
     //verifica que exista la categoria
-    const category = await this.IcategoryRepository.findById(company_id);
+    const category = await this.IcategoryRepository.findById(dto.category_id);
     if (!category) {
       throw new CategoryNotFound();
     }

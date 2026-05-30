@@ -1,6 +1,7 @@
 import { MenuItems } from "@/modules/users/domain/entities/MenuItems";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 import { MenuItemModel } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsModel";
+import { transcode } from "node:buffer";
 
 export class MenuItemsRepository implements IMenuRepository {
   private toEntity(doc: any): MenuItems {
@@ -21,7 +22,7 @@ export class MenuItemsRepository implements IMenuRepository {
   }
   async findById(id: string): Promise<MenuItems | null> {
     try {
-      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null }).populate("categoy_id", "name");
+      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null }).populate("category_id", "name");
       if (!doc) return null;
       return this.toEntity(doc);
     } catch (error) {
@@ -32,6 +33,7 @@ export class MenuItemsRepository implements IMenuRepository {
     try {
       const doc = new MenuItemModel({
         category_id: menuItems.category_id,
+        company_id: menuItems.company_id,
         name: menuItems.name,
         description: menuItems.description,
         price: menuItems.price,
@@ -45,6 +47,7 @@ export class MenuItemsRepository implements IMenuRepository {
       const saved = await doc.save();
       return this.toEntity(saved);
     } catch (error) {
+      console.error(error);
       throw new Error("error al registar MenuItems");
     }
   }
@@ -70,6 +73,23 @@ export class MenuItemsRepository implements IMenuRepository {
       return this.toEntity(doc);
     } catch (error) {
       throw new Error("Error al actualizar datos del items");
+    }
+  }
+  async increaseDecreaseStock(menuItems: MenuItems): Promise<void> {
+    try {
+      const doc = await MenuItemModel.findOneAndUpdate(
+        { _id: menuItems.id, deleted_at: null },
+        {
+          $set: {
+            stock: menuItems.stock,
+            daily_stock: menuItems.daily_stock,
+          },
+        },
+      );
+      return;
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al descontar stock");
     }
   }
 }

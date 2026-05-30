@@ -16,7 +16,6 @@ import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.mi
 import { n8nRegisterNotifier } from "@/modules/users/infrastructure/services/n8nRegisterNotifier";
 
 const router = Router();
-//inyeccion de dependencias
 // capa de Infraestructura (Adaptadores de salida)
 //Instancia del repositorio basada en Mongoose */
 const userRepository = new MongooseUserRepository();

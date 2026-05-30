@@ -1,4 +1,5 @@
 export interface ResponseMenuForBotDTO {
+  id: string;
   category: {
     name: string;
   };

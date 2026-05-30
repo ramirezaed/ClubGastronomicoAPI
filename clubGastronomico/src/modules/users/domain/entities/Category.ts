@@ -1,6 +1,6 @@
 import { categoryAlreadyActiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyActive";
 import { categoryAlreadyInactiveError } from "@/modules/users/domain/exceptions/category/categoryAlreadyInactive";
-import { categoryDuplicateNameError } from "@/modules/users/domain/exceptions/category/categoryDuplicateNameError";
+
 import { categoryNotFound } from "@/modules/users/domain/exceptions/category/categoryNotFound";
 import { RegisterCategoryError } from "@/modules/users/domain/exceptions/category/registerCategoryError";
 

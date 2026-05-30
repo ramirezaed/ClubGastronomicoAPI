@@ -9,9 +9,11 @@ import { UpdateMenuItemsUseCase } from "@/modules/users/application/use-cases/Me
 import { CategoryNotFound } from "@/modules/users/domain/exceptions/CategoryItems/CategoryItemsNoyFoundError";
 import { DuplicateNameMenuItemsError } from "@/modules/users/domain/exceptions/CategoryItems/DuplicateNameError";
 import { InactiveMenuItems } from "@/modules/users/domain/exceptions/MenuItems/InactiveMenuError";
+import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { MenuAlreadyActivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyActiveError";
 import { MenuAlreadyDeactivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyDeactivateError";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
+
 import { Request, Response } from "express";
 
 export class MenuItemsController {
@@ -86,6 +88,9 @@ export class MenuItemsController {
       if (error instanceof CategoryNotFound) {
         res.status(404).json({ message: error.message });
         return;
+      }
+      if (error instanceof itemValidationError) {
+        res.status(400).json({ message: error.message });
       }
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });

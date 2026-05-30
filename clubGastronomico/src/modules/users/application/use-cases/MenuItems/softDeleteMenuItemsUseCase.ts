@@ -10,7 +10,7 @@ export class softDeleteMenuItemsUseCase {
     if (!items) {
       throw new MenuItemsNotFoundError();
     }
-    items.softDelete;
+    items.softDelete();
     //llama al metodo update en el repositorio para que actualice la fecha de null a new Date
     await this.imenuRepository.update(items);
   }

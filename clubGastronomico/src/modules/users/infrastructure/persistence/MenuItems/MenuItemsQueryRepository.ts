@@ -14,8 +14,6 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
         id: doc.category_id._id?.toString() ?? doc.category_id.toString(),
         name: doc.category_id.name, // viene de populate
       },
-      // company: doc.company_id.toString(),
-      // branch: doc.branch_id?.toString() ?? null,
       name: doc.name,
       description: doc.description,
       price: doc.price,
@@ -28,6 +26,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
   private toBotDTO(doc: any): ResponseMenuForBotDTO {
     return {
+      id: doc._id.toString(),
       category: {
         name: doc.category_id.name,
       },
@@ -39,7 +38,14 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
   async findByName(category_id: string, company_id: string, name: string): Promise<ResponseMenuDTO | null> {
     try {
-      const doc = await MenuItemModel.findOne({ category_id: category_id, company_id: company_id, name: name, deleted_at: null });
+      const doc = await MenuItemModel.findOne({
+        category_id,
+        company_id,
+        name,
+        deleted_at: null,
+      })
+        .populate("category_id")
+        .lean();
       if (!doc) return null;
       return this.toDTO(doc);
     } catch (error) {
@@ -48,11 +54,17 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
   }
   async findById(id: string): Promise<ResponseMenuDTO | null> {
     try {
-      const doc = await MenuItemModel.findOne({ _id: id, deleted_at: null });
+      const doc = await MenuItemModel.findOne({
+        _id: id,
+        deleted_at: null,
+      })
+        .populate("category_id")
+        .lean();
       if (!doc) return null;
+
       return this.toDTO(doc);
     } catch (error) {
-      throw new Error("error al buscar menuItems por id");
+      throw new Error("error al buscar menuItems por idbot");
     }
   }
   async getAll(
@@ -95,6 +107,7 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       throw new Error("error al buscar items");
     }
   }
+
   async getAllForBot(company_id: string): Promise<ResponseMenuForBotDTO[]> {
     try {
       const query: QueryFilter<IMenuItemsDocument> = {

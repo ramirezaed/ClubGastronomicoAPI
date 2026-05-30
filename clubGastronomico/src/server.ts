@@ -1,5 +1,6 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import "@/modules/users/infrastructure/cron/resetDayliStock";
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
@@ -13,6 +14,8 @@ import CompanyRouter from "@/modules/users/infrastructure/http/company.router";
 import PlansRouter from "@/modules/users/infrastructure/http/plans.router";
 import categoryRouter from "@/modules/users/infrastructure/http/categoryRouter";
 import MenuItemsRouter from "@/modules/users/infrastructure/http/MenuItemsRouter";
+import orderRouter from "@/modules/users/infrastructure/http/orderRouter";
+import "@/modules/users/infrastructure/cron/resetDayliStock";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -35,6 +38,7 @@ app.use("/api/company", CompanyRouter);
 app.use("/api/plans", PlansRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/menu-items", MenuItemsRouter);
+app.use("/api/orders", orderRouter);
 
 const startServer = async () => {
   try {

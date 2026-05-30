@@ -1,8 +1,8 @@
 import { InactiveMenuItems } from "@/modules/users/domain/exceptions/MenuItems/InactiveMenuError";
+import { itemValidationError } from "@/modules/users/domain/exceptions/MenuItems/itemValidationError";
 import { MenuAlreadyActivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyActiveError";
 import { MenuAlreadyDeactivateError } from "@/modules/users/domain/exceptions/MenuItems/MenuAlreadyDeactivateError";
 import { MenuItemsNotFoundError } from "@/modules/users/domain/exceptions/MenuItems/MenuItemsNotFoundError";
-import { RegisterMenuError } from "@/modules/users/domain/exceptions/MenuItems/RegisterMenuError";
 
 export class MenuItems {
   constructor(
@@ -31,11 +31,29 @@ export class MenuItems {
     daily_stock: number,
     image_url: string | null,
   ): MenuItems {
-    if (!category_id || !company_id || !name || !description || !price || !preparation_time_minutes || !stock || !daily_stock) {
-      throw new RegisterMenuError();
+    if (!category_id || !company_id || !name || !description || !price || stock || daily_stock) {
+      throw new itemValidationError(`Todos los campos son necesarios`);
     }
-    return new MenuItems("", category_id, company_id, name, description, price, 15, stock, 100, image_url, true, null);
+    if (daily_stock > stock) {
+      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
+    }
+
+    return new MenuItems(
+      "",
+      category_id,
+      company_id,
+      name,
+      description,
+      price,
+      preparation_time_minutes,
+      stock,
+      daily_stock,
+      image_url,
+      true,
+      null,
+    );
   }
+
   update(
     name: string,
     description: string,
@@ -46,6 +64,9 @@ export class MenuItems {
   ): void {
     if (!this.is_active) {
       throw new InactiveMenuItems();
+    }
+    if (daily_stock > stock) {
+      throw new itemValidationError(`el stock diario no puede ser mayor que el stock total`);
     }
     this.name = name ?? this.name;
     this.description = description ?? this.description;
@@ -72,5 +93,23 @@ export class MenuItems {
     }
     this.deleted_at = new Date();
     this.is_active = false;
+  }
+
+  decreaseStock(quantity: number): void {
+    if (quantity <= 0) {
+      throw new Error("La cantidad debe ser mayor a 0");
+    }
+    if (this.daily_stock < quantity) {
+      throw new Error("Stock insuficiente");
+    }
+    this.daily_stock -= quantity;
+    this.stock -= quantity;
+  }
+  increaseStock(quantity: number): void {
+    if (quantity <= 0) {
+      throw new Error("La cantidad debe ser mayor a 0");
+    }
+    this.daily_stock += quantity;
+    this.stock += quantity;
   }
 }
