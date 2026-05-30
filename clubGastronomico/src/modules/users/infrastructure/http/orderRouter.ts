@@ -445,5 +445,7 @@ orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner",
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.patch("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.cancel(req, res));
+orderRouter.patch("/:id/cancel", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) =>
+  orderController.cancel(req, res),
+);
 export default orderRouter;

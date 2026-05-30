@@ -14,6 +14,7 @@ import PlansRouter from "@/modules/users/infrastructure/http/plans.router";
 import categoryRouter from "@/modules/users/infrastructure/http/categoryRouter";
 import MenuItemsRouter from "@/modules/users/infrastructure/http/MenuItemsRouter";
 import orderRouter from "@/modules/users/infrastructure/http/orderRouter";
+import orderCancellationRouter from "@/modules/users/infrastructure/http/orderCancellationRouter";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -37,6 +38,7 @@ app.use("/api/plans", PlansRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/menu-items", MenuItemsRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/ordersLog", orderCancellationRouter);
 
 const startServer = async () => {
   try {

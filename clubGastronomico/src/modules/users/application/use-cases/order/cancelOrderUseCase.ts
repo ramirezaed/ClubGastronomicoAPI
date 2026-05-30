@@ -6,7 +6,6 @@ import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/I
 import { IorderRepository } from "@/modules/users/domain/repositories/order/IorderRepository";
 import { IorderCancellationRepository } from "@/modules/users/domain/repositories/orderCancellation/IorderCancellationRepository";
 import { Cancellation_Reason, OrderCancellation } from "@/modules/users/domain/entities/OrderCancellation";
-import { ValidationCancellationError } from "@/modules/users/domain/exceptions/cancellationOrder/validationCancellation";
 
 export class cancelOrderUseCase {
   constructor(
@@ -25,6 +24,10 @@ export class cancelOrderUseCase {
     if (!order) {
       throw new OrderNotFoundError();
     }
+
+    //valida los motivos antes de la cancelacion
+    const orderCancellation = OrderCancellation.create(order.id, company.id, reason, custom_reason);
+
     //guarda stado de la orden antes de ser cancelada
     const status = order.status;
 
@@ -43,8 +46,7 @@ export class cancelOrderUseCase {
         }
       }
     }
-    // registra la orden cancelada
-    const orderCancellation = OrderCancellation.create(order.id, company.id, reason, custom_reason);
+
     await this.Icancellation.save(orderCancellation);
   }
 }

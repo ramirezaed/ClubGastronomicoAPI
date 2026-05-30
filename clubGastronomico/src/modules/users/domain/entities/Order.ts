@@ -89,12 +89,9 @@ export class Order {
     }
     this.status = status;
   }
+
   cancelOrder(): void {
-    // const now = new Date();
-    // if (this.created_at < new Date(now.setDate(now.getDate() - 1))) {
-    //   throw new orderValidationError("no se pueden cancelar ordenes de dias anteriores");
-    // }
-    if ((this.status = OrderStatus.CANCEL)) {
+    if (this.status === OrderStatus.CANCEL) {
       throw new orderValidationError(`la orden ya fue cancelada`);
     }
     this.status = OrderStatus.CANCEL;

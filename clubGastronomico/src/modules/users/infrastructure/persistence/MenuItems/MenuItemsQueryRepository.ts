@@ -19,7 +19,6 @@ export class MenuItemsQueryRepository implements IMenuQueryRepository {
       price: doc.price,
       preparation_time_minutes: doc.preparation_time_minutes,
       stock: doc.stock,
-      daily_stock: doc.daily_stock,
       image_url: doc.image_url,
       is_active: doc.is_active,
     };

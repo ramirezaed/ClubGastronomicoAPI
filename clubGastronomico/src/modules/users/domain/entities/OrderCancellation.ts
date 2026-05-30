@@ -34,6 +34,10 @@ export class OrderCancellation {
         `Por favor, indícanos el motivo de la cancelación para poder mejorar nuestro servicio`,
       );
     }
+
+    if (!Object.values(Cancellation_Reason).includes(reason)) {
+      throw new ValidationCancellationError("Motivo de cancelación inválido");
+    }
     if (reason === Cancellation_Reason.OTHER && !custom_reason?.trim()) {
       throw new ValidationCancellationError("Debe especificar el motivo cuando selecciona 'Otro motivo'");
     }
