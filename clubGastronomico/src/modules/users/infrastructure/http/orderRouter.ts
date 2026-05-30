@@ -9,6 +9,7 @@ import { MenuItemsQueryRepository } from "@/modules/users/infrastructure/persist
 import { MenuItemsRepository } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsRepository";
 import { OrderQueryRepository } from "@/modules/users/infrastructure/persistence/order/orderQueryRepository";
 import { OrderRepository } from "@/modules/users/infrastructure/persistence/order/orderRepository";
+import { orderCancellationRepository } from "@/modules/users/infrastructure/persistence/orderCancellation/ordercancellationRepository";
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
 import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
 import { Router } from "express";
@@ -22,6 +23,7 @@ const orderQueryRepository = new OrderQueryRepository();
 const companyQueryRepository = new CompanyQueryRepository();
 const menuItemsQueryRepository = new MenuItemsQueryRepository();
 const menuItems = new MenuItemsRepository();
+const orderCancellation = new orderCancellationRepository();
 // capa de aplicacion (casos de uso)
 
 const registerUseCase = new registerOrderUseCase(orderRepository, companyQueryRepository, menuItemsQueryRepository, menuItems);
@@ -34,7 +36,7 @@ const registerForBOTUseCase = new registerOrderUseCase(
   menuItemsQueryRepository,
   menuItems,
 );
-const cancelUseCase = new cancelOrderUseCase(orderRepository, companyQueryRepository, menuItems);
+const cancelUseCase = new cancelOrderUseCase(orderRepository, companyQueryRepository, menuItems, orderCancellation);
 
 //capa de interfaz, se inyectan las dependencias
 const orderController = new OrderController(

@@ -126,7 +126,8 @@ export class OrderController {
     try {
       const company_id = req.user.company_id as string;
       const id = req.params.id as string;
-      await this.cancelOrder.execute(id, company_id);
+      const { reason, custom_reason } = req.body;
+      await this.cancelOrder.execute(id, company_id, reason, custom_reason);
 
       res.status(200).json({ message: "Orden cancelada" });
       return;

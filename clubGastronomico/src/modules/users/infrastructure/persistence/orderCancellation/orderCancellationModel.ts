@@ -1,11 +1,12 @@
 import { IorderCancellationDocument } from "@/modules/users/infrastructure/persistence/orderCancellation/orderCancellationDocument";
 import { Schema, model } from "mongoose";
 
-export enum CANCELLATION_REASON {
-  FOOD_COLD = "El pedido llego frio",
-  BAD_CONDITION = "El pedido no llego en condiciones",
-  WRONG_ORDER = "No es lo que esperaba",
-  DELAY = "Demora en la entrega",
+export enum Cancellation_Reason {
+  WRONG_ORDER = "No es lo que pedí (Plato equivocado)",
+  INCOMPLETE_ORDER = "Faltan productos en el pedido",
+  FOOD_COLD = "La comida llegó fría",
+  BAD_QUALITY = "La comida está quemada, cruda o en mal estado",
+  SPILL_OR_DAMAGED = "El pedido llegó volcado o roto",
   OTHER = "Otro",
 }
 
@@ -17,7 +18,6 @@ const OrderCancellationSchema = new Schema<IorderCancellationDocument>(
       ref: "Order",
       unique: true,
     },
-
     company_id: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -25,7 +25,7 @@ const OrderCancellationSchema = new Schema<IorderCancellationDocument>(
     },
     reason: {
       type: String,
-      enum: Object.values(CANCELLATION_REASON),
+      enum: Object.values(Cancellation_Reason),
       required: true,
     },
     custom_reason: {
