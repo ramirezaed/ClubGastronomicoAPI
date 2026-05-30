@@ -57,8 +57,8 @@ export class MenuItems {
     if (!this.is_active) {
       throw new InactiveMenuItems();
     }
-    if (stock <= 0) {
-      throw new itemValidationError(`el stock debe ser mayor a 0`);
+    if (stock < 0) {
+      throw new itemValidationError(`el stock no puede tener un valor negativo`);
     }
     this.name = name ?? this.name;
     this.description = description ?? this.description;
