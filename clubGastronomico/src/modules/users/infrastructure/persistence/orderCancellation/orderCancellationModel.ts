@@ -2,12 +2,14 @@ import { IorderCancellationDocument } from "@/modules/users/infrastructure/persi
 import { Schema, model } from "mongoose";
 
 export enum Cancellation_Reason {
-  WRONG_ORDER = "No es lo que pedí (Plato equivocado)",
-  INCOMPLETE_ORDER = "Faltan productos en el pedido",
-  FOOD_COLD = "La comida llegó fría",
-  BAD_QUALITY = "La comida está quemada, cruda o en mal estado",
-  SPILL_OR_DAMAGED = "El pedido llegó volcado o roto",
-  OTHER = "Otro",
+  LONG_WAIT_TIME = "El tiempo de espera es demasiado largo",
+  WRONG_ADDRESS = "Me equivoqué en la dirección de entrega",
+  MISTAKE_IN_ITEMS = "Pedí los productos equivocados",
+  FORGOT_DISCOUNT = "Olvidé aplicar un cupón o descuento",
+  DUPLICATED_ORDER = "Hice el pedido dos veces sin querer",
+  BUDGET_EXCEEDED = "El costo final superó mi presupuesto",
+  NO_LONGER_WANTED = "Ya no quiero el pedido / Cambié de opinión",
+  OTHER = "Otro motivo",
 }
 
 const OrderCancellationSchema = new Schema<IorderCancellationDocument>(
