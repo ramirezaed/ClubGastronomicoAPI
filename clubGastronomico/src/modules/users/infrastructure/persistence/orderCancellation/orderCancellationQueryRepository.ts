@@ -1,18 +1,20 @@
 import { ResponseOrderCancellationDTO } from "@/modules/users/application/dtos/orderCancellation/respondeOrderCancellationDTO";
 import { IPaginationDTO, IPaginatedResponseDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
 import { Cancellation_Reason } from "@/modules/users/domain/entities/OrderCancellation";
-import { IorderCancellatioRepository } from "@/modules/users/domain/repositories/orderCancellation/IorderCancellatioQueryRepository";
 import { IorderCancellationDocument } from "@/modules/users/infrastructure/persistence/orderCancellation/orderCancellationDocument";
 import OrderCancellationModel from "@/modules/users/infrastructure/persistence/orderCancellation/orderCancellationModel";
 import { QueryFilter } from "mongoose";
+import { IorderCancellatioQueryRepository } from "@/modules/users/domain/repositories/orderCancellation/IorderCancellatioQueryRepository";
 
-export class orderCancellationQueryRepository implements IorderCancellatioRepository {
+export class orderCancellationQueryRepository implements IorderCancellatioQueryRepository {
   private toDTO(doc: any): ResponseOrderCancellationDTO {
     return {
       id: doc._id.toString(),
-      order_id: doc.order_id.toString(),
+      // order_id: doc.order_id.toString(),
+      order_id: doc.order_id,
       reason: doc.reason,
       custom_reason: doc.custom_reason,
+      created_at: doc.created_at,
     };
   }
   async getAll(
@@ -53,6 +55,19 @@ export class orderCancellationQueryRepository implements IorderCancellatioReposi
     } catch (error) {
       console.error(error);
       throw new Error("error al buscar items");
+    }
+  }
+
+  async findById(id: string, company_id: string): Promise<ResponseOrderCancellationDTO | null> {
+    try {
+      const doc = await OrderCancellationModel.findOne({ _id: id, company_id: company_id, deleted_at: null }).populate(
+        "order_id",
+      );
+      if (!doc) return null;
+      return this.toDTO(doc);
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al buscar orden cancelada");
     }
   }
 }
