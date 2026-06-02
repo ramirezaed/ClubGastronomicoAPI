@@ -4,15 +4,18 @@ import { OrderNotFoundError } from "@/modules/users/domain/exceptions/order/orde
 import { ICompanyQueryRepository } from "@/modules/users/domain/repositories/company/ICompanyQueryrepository";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 import { IorderRepository } from "@/modules/users/domain/repositories/order/IorderRepository";
+import { IorderCancellationRepository } from "@/modules/users/domain/repositories/orderCancellation/IorderCancellationRepository";
+import { Cancellation_Reason, OrderCancellation } from "@/modules/users/domain/entities/OrderCancellation";
 
 export class cancelOrderUseCase {
   constructor(
     private readonly iorderRepository: IorderRepository,
     private readonly icompanyQuery: ICompanyQueryRepository,
     private readonly imenuItemRepository: IMenuRepository,
+    private readonly Icancellation: IorderCancellationRepository,
   ) {}
 
-  async execute(id: string, company_id: string): Promise<void> {
+  async execute(id: string, company_id: string, reason: Cancellation_Reason, custom_reason?: string): Promise<void> {
     const company = await this.icompanyQuery.findById(company_id);
     if (!company) {
       throw new CompanyNotFoundError();
@@ -21,6 +24,10 @@ export class cancelOrderUseCase {
     if (!order) {
       throw new OrderNotFoundError();
     }
+
+    //valida los motivos antes de la cancelacion
+    const orderCancellation = OrderCancellation.create(order.id, company.id, reason, custom_reason);
+
     //guarda stado de la orden antes de ser cancelada
     const status = order.status;
 
@@ -39,5 +46,7 @@ export class cancelOrderUseCase {
         }
       }
     }
+
+    await this.Icancellation.save(orderCancellation);
   }
 }

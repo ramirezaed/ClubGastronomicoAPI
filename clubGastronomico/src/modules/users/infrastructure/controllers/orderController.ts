@@ -4,6 +4,7 @@ import { findByIdOrderUseCase } from "@/modules/users/application/use-cases/orde
 import { getAllOrderUsecase } from "@/modules/users/application/use-cases/order/getAllOrderUseCase";
 import { registerOrderUseCase } from "@/modules/users/application/use-cases/order/registerOrderUseCase";
 import { OrderStatus } from "@/modules/users/domain/entities/Order";
+import { ValidationCancellationError } from "@/modules/users/domain/exceptions/cancellationOrder/validationCancellation";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
 import { OrderNotFoundError } from "@/modules/users/domain/exceptions/order/orderNotFoundError";
 import { orderValidationError } from "@/modules/users/domain/exceptions/order/orderValidationError";
@@ -106,7 +107,7 @@ export class OrderController {
 
       let status: OrderStatus | undefined;
 
-      // parse string safely
+      // parse string
       if (typeof req.query.status === "string") {
         status = req.query.status as OrderStatus;
       }
@@ -126,7 +127,8 @@ export class OrderController {
     try {
       const company_id = req.user.company_id as string;
       const id = req.params.id as string;
-      await this.cancelOrder.execute(id, company_id);
+      const { reason, custom_reason } = req.body;
+      await this.cancelOrder.execute(id, company_id, reason, custom_reason);
 
       res.status(200).json({ message: "Orden cancelada" });
       return;
@@ -135,7 +137,7 @@ export class OrderController {
         res.status(404).json({ message: error.message });
         return;
       }
-      if (error instanceof orderValidationError) {
+      if (error instanceof orderValidationError || error instanceof ValidationCancellationError) {
         res.status(400).json({ message: error.message });
         return;
       }

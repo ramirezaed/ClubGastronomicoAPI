@@ -47,8 +47,6 @@ export class OrderQueryRepository implements IOrderQueryRepository {
       const query: QueryFilter<IorderDocument> = { company_id, deleted_at: null };
 
       //si no es indefinido el filtro es status
-      //regex para busquedas parciales, "i" para busqueda insensitiva (mayusculas o minusculas)
-      // if (filter?.status) query.status = { $regex: filter.status, $options: "i" };
       if (filter?.status) query.status = filter.status;
       //obtiene el numero de paginas enviadas, por defecto usa 1
       const page = pagination?.page ?? 1;
