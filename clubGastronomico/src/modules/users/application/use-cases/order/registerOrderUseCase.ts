@@ -81,7 +81,7 @@ export class registerOrderUseCase {
         unit_price: item.unit_price,
       })),
       total_amount: saved.total_amount,
-      created_at: new Date(),
+      created_at: saved.created_at,
     };
   }
 }

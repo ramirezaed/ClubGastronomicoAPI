@@ -15,6 +15,7 @@ import categoryRouter from "@/modules/users/infrastructure/http/categoryRouter";
 import MenuItemsRouter from "@/modules/users/infrastructure/http/MenuItemsRouter";
 import orderRouter from "@/modules/users/infrastructure/http/orderRouter";
 import orderCancellationRouter from "@/modules/users/infrastructure/http/orderCancellationRouter";
+import reportsRouter from "@/modules/users/infrastructure/http/reportRouter";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -39,7 +40,7 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/menu-items", MenuItemsRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/ordersLog", orderCancellationRouter);
-
+app.use("/api/reports", reportsRouter);
 const startServer = async () => {
   try {
     await connectDB();
