@@ -34,6 +34,11 @@ export class topItemsUseCase {
     if (to < from) {
       throw new ValidationReportsError("La fecha de fin no puede ser menor a la fecha de inicio");
     }
-    return this.ireportQueryRepository.getTopProducts(company_id, from, to);
+    const topItems = await this.ireportQueryRepository.getTopProducts(company_id, from, to);
+    return {
+      date_from: topItems.date_from,
+      date_to: topItems.date_to,
+      topItems: topItems.topItems,
+    };
   }
 }
