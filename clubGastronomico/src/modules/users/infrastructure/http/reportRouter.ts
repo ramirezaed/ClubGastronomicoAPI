@@ -1,6 +1,7 @@
 import { canceledSalesUseCase } from "@/modules/users/application/use-cases/reports/canceledSalesUseCase";
 import { dailySalesUseCase } from "@/modules/users/application/use-cases/reports/dailySalesUseCase";
 import { getReportsCancellationsUseCase } from "@/modules/users/application/use-cases/reports/getReportsCancellationsUseCase";
+import { salesMonthUseCase } from "@/modules/users/application/use-cases/reports/SalesMonthUseCase";
 import { topHourDayUseCase } from "@/modules/users/application/use-cases/reports/topHourDayUseCase";
 import { topItemsUseCase } from "@/modules/users/application/use-cases/reports/topItemsUseCase";
 import { ReportsController } from "@/modules/users/infrastructure/controllers/reportsController";
@@ -20,8 +21,9 @@ const canceledSales = new canceledSalesUseCase(reportsQueryrepository, companyQu
 const topItems = new topItemsUseCase(reportsQueryrepository, companyQueryRepository);
 const topHpur = new topHourDayUseCase(reportsQueryrepository, companyQueryRepository);
 const cancellations = new getReportsCancellationsUseCase(reportsQueryrepository, companyQueryRepository);
+const SalesMonth = new salesMonthUseCase(reportsQueryrepository, companyQueryRepository);
 
-const reportsController = new ReportsController(dailySales, canceledSales, topItems, topHpur, cancellations);
+const reportsController = new ReportsController(dailySales, canceledSales, topItems, topHpur, cancellations, SalesMonth);
 
 /**
  * @swagger
@@ -364,6 +366,61 @@ reportsRouter.get("/top-hours-days", authMiddleware, authorizeRoles("owner"), (r
  */
 reportsRouter.get("/cancellations", authMiddleware, authorizeRoles("owner"), (req, res) =>
   reportsController.getCancellations(req, res),
+);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     MonthlySales:
+ *       type: object
+ *       properties:
+ *         month:
+ *           type: string
+ *           example: "2026-01"
+ *         total_orders:
+ *           type: integer
+ *           example: 245
+ *         total_amount:
+ *           type: number
+ *           example: 1250000
+ *
+ *     SalesEvolutionReport:
+ *       type: object
+ *       properties:
+ *         months:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/MonthlySales'
+ */
+
+/**
+ * @swagger
+ * /api/reports/sales-evolutions:
+ *   get:
+ *     summary: Obtener evolución mensual de ventas
+ *     description: Devuelve la evolución de ventas agrupada por mes, incluyendo cantidad de pedidos y monto total vendido. Disponible únicamente para compañías con plan Premium.
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Reporte obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SalesEvolutionReport'
+ *       403:
+ *         description: El plan actual no permite acceder a este reporte
+ *       404:
+ *         description: Compañía no encontrada o inactiva
+ *       401:
+ *         description: No autenticado
+ *       500:
+ *         description: Error interno del servidor
+ */
+reportsRouter.get("/sales-evolutions", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  reportsController.salesMonthEvolutions(req, res),
 );
 
 export default reportsRouter;

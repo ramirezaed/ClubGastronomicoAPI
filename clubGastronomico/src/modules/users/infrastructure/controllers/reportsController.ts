@@ -1,6 +1,7 @@
 import { canceledSalesUseCase } from "@/modules/users/application/use-cases/reports/canceledSalesUseCase";
 import { dailySalesUseCase } from "@/modules/users/application/use-cases/reports/dailySalesUseCase";
 import { getReportsCancellationsUseCase } from "@/modules/users/application/use-cases/reports/getReportsCancellationsUseCase";
+import { salesMonthUseCase } from "@/modules/users/application/use-cases/reports/SalesMonthUseCase";
 import { topHourDayUseCase } from "@/modules/users/application/use-cases/reports/topHourDayUseCase";
 import { topItemsUseCase } from "@/modules/users/application/use-cases/reports/topItemsUseCase";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
@@ -16,6 +17,7 @@ export class ReportsController {
     private readonly topItemsRepots: topItemsUseCase,
     private readonly topHourDayReports: topHourDayUseCase,
     private readonly getReportcancellations: getReportsCancellationsUseCase,
+    private readonly salesMonth: salesMonthUseCase,
   ) {}
 
   async dailySales(req: Request, res: Response): Promise<void> {
@@ -140,6 +142,25 @@ export class ReportsController {
       }
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async salesMonthEvolutions(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+      const salesMonth = await this.salesMonth.execute(company_id);
+      res.status(200).json(salesMonth);
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof ValidationPlanReportsError) {
+        res.status(403).json({ message: error.message });
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno en el servidor" });
       return;
     }
   }

@@ -1,5 +1,6 @@
 import { canceledSalesDTO, CancellationReportDTO } from "@/modules/users/application/dtos/reports/canceledSalesReportsDTO";
 import { dailySalesReportsDTO } from "@/modules/users/application/dtos/reports/dailySalesReportsDTO";
+import { SalesEvolutionReportDTO } from "@/modules/users/application/dtos/reports/SalesMonthDTO";
 import { TopHoursReportDTO } from "@/modules/users/application/dtos/reports/topHourDTO";
 import { topItemsReportsDTO } from "@/modules/users/application/dtos/reports/topItemsDTO";
 import { OrderStatus } from "@/modules/users/domain/entities/Order";
@@ -174,7 +175,6 @@ export class reportsQueryRepository implements IreportQueryRepository {
       throw new Error("error al buscar top horas por día");
     }
   }
-
   async getCancellations(company_id: string, dateFrom: string, dateTo: string): Promise<CancellationReportDTO> {
     try {
       const start = new Date(`${dateFrom}T00:00:00.000Z`);
@@ -223,6 +223,45 @@ export class reportsQueryRepository implements IreportQueryRepository {
     } catch (error) {
       console.error(error);
       throw new Error("error al buscar cancelaciones");
+    }
+  }
+  async getSalesEvolution(company_id: string): Promise<SalesEvolutionReportDTO> {
+    try {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth() - 5, 1); // primer dia de hace 6 meses
+
+      const results = await OrderModel.aggregate([
+        {
+          $match: {
+            company_id: new mongoose.Types.ObjectId(company_id),
+            created_at: { $gte: start },
+            deleted_at: null,
+            status: OrderStatus.PENDING,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$created_at" },
+              month: { $month: "$created_at" },
+            },
+            total_orders: { $sum: 1 },
+            total_amount: { $sum: "$total_amount" },
+          },
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } },
+      ]);
+
+      return {
+        months: results.map((r) => ({
+          month: `${r._id.year}-${String(r._id.month).padStart(2, "0")}`,
+          total_orders: r.total_orders,
+          total_amount: r.total_amount,
+        })),
+      };
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al buscar evolución de ventas");
     }
   }
 }

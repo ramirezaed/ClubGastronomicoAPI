@@ -1,5 +1,6 @@
 import { canceledSalesDTO, CancellationReportDTO } from "@/modules/users/application/dtos/reports/canceledSalesReportsDTO";
 import { dailySalesReportsDTO } from "@/modules/users/application/dtos/reports/dailySalesReportsDTO";
+import { SalesEvolutionReportDTO } from "@/modules/users/application/dtos/reports/SalesMonthDTO";
 import { TopHoursReportDTO } from "@/modules/users/application/dtos/reports/topHourDTO";
 import { topItemsReportsDTO } from "@/modules/users/application/dtos/reports/topItemsDTO";
 
@@ -9,4 +10,5 @@ export interface IreportQueryRepository {
   getTopProducts(company_id: string, dateFrom: string, dateTo: string): Promise<topItemsReportsDTO>;
   getTopHours(company_id: string, dateFrom: string, dateTo: string): Promise<TopHoursReportDTO>;
   getCancellations(company_id: string, dateFrom: string, dateTo: string): Promise<CancellationReportDTO>;
+  getSalesEvolution(company_id: string): Promise<SalesEvolutionReportDTO>;
 }
