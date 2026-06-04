@@ -1,5 +1,6 @@
 import { topItemsReportsDTO } from "@/modules/users/application/dtos/reports/topItemsDTO";
 import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/CompanyNotFoundError";
+import { ValidationPlanReportsError } from "@/modules/users/domain/exceptions/reports/ValidationPlanReportsError";
 import { ValidationReportsError } from "@/modules/users/domain/exceptions/reports/validationReportsError";
 import { ICompanyQueryRepository } from "@/modules/users/domain/repositories/company/ICompanyQueryrepository";
 import { IreportQueryRepository } from "@/modules/users/domain/repositories/reports/IreportsQueryRepository";
@@ -14,6 +15,9 @@ export class topItemsUseCase {
     const company = await this.icompanyQueryRepository.findById(company_id);
     if (!company || !company.is_active) {
       throw new CompanyNotFoundError();
+    }
+    if (company.subscription_plan.name !== "Free") {
+      throw new ValidationPlanReportsError("Esta funcion no esta disponible en tu plan");
     }
     //asigna fecha del dia
     const today = new Date().toISOString().split("T")[0];

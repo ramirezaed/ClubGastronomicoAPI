@@ -1,5 +1,6 @@
 import { canceledSalesUseCase } from "@/modules/users/application/use-cases/reports/canceledSalesUseCase";
 import { dailySalesUseCase } from "@/modules/users/application/use-cases/reports/dailySalesUseCase";
+import { getProductRankingUseCase } from "@/modules/users/application/use-cases/reports/getProductRankinUseCase";
 import { getReportsCancellationsUseCase } from "@/modules/users/application/use-cases/reports/getReportsCancellationsUseCase";
 import { salesMonthUseCase } from "@/modules/users/application/use-cases/reports/SalesMonthUseCase";
 import { topHourDayUseCase } from "@/modules/users/application/use-cases/reports/topHourDayUseCase";
@@ -18,6 +19,7 @@ export class ReportsController {
     private readonly topHourDayReports: topHourDayUseCase,
     private readonly getReportcancellations: getReportsCancellationsUseCase,
     private readonly salesMonth: salesMonthUseCase,
+    private readonly getRankingProduct: getProductRankingUseCase,
   ) {}
 
   async dailySales(req: Request, res: Response): Promise<void> {
@@ -80,6 +82,10 @@ export class ReportsController {
       }
       if (error instanceof ValidationReportsError) {
         res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error instanceof ValidationPlanReportsError) {
+        res.status(403).json({ message: error.message });
         return;
       }
       console.error(error);
@@ -161,6 +167,27 @@ export class ReportsController {
       }
       console.error(error);
       res.status(500).json({ message: "error interno en el servidor" });
+      return;
+    }
+  }
+
+  async getRanking(req: Request, res: Response): Promise<void> {
+    try {
+      const company_id = req.user.company_id as string;
+      const ranking = await this.getRankingProduct.execute(company_id);
+      res.status(200).json(ranking);
+      return;
+    } catch (error) {
+      if (error instanceof CompanyNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error instanceof ValidationPlanReportsError) {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
       return;
     }
   }

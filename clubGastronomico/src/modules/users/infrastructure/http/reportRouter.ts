@@ -1,5 +1,6 @@
 import { canceledSalesUseCase } from "@/modules/users/application/use-cases/reports/canceledSalesUseCase";
 import { dailySalesUseCase } from "@/modules/users/application/use-cases/reports/dailySalesUseCase";
+import { getProductRankingUseCase } from "@/modules/users/application/use-cases/reports/getProductRankinUseCase";
 import { getReportsCancellationsUseCase } from "@/modules/users/application/use-cases/reports/getReportsCancellationsUseCase";
 import { salesMonthUseCase } from "@/modules/users/application/use-cases/reports/SalesMonthUseCase";
 import { topHourDayUseCase } from "@/modules/users/application/use-cases/reports/topHourDayUseCase";
@@ -22,8 +23,17 @@ const topItems = new topItemsUseCase(reportsQueryrepository, companyQueryReposit
 const topHpur = new topHourDayUseCase(reportsQueryrepository, companyQueryRepository);
 const cancellations = new getReportsCancellationsUseCase(reportsQueryrepository, companyQueryRepository);
 const SalesMonth = new salesMonthUseCase(reportsQueryrepository, companyQueryRepository);
+const getRankingProduct = new getProductRankingUseCase(reportsQueryrepository, companyQueryRepository);
 
-const reportsController = new ReportsController(dailySales, canceledSales, topItems, topHpur, cancellations, SalesMonth);
+const reportsController = new ReportsController(
+  dailySales,
+  canceledSales,
+  topItems,
+  topHpur,
+  cancellations,
+  SalesMonth,
+  getRankingProduct,
+);
 
 /**
  * @swagger
@@ -393,7 +403,6 @@ reportsRouter.get("/cancellations", authMiddleware, authorizeRoles("owner"), (re
  *           items:
  *             $ref: '#/components/schemas/MonthlySales'
  */
-
 /**
  * @swagger
  * /api/reports/sales-evolutions:
@@ -423,4 +432,66 @@ reportsRouter.get("/sales-evolutions", authMiddleware, authorizeRoles("owner"), 
   reportsController.salesMonthEvolutions(req, res),
 );
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ProductRanking:
+ *       type: object
+ *       properties:
+ *         menuItems_id:
+ *           type: string
+ *           example: "6a13330f8e9b769082a1985a"
+ *         item_name:
+ *           type: string
+ *           example: "Hamburguesa Completa"
+ *         category_name:
+ *           type: string
+ *           example: "Hamburguesas"
+ *         total_quantity:
+ *           type: integer
+ *           example: 125
+ *
+ *     ProductRankingReport:
+ *       type: object
+ *       properties:
+ *         top_sellers:
+ *           type: array
+ *           description: Productos más vendidos
+ *           items:
+ *             $ref: '#/components/schemas/ProductRanking'
+ *         least_sellers:
+ *           type: array
+ *           description: Productos menos vendidos
+ *           items:
+ *             $ref: '#/components/schemas/ProductRanking'
+ */
+/**
+ * @swagger
+ * /api/reports/items-ranking:
+ *   get:
+ *     summary: Obtener ranking de productos
+ *     description: Devuelve el ranking de productos más vendidos y menos vendidos. Disponible únicamente para compañías con plan Free.
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Ranking obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductRankingReport'
+ *       403:
+ *         description: El plan actual no permite acceder a este reporte
+ *       404:
+ *         description: Compañía no encontrada o inactiva
+ *       401:
+ *         description: No autenticado
+ *       500:
+ *         description: Error interno del servidor
+ */
+reportsRouter.get("/items-ranking", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  reportsController.getRanking(req, res),
+);
 export default reportsRouter;

@@ -1,5 +1,9 @@
 import { canceledSalesDTO, CancellationReportDTO } from "@/modules/users/application/dtos/reports/canceledSalesReportsDTO";
-import { dailySalesReportsDTO } from "@/modules/users/application/dtos/reports/dailySalesReportsDTO";
+import {
+  dailySalesReportsDTO,
+  ProductRankingDTO,
+  ProductRankingReportDTO,
+} from "@/modules/users/application/dtos/reports/dailySalesReportsDTO";
 import { SalesEvolutionReportDTO } from "@/modules/users/application/dtos/reports/SalesMonthDTO";
 import { TopHoursReportDTO } from "@/modules/users/application/dtos/reports/topHourDTO";
 import { topItemsReportsDTO } from "@/modules/users/application/dtos/reports/topItemsDTO";
@@ -10,6 +14,14 @@ import OrderCancellationModel from "@/modules/users/infrastructure/persistence/o
 import mongoose, { now } from "mongoose";
 
 export class reportsQueryRepository implements IreportQueryRepository {
+  private toProductRankingDTO(r: any): ProductRankingDTO {
+    return {
+      menuItems_id: r._id.toString(),
+      item_name: r.item_name,
+      category_name: r.category_name,
+      total_quantity: r.total_quantity,
+    };
+  }
   async getDailySales(company_id: string, date: string): Promise<dailySalesReportsDTO> {
     try {
       // Si no ingresa fecha, usar la fecha actual
@@ -102,7 +114,7 @@ export class reportsQueryRepository implements IreportQueryRepository {
             total_amount: { $sum: { $multiply: ["$items.quantity", "$items.unit_price"] } },
           },
         },
-        { $sort: { total_quantity: -1 } },
+        { $sort: { total_quantity: -1 } }, //ordena de mayor a menor
         { $limit: 5 },
       ]);
 
@@ -262,6 +274,89 @@ export class reportsQueryRepository implements IreportQueryRepository {
     } catch (error) {
       console.error(error);
       throw new Error("error al buscar evolución de ventas");
+    }
+  }
+  // async getProductRanking(company_id: string): Promise<ProductRankingReportDTO> {
+  //   try {
+  //     const results = await OrderModel.aggregate([
+  //       {
+  //         $match: {
+  //           company_id: new mongoose.Types.ObjectId(company_id),
+  //           deleted_at: null,
+  //           status: OrderStatus.PENDING,
+  //         },
+  //       },
+  //       { $unwind: "$items" },
+  //       {
+  //         $group: {
+  //           _id: "$items.menuItems_id",
+  //           item_name: { $first: "$items.item_name" },
+  //           category_name: { $first: "$items.category_name" },
+  //           total_quantity: { $sum: "$items.quantity" },
+  //         },
+  //       },
+  //       { $sort: { total_quantity: -1 } },
+  //     ]);
+
+  //     if (!results.length) return { top_sellers: [], least_sellers: [] };
+
+  //     // umbral del top: cantidad del puesto 5 (o ultimo si hay menos de 5)
+  //     const topThreshold = results[Math.min(4, results.length - 1)].total_quantity;
+  //     // umbral del bottom: cantidad del puesto -5 (o primero si hay menos de 5)
+  //     const bottomThreshold = results[Math.max(results.length - 5, 0)].total_quantity;
+
+  //     // incluye todos los que empatan en el umbral
+  //     const top_sellers = results.filter((r) => r.total_quantity >= topThreshold).map(this.toProductRankingDTO);
+
+  //     const least_sellers = results.filter((r) => r.total_quantity <= bottomThreshold).map(this.toProductRankingDTO);
+
+  //     return { top_sellers, least_sellers };
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new Error("error al buscar ranking de productos");
+  //   }
+  // }
+  async getProductRanking(company_id: string): Promise<ProductRankingReportDTO> {
+    try {
+      const results = await OrderModel.aggregate([
+        {
+          $match: {
+            company_id: new mongoose.Types.ObjectId(company_id),
+            deleted_at: null,
+            status: OrderStatus.PENDING,
+          },
+        },
+        { $unwind: "$items" },
+        {
+          $group: {
+            _id: "$items.menuItems_id",
+            item_name: { $first: "$items.item_name" },
+            category_name: { $first: "$items.category_name" },
+            total_quantity: { $sum: "$items.quantity" },
+          },
+        },
+        { $sort: { total_quantity: -1 } },
+      ]);
+
+      if (!results.length) return { top_sellers: [], least_sellers: [] };
+
+      const splitIndex = Math.ceil(results.length / 2);
+      const topPool = results.slice(0, splitIndex);
+      const bottomPool = results.slice(splitIndex);
+
+      const topThreshold = topPool[Math.min(4, topPool.length - 1)].total_quantity;
+      const bottomThreshold = bottomPool.length
+        ? bottomPool[Math.max(bottomPool.length - 5, 0)].total_quantity
+        : topPool[topPool.length - 1].total_quantity;
+
+      const top_sellers = topPool.filter((r) => r.total_quantity >= topThreshold).map(this.toProductRankingDTO);
+
+      const least_sellers = bottomPool.filter((r) => r.total_quantity <= bottomThreshold).map(this.toProductRankingDTO);
+
+      return { top_sellers, least_sellers };
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al buscar ranking de productos");
     }
   }
 }
