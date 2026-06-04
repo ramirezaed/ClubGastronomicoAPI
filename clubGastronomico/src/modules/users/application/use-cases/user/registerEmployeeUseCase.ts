@@ -6,50 +6,45 @@ import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/Dupl
 import { ResponseUserDTO } from "@/modules/users/application/dtos/user/ResponseUserDTO";
 import { IRoleQueryRepository } from "@/modules/users/domain/repositories/role/IRoleQueryRepository";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
-import { UserRegisterNotifier } from "@/modules/users/domain/ports/UserResgisterNotifier";
+import { ValidationRegisterUserError } from "@/modules/users/domain/exceptions/user/validationRegisterUser";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 
-export class RegisterUserUseCase {
+export class RegisterEmployeeUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly passwordHash: IPasswordHash,
     private readonly roleRepository: IRoleQueryRepository,
-    private readonly registerNotifier: UserRegisterNotifier,
   ) {}
 
-  async execute(dto: IRegisterUserDTO): Promise<ResponseUserDTO> {
+  async execute(owner_id: string, dto: IRegisterUserDTO): Promise<ResponseUserDTO> {
+    const owner = await this.userRepository.findById(owner_id);
+    if (!owner || !owner.is_active) {
+      throw new UserNotExistError();
+    }
+    if (owner.role_name !== "owner") {
+      throw new ValidationRegisterUserError("no estas autorizado para realizar esta accion1");
+    }
     const exists = await this.userRepository.findByEmail(dto.email);
     if (exists) {
       throw new DuplicateEmailError(dto.email);
     }
-    const ownerRole = await this.roleRepository.findByName("owner");
-    console.log("ownerRole:", ownerRole); // Ver qué contiene
-    if (!ownerRole) throw new RolesNotFoundError();
+    const EmployeRole = await this.roleRepository.findByName("employee");
+    if (!EmployeRole) throw new RolesNotFoundError();
 
     const hashedPassword = await this.passwordHash.hash(dto.password);
 
-    const user = User.create(
+    const user = User.createEmployee(
       dto.name,
       dto.lastname,
       dto.email,
       hashedPassword,
-      ownerRole.id, // rol owner por defecto
-      ownerRole.name,
-      dto.company_id ?? null,
+      EmployeRole.id,
+      EmployeRole.name,
+      owner.company_id,
       dto.branch_id ?? null,
     );
 
     const saved = await this.userRepository.save(user);
-    //llama al evento externo "n8n"
-    try {
-      await this.registerNotifier.notify({
-        id: user.id,
-        name: user.name,
-        lastname: user.lastname,
-        email: user.email,
-      });
-    } catch (error) {
-      console.error(error);
-    }
 
     return {
       id: saved.id,

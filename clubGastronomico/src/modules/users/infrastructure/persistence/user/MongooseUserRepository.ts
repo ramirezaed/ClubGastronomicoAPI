@@ -12,8 +12,6 @@ export class MongooseUserRepository implements IUserRepository {
       doc.lastname,
       doc.email,
       doc.password,
-      // doc.role_id,
-      // doc.role_name,
       doc.role_id?._id?.toString() ?? doc.role_id, // soporta populate o no populate
       doc.role_id?.name ?? doc.role_name ?? null, // nombre del rol plano
       doc.is_active,
@@ -33,21 +31,28 @@ export class MongooseUserRepository implements IUserRepository {
   }
 
   async save(user: User): Promise<User> {
-    const doc = new UserModel({
-      company_id: user.company_id,
-      branch_id: user.branch_id,
-      name: user.name,
-      lastname: user.lastname,
-      email: user.email,
-      password: user.password,
-      role_id: user.role_id,
-      is_active: user.is_active,
-      deleted_at: user.deleted_at,
-    });
+    try {
+      const doc = new UserModel({
+        company_id: user.company_id,
+        branch_id: user.branch_id,
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        password: user.password,
+        role_id: user.role_id,
+        role_name: user.role_name,
+        is_active: user.is_active,
+        deleted_at: user.deleted_at,
+      });
 
-    const saved = await doc.save();
-    return this.toEntity(saved); //
+      const saved = await doc.save();
+      return this.toEntity(saved); //
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al registar usuario");
+    }
   }
+
   async update(user: User): Promise<User | null> {
     const doc = await UserModel.findOneAndUpdate(
       {

@@ -15,6 +15,9 @@ import { UpdateRoleUserError } from "@/modules/users/domain/exceptions/user/Upda
 import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
 import { UnauthorizedUserError } from "@/modules/users/domain/exceptions/user/UnauthorizedUserError";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
+import { RegisterEmployeeUseCase } from "@/modules/users/application/use-cases/user/registerEmployeeUseCase";
+import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError";
+import { ValidationRegisterUserError } from "@/modules/users/domain/exceptions/user/validationRegisterUser";
 export class UserController {
   constructor(
     private readonly meUser: MeUserUseCase,
@@ -25,6 +28,7 @@ export class UserController {
     private readonly deactivateUser: DeactivateUserUseCase,
     private readonly updateRoleUser: UpdateRoleUserUseCase,
     private readonly findByIdUser: findByIdUseCase,
+    private readonly registerEmployee: RegisterEmployeeUseCase,
   ) {}
 
   async me(req: Request, res: Response): Promise<void> {
@@ -39,7 +43,7 @@ export class UserController {
         return;
       }
       console.log(error);
-      res.status(500).json({ message: "Error interno del1 servidor" });
+      res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
   }
@@ -95,7 +99,6 @@ export class UserController {
       return;
     }
   }
-
   async softDelete(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
@@ -190,6 +193,29 @@ export class UserController {
       }
       res.status(500).json({ message: "error interno del servidor" });
       return;
+    }
+  }
+  async newEmployee(req: Request, res: Response): Promise<void> {
+    try {
+      const owner_id = req.user.id as string;
+      const data = req.body;
+      const newEmployee = await this.registerEmployee.execute(owner_id, data);
+      res.status(201).json(newEmployee);
+      return;
+    } catch (error) {
+      if (error instanceof DuplicateEmailError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error instanceof ValidationRegisterUserError) {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+      if (error instanceof RolesNotFoundError || error instanceof UserNotExistError) {
+        res.status(404).json({ message: error.message });
+      }
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
     }
   }
 }

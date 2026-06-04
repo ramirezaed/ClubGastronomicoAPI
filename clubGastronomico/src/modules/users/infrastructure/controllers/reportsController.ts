@@ -9,7 +9,6 @@ import { CompanyNotFoundError } from "@/modules/users/domain/exceptions/Company/
 import { ValidationPlanReportsError } from "@/modules/users/domain/exceptions/reports/ValidationPlanReportsError";
 import { ValidationReportsError } from "@/modules/users/domain/exceptions/reports/validationReportsError";
 import { Request, Response } from "express";
-import { isStringOneByteRepresentation } from "node:v8";
 
 export class ReportsController {
   constructor(
@@ -170,7 +169,6 @@ export class ReportsController {
       return;
     }
   }
-
   async getRanking(req: Request, res: Response): Promise<void> {
     try {
       const company_id = req.user.company_id as string;
