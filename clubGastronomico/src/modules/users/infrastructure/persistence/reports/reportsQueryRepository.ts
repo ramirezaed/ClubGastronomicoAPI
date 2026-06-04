@@ -1,10 +1,11 @@
-import { canceledSalesDTO } from "@/modules/users/application/dtos/reports/canceledSalesReportsDTO";
+import { canceledSalesDTO, CancellationReportDTO } from "@/modules/users/application/dtos/reports/canceledSalesReportsDTO";
 import { dailySalesReportsDTO } from "@/modules/users/application/dtos/reports/dailySalesReportsDTO";
 import { TopHoursReportDTO } from "@/modules/users/application/dtos/reports/topHourDTO";
 import { topItemsReportsDTO } from "@/modules/users/application/dtos/reports/topItemsDTO";
 import { OrderStatus } from "@/modules/users/domain/entities/Order";
 import { IreportQueryRepository } from "@/modules/users/domain/repositories/reports/IreportsQueryRepository";
 import OrderModel from "@/modules/users/infrastructure/persistence/order/OrderModel";
+import OrderCancellationModel from "@/modules/users/infrastructure/persistence/orderCancellation/orderCancellationModel";
 import mongoose, { now } from "mongoose";
 
 export class reportsQueryRepository implements IreportQueryRepository {
@@ -158,16 +159,11 @@ export class reportsQueryRepository implements IreportQueryRepository {
       };
 
       return {
-        date_from: dateFrom,
-        date_to: dateTo,
         top_hours: results.map((r) => {
           const hour_from = r._id.hourBlock * 2;
           const hour_to = hour_from + 2;
           const dayName = daysMap[r._id.dayOfWeek];
           return {
-            day_of_week: dayName,
-            hour_from,
-            hour_to,
             label: `${dayName} ${String(hour_from).padStart(2, "0")}:00 - ${String(hour_to).padStart(2, "0")}:00`,
             total_orders: r.total_orders,
           };
@@ -176,6 +172,57 @@ export class reportsQueryRepository implements IreportQueryRepository {
     } catch (error) {
       console.error(error);
       throw new Error("error al buscar top horas por día");
+    }
+  }
+
+  async getCancellations(company_id: string, dateFrom: string, dateTo: string): Promise<CancellationReportDTO> {
+    try {
+      const start = new Date(`${dateFrom}T00:00:00.000Z`);
+      const end = new Date(`${dateTo}T23:59:59.999Z`);
+
+      const companyObjectId = new mongoose.Types.ObjectId(company_id);
+
+      // total de órdenes del período (cualquier status)
+      const total_orders = await OrderModel.countDocuments({
+        company_id: companyObjectId,
+        created_at: { $gte: start, $lte: end },
+        deleted_at: null,
+      });
+
+      // cancelaciones agrupadas por motivo
+      const results = await OrderCancellationModel.aggregate([
+        {
+          $match: {
+            company_id: companyObjectId,
+            created_at: { $gte: start, $lte: end },
+          },
+        },
+        {
+          $group: {
+            _id: "$reason",
+            total: { $sum: 1 },
+          },
+        },
+        { $sort: { total: -1 } },
+      ]);
+
+      const total_cancellations = results.reduce((acc, r) => acc + r.total, 0);
+
+      return {
+        date_from: dateFrom,
+        date_to: dateTo,
+        total_orders,
+        total_cancellations,
+        cancellation_percentage: total_orders === 0 ? 0 : Number(((total_cancellations / total_orders) * 100).toFixed(1)),
+        reasons: results.map((r) => ({
+          reason: r._id,
+          total: r.total,
+          percentage_of_cancellations: total_cancellations === 0 ? 0 : Number(((r.total / total_cancellations) * 100).toFixed(1)),
+        })),
+      };
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al buscar cancelaciones");
     }
   }
 }

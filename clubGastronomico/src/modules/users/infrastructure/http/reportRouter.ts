@@ -1,5 +1,6 @@
 import { canceledSalesUseCase } from "@/modules/users/application/use-cases/reports/canceledSalesUseCase";
 import { dailySalesUseCase } from "@/modules/users/application/use-cases/reports/dailySalesUseCase";
+import { getReportsCancellationsUseCase } from "@/modules/users/application/use-cases/reports/getReportsCancellationsUseCase";
 import { topHourDayUseCase } from "@/modules/users/application/use-cases/reports/topHourDayUseCase";
 import { topItemsUseCase } from "@/modules/users/application/use-cases/reports/topItemsUseCase";
 import { ReportsController } from "@/modules/users/infrastructure/controllers/reportsController";
@@ -18,8 +19,9 @@ const dailySales = new dailySalesUseCase(reportsQueryrepository, companyQueryRep
 const canceledSales = new canceledSalesUseCase(reportsQueryrepository, companyQueryRepository);
 const topItems = new topItemsUseCase(reportsQueryrepository, companyQueryRepository);
 const topHpur = new topHourDayUseCase(reportsQueryrepository, companyQueryRepository);
+const cancellations = new getReportsCancellationsUseCase(reportsQueryrepository, companyQueryRepository);
 
-const reportsController = new ReportsController(dailySales, canceledSales, topItems, topHpur);
+const reportsController = new ReportsController(dailySales, canceledSales, topItems, topHpur, cancellations);
 
 /**
  * @swagger
@@ -268,8 +270,100 @@ reportsRouter.get("/top-items", authMiddleware, authorizeRoles("owner"), (req, r
  *       500:
  *         description: Error interno del servidor
  */
-
 reportsRouter.get("/top-hours-days", authMiddleware, authorizeRoles("owner"), (req, res) =>
   reportsController.topHourDay(req, res),
 );
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CancellationReason:
+ *       type: object
+ *       properties:
+ *         reason:
+ *           type: string
+ *           example: "El tiempo de espera es demasiado largo"
+ *         total:
+ *           type: integer
+ *           example: 12
+ *         percentage_of_cancellations:
+ *           type: number
+ *           example: 35.29
+ *
+ *     CancellationReport:
+ *       type: object
+ *       properties:
+ *         date_from:
+ *           type: string
+ *           format: date
+ *           example: "2026-06-01"
+ *         date_to:
+ *           type: string
+ *           format: date
+ *           example: "2026-06-30"
+ *         total_orders:
+ *           type: integer
+ *           example: 250
+ *         total_cancellations:
+ *           type: integer
+ *           example: 34
+ *         cancellation_percentage:
+ *           type: number
+ *           example: 13.6
+ *         reasons:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/CancellationReason'
+ */
+/**
+ * @swagger
+ * /api/reports/cancellations:
+ *   get:
+ *     summary: Obtener reporte de cancelaciones
+ *     description: Devuelve estadísticas de cancelaciones para un rango de fechas, incluyendo porcentaje total de cancelaciones y distribución por motivo. Si no se envían fechas, se utiliza la fecha actual.
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date_from
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2026-06-01"
+ *         description: Fecha inicial del reporte. Si no se envía, se utiliza la fecha actual.
+ *
+ *       - in: query
+ *         name: date_to
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2026-06-30"
+ *         description: Fecha final del reporte. Si no se envía, se utiliza la fecha actual.
+ *
+ *     responses:
+ *       200:
+ *         description: Reporte obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CancellationReport'
+ *       400:
+ *         description: Fechas inválidas o rango de fechas incorrecto
+ *       403:
+ *         description: El plan actual no permite acceder a este reporte
+ *       404:
+ *         description: Compañía no encontrada o inactiva
+ *       401:
+ *         description: No autenticado
+ *       500:
+ *         description: Error interno del servidor
+ */
+reportsRouter.get("/cancellations", authMiddleware, authorizeRoles("owner"), (req, res) =>
+  reportsController.getCancellations(req, res),
+);
+
 export default reportsRouter;
