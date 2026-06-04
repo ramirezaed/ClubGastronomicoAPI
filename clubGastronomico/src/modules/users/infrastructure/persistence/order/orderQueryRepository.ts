@@ -25,7 +25,7 @@ export class OrderQueryRepository implements IOrderQueryRepository {
         time: item.time,
       })),
       total_amount: doc.total_amount,
-      created_at: new Date(),
+      created_at: doc.created_at,
     };
   }
   async findById(order_id: string, company_id: string): Promise<ResponseOrderDTO | null> {
@@ -38,6 +38,7 @@ export class OrderQueryRepository implements IOrderQueryRepository {
       throw new Error("error al buscar orden por id");
     }
   }
+
   async getAll(
     company_id: string,
     filter?: { status?: string },

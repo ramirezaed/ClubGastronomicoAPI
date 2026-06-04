@@ -111,6 +111,7 @@ const OrderSchema = new Schema<IorderDocument>(
     },
   },
 );
-
+//indice para mejorar el rendimiento de las consultas en los reportes
+OrderSchema.index({ company_id: 1, created_at: 1, status: 1 });
 const OrderModel = model("Order", OrderSchema);
 export default OrderModel;
