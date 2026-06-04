@@ -43,6 +43,22 @@ export class User {
     }
     return new User("", company_id, branch_id, name, lastname, email, hashedPassword, role_id, role_name, false, null);
   }
+  static createEmployee(
+    name: string,
+    lastname: string,
+    email: string,
+    hashedPassword: string, // ya viene hasheado del caso de uso
+    role_id: string,
+    role_name: string,
+    company_id: string | null,
+    branch_id: string | null,
+  ): User {
+    if (!name || !lastname || !email || !hashedPassword || !role_id) {
+      throw new RegisterUserError();
+    }
+    return new User("", company_id, branch_id, name, lastname, email, hashedPassword, role_id, role_name, true, null);
+  }
+
   verifyIsActive(): void {
     if (!this.is_active) {
       throw new InactiveUserError();
@@ -96,6 +112,7 @@ export class User {
       throw new InvalidCreedentialError();
     }
   }
+
   assingCompany(companyID: string): void {
     //asigna compañia al usuario
     this.company_id = companyID;

@@ -45,7 +45,19 @@ export class OrderQueryRepository implements IOrderQueryRepository {
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<ResponseOrderDTO>> {
     try {
-      const query: QueryFilter<IorderDocument> = { company_id, deleted_at: null };
+      // Fecha de inicio: hoy a las 4am
+      const todayStart = new Date();
+      todayStart.setHours(4, 0, 0, 0);
+
+      // Fecha de fin: mañana a las 4am
+      const tomorrowStart = new Date(todayStart);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+      const query: QueryFilter<IorderDocument> = {
+        company_id,
+        deleted_at: null,
+        created_at: { $gte: todayStart, $lt: tomorrowStart },
+      };
 
       //si no es indefinido el filtro es status
       if (filter?.status) query.status = filter.status;

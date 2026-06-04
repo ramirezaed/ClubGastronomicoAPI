@@ -1,7 +1,3 @@
-//  Es una interface, define los metodos como save(user), o findByEmail(email)
-//  no tiene codigo, solo dice lo que se puede hacer
-//  se puede hacer un findByEmail(email),   findById(id), save, update, etc
-//devueven entidad
 import { User } from "@domain/entities/User";
 
 export interface IUserRepository {

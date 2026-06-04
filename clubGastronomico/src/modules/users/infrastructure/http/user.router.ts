@@ -14,13 +14,18 @@ import { MongooseUserQueryRepository } from "@/modules/users/infrastructure/pers
 import { findByIdUseCase } from "@/modules/users/application/use-cases/user/findByIdUseCase";
 import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
 import { n8nActivateNotifier } from "@/modules/users/infrastructure/services/n8nActivateNotifier";
+import { RegisterEmployeeUseCase } from "@/modules/users/application/use-cases/user/registerEmployeeUseCase";
+import { PasswordHasher } from "@/modules/users/infrastructure/services/PasswordHash";
+import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
 
 const UserRouter = Router();
 
 const userRepository = new MongooseUserRepository();
 const userQueryRepository = new MongooseUserQueryRepository();
 const roleRepository = new MongooseRoleRepository();
+const roleQueryRepository = new MongooseRoleQueryRepository();
 const notifier = new n8nActivateNotifier();
+const passwordHash = new PasswordHasher();
 
 const meUserUseCase = new MeUserUseCase(userQueryRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
@@ -30,6 +35,7 @@ const activateUserUseCase = new ActivateUserUseCase(userRepository, notifier);
 const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
 const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
 const findByIdUserUseCase = new findByIdUseCase(userQueryRepository);
+const registerEmployee = new RegisterEmployeeUseCase(userRepository, passwordHash, roleQueryRepository);
 
 const userController = new UserController(
   meUserUseCase,
@@ -40,6 +46,7 @@ const userController = new UserController(
   deactivateUserUseCase,
   updateRoleUserUseCase,
   findByIdUserUseCase,
+  registerEmployee,
 );
 
 /**
@@ -168,9 +175,7 @@ const userController = new UserController(
  *         description: Error interno del servidor
  */
 
-UserRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
-  userController.getAll(req, res),
-);
+UserRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) => userController.getAll(req, res));
 /**
  * @swagger
  * /api/user/me:
@@ -442,8 +447,7 @@ UserRouter.patch("/role/:id", authMiddleware, authorizeRoles("SuperAdmin", "owne
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  userController.softDelete(req, res),
-);
+UserRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => userController.softDelete(req, res));
 
+UserRouter.post("/register", authMiddleware, authorizeRoles("owner"), (req, res) => userController.newEmployee(req, res));
 export default UserRouter;
