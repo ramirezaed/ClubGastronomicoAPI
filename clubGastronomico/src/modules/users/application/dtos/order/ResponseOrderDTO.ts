@@ -1,6 +1,7 @@
 export interface ResponseOrderDTO {
   id: string;
   status: string;
+  order_number: number;
   customer: {
     name: string;
     address: string;
