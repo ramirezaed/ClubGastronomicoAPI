@@ -32,7 +32,7 @@ export class registerOrderUseCase {
       }
       //verifica stock disponible, que la orden no supere el stock disponible
       if (menuItems.stock === 0 || menuItems.stock < item.quantity) {
-        throw new orderValidationError(`Stock insuficiente para ${menuItems.name}, solo contamos con ${menuItems.stock}`);
+        throw new orderValidationError(`Por el momento solo contamos con ${menuItems.stock} ${menuItems.name}`);
       }
 
       //push agrega un nuevo elemento al final del array
@@ -67,6 +67,7 @@ export class registerOrderUseCase {
     return {
       id: saved.id,
       status: saved.status,
+      order_number: saved.order_number,
       customer: {
         name: saved.customer.name,
         address: saved.customer.address,

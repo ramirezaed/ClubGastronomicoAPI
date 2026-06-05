@@ -2,7 +2,7 @@ import { Order } from "@/modules/users/domain/entities/Order";
 import { IorderRepository } from "@/modules/users/domain/repositories/order/IorderRepository";
 import { IorderDocument } from "@/modules/users/infrastructure/persistence/order/IorderDocument";
 import OrderModel from "@/modules/users/infrastructure/persistence/order/OrderModel";
-
+import { Types } from "mongoose";
 export class OrderRepository implements IorderRepository {
   private toEntity(doc: IorderDocument): Order {
     return new Order(
@@ -10,6 +10,7 @@ export class OrderRepository implements IorderRepository {
       doc.company_id.toString(),
       //   doc.branch_id.toString(),
       doc.status,
+      doc.order_number,
       {
         name: doc.customer.name,
         address: doc.customer.address,
@@ -32,6 +33,15 @@ export class OrderRepository implements IorderRepository {
       doc.updated_at,
     );
   }
+  private async getNextOrderNumber(company_id: string): Promise<number> {
+    const lastOrder = await OrderModel.findOne(
+      { company_id: new Types.ObjectId(company_id) },
+      { order_number: 1 },
+      { sort: { order_number: -1 } }, // el más alto
+    );
+
+    return (lastOrder?.order_number ?? 0) + 1;
+  }
 
   async findById(id: string, company_id: string): Promise<Order | null> {
     try {
@@ -46,10 +56,12 @@ export class OrderRepository implements IorderRepository {
 
   async save(order: Order): Promise<Order> {
     try {
+      //busca el siguiente numero de la ultima orden antes de guardar
+      const numberOrder = await this.getNextOrderNumber(order.company_id);
       const doc = new OrderModel({
         company_id: order.company_id,
         status: order.status,
-
+        order_number: numberOrder,
         customer: {
           name: order.customer.name,
           address: order.customer.address,

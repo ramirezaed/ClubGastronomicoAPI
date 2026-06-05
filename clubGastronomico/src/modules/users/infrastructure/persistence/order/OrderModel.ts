@@ -21,7 +21,10 @@ const OrderSchema = new Schema<IorderDocument>(
       default: ORDER_STATUS.PENDING,
       required: true,
     },
-
+    order_number: {
+      type: Number,
+      requiered: false,
+    },
     customer: {
       name: {
         type: String,
@@ -111,6 +114,7 @@ const OrderSchema = new Schema<IorderDocument>(
     },
   },
 );
+OrderSchema.index({ company_id: 1, order_number: 1 }, { unique: true, sparse: true });
 //indice para mejorar el rendimiento de las consultas en los reportes
 OrderSchema.index({ company_id: 1, created_at: 1, status: 1 });
 const OrderModel = model("Order", OrderSchema);

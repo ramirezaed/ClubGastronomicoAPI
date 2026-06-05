@@ -33,6 +33,7 @@ export class Order {
     public readonly company_id: string,
     // public readonly branch_id: string,
     public status: string,
+    public order_number: number,
     public customer: Customer,
     public items: OrderItem[],
     public total_amount: number,
@@ -68,8 +69,9 @@ export class Order {
     //.reduce convierte un arreglo entero en unico valor
     // 0 al final indica el inicio del total y el acumulador
     const total_amount = orderItems.reduce((total, item) => total + item.quantity * item.unit_price, 0);
-    return new Order("", company_id, "Pendiente", customer, orderItems, total_amount, null, new Date(), new Date());
+    return new Order("", company_id, "Pendiente", 0, customer, orderItems, total_amount, null, new Date(), new Date());
   }
+
   changeStatus(status: OrderStatus): void {
     //verifica el estado actual con el nuevo estado
     if (this.status === status) {
