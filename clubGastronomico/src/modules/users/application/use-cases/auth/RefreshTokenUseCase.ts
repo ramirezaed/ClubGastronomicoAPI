@@ -5,8 +5,9 @@ export class RefreshTokenUseCase {
 
   async execute(refreshToken: string): Promise<{ accessToken: string }> {
     const payload = this.tokenService.verifyRefreshToken(refreshToken);
+    const { iat, exp, ...cleanPayload } = payload;
     return {
-      accessToken: this.tokenService.generateAccessToken(payload),
+      accessToken: this.tokenService.generateAccessToken(cleanPayload),
     };
   }
 }
