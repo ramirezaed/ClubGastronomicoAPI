@@ -109,7 +109,9 @@ export class AuthController {
         password,
         role_id,
       });
-      res.status(201).json({ message: "Usuario registrado exitosamente", user });
+      res
+        .status(201)
+        .json({ message: "Registro exitoso. Tu cuenta está en revisión y, a la brevedad, podrás ingresar al sistema.", user });
       return;
     } catch (error) {
       if (error instanceof DuplicateEmailError) {
