@@ -9,7 +9,12 @@ export class JwtTokenService implements ITokenService {
   }
   //genera el refresh token
   generateRefreshToken(payload: TokenPayload): string {
-    return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
+    try {
+      return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
+    } catch (error) {
+      console.error(error);
+      throw new Error();
+    }
   }
 
   verifyRefreshToken(token: string): TokenPayload {

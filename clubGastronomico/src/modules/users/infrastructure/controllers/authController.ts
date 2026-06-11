@@ -66,6 +66,7 @@ export class AuthController {
         res.status(401).json({ message: error.message });
         return;
       }
+      console.error(error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
@@ -108,7 +109,9 @@ export class AuthController {
         password,
         role_id,
       });
-      res.status(201).json({ message: "Usuario registrado exitosamente", user });
+      res
+        .status(201)
+        .json({ message: "Registro exitoso. Tu cuenta está en revisión y, a la brevedad, podrás ingresar al sistema.", user });
       return;
     } catch (error) {
       if (error instanceof DuplicateEmailError) {
@@ -131,9 +134,7 @@ export class AuthController {
       const { email } = req.body;
       await this.forgot.execute(email);
       // siempre 200 aunque el email no exista, por seguridad
-      res
-        .status(200)
-        .json({ message: "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña." });
+      res.status(200).json({ message: "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña." });
     } catch (error) {
       if (error instanceof InactiveUserError) {
         res.status(403).json({ message: error.message });

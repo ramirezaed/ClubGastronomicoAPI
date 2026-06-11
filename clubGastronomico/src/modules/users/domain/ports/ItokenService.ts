@@ -14,6 +14,8 @@ export interface TokenPayload {
   role_name: string;
   company_id: string | null;
   branch_id: string | null;
+  iat?: number;
+  exp?: number;
 }
 export interface ResetTokenPayload {
   id: string;
