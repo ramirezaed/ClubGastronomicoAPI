@@ -110,6 +110,7 @@ export class UserController {
         res.status(404).json({ message: error.message });
         return;
       }
+      console.error("error", error);
       res.status(500).json({ message: "error interno del servidor" });
       return;
     }

@@ -7,6 +7,7 @@ import { RegisterUserError } from "@/modules/users/domain/exceptions/user/Regist
 import { UserAlreadyActiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyActiveError";
 import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
 import { UserInactiveError } from "@/modules/users/domain/exceptions/user/UserInactiveError";
+import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 
 //entidad de dominio User
 //representa a un usuario dentro del sistema
@@ -84,9 +85,9 @@ export class User {
     this.is_active = false;
   }
   delete(): void {
-    if (!this.deleted_at) {
+    if (this.deleted_at) {
       //si no es null, ya fue eliminado
-      throw new Error("usuario ya fue eliminado");
+      throw new UserNotExistError();
     }
     this.deleted_at = new Date();
     this.is_active = false;
