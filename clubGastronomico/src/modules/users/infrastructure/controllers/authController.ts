@@ -129,6 +129,7 @@ export class AuthController {
       return;
     }
   }
+
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
@@ -162,6 +163,7 @@ export class AuthController {
         res.status(404).json({ message: error.message });
         return;
       }
+
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
