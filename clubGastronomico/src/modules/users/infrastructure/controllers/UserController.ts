@@ -232,7 +232,7 @@ export class UserController {
       return;
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "error interno del servidoradasdasd" });
+      res.status(500).json({ message: "error interno del servidor" });
       return;
     }
   }

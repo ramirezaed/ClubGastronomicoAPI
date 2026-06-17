@@ -4,8 +4,6 @@ import { GetUserResponseDTO } from "@/modules/users/application/dtos/user/GetUse
 import { IPaginationDTO, IPaginatedResponseDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
 import { CurrentUserDto } from "@/modules/users/application/dtos/user/CurrentUserDTO";
 import { findUserResponseDTO } from "@/modules/users/application/dtos/user/findResponseDTO";
-import { QueryFilter } from "mongoose";
-import { IUserDocument } from "@/modules/users/infrastructure/persistence/user/IUserDocument";
 
 export class MongooseUserQueryRepository implements IUserQueryRepository {
   private toDTO(doc: any): GetUserResponseDTO {
@@ -160,7 +158,7 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     }
   }
 
-  async findUser(filter?: { name?: string; email?: string }): Promise<findUserResponseDTO[]> {
+  async findUser(filter?: { name?: string; email?: string }): Promise<GetUserResponseDTO[]> {
     try {
       const query: any = { deleted_at: null };
       // Construir condición OR para buscar por nombre O email
@@ -174,13 +172,10 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
         }
         query.$or = orConditions;
       }
-      const docs = await UserModel.find(query).select("name email").lean();
-      return docs.map((doc) => ({
-        name: doc.name || "",
-        email: doc.email || "",
-      }));
+      const docs = await UserModel.find(query).populate("role_id", "name").populate("company_id", "name").lean();
+      return docs.map((doc) => this.toDTO(doc));
     } catch (error) {
-      throw new Error("error al buscar usuario");
+      throw error;
     }
   }
 }
