@@ -30,7 +30,7 @@ const passwordHash = new PasswordHasher();
 
 const meUserUseCase = new MeUserUseCase(userQueryRepository);
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
-const getAllUserUseCase = new GetAllUsersUseCase(userQueryRepository, roleRepository);
+const getAllUserUseCase = new GetAllUsersUseCase(userQueryRepository, roleRepository, roleQueryRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 const activateUserUseCase = new ActivateUserUseCase(userRepository, notifier);
 const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
