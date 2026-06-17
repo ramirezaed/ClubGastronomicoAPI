@@ -3,6 +3,7 @@
 import { IPaginationDTO, IPaginatedResponseDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
 import { GetUserResponseDTO } from "@/modules/users/application/dtos/user/GetUserResponseDTO";
 import { CurrentUserDto } from "@/modules/users/application/dtos/user/CurrentUserDTO";
+import { findUserResponseDTO } from "@/modules/users/application/dtos/user/findResponseDTO";
 export interface IUserQueryRepository {
   findById(id: string): Promise<GetUserResponseDTO | null>;
   findAll(
@@ -15,4 +16,5 @@ export interface IUserQueryRepository {
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<GetUserResponseDTO>>;
   me(id: string): Promise<GetUserResponseDTO | null>;
+  findUser(filter?: { name?: string; email?: string }): Promise<findUserResponseDTO[]>;
 }

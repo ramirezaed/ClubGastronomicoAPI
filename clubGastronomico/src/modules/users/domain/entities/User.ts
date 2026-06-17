@@ -6,6 +6,7 @@ import { InvalidCreedentialError } from "@/modules/users/domain/exceptions/user/
 import { RegisterUserError } from "@/modules/users/domain/exceptions/user/RegisterUserError";
 import { UserAlreadyActiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyActiveError";
 import { UserAlreadyDeactiveError } from "@/modules/users/domain/exceptions/user/UserAlreadyDeactiveError";
+import { userErrorValidation404 } from "@/modules/users/domain/exceptions/user/UserErrorValidation404";
 import { UserInactiveError } from "@/modules/users/domain/exceptions/user/UserInactiveError";
 import { UserNotExistError } from "@/modules/users/domain/exceptions/user/UserNotExistsError";
 
@@ -95,13 +96,12 @@ export class User {
   // updateRole(idRole: string, roleName: string): void {
   updateRole(idRole: string): void {
     if (!this.is_active) {
-      throw new UserInactiveError();
+      throw new userErrorValidation404("el usuario no se encuentra activo");
     }
     if (!idRole) {
       throw new Error("todos los campos son necesrio");
     }
     this.role_id = idRole;
-    // this.role_name = roleName;
   }
 
   resetPassword(hashedPassword: string): void {

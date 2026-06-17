@@ -3,6 +3,9 @@ import { IUserQueryRepository } from "@/modules/users/domain/repositories/user/I
 import { GetUserResponseDTO } from "@/modules/users/application/dtos/user/GetUserResponseDTO";
 import { IPaginationDTO, IPaginatedResponseDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
 import { CurrentUserDto } from "@/modules/users/application/dtos/user/CurrentUserDTO";
+import { findUserResponseDTO } from "@/modules/users/application/dtos/user/findResponseDTO";
+import { QueryFilter } from "mongoose";
+import { IUserDocument } from "@/modules/users/infrastructure/persistence/user/IUserDocument";
 
 export class MongooseUserQueryRepository implements IUserQueryRepository {
   private toDTO(doc: any): GetUserResponseDTO {
@@ -30,7 +33,6 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
         : null,
     };
   }
-
   async findAll(
     filter?: { is_active?: boolean; roleName?: string },
     pagination?: IPaginationDTO,
@@ -155,6 +157,30 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     } catch (error) {
       console.error(error);
       throw new Error("error en persisntecia metodo me");
+    }
+  }
+
+  async findUser(filter?: { name?: string; email?: string }): Promise<findUserResponseDTO[]> {
+    try {
+      const query: any = { deleted_at: null };
+      // Construir condición OR para buscar por nombre O email
+      if (filter?.name || filter?.email) {
+        const orConditions = [];
+        if (filter?.name) {
+          orConditions.push({ name: { $regex: filter.name, $options: "i" } });
+        }
+        if (filter?.email) {
+          orConditions.push({ email: { $regex: filter.email, $options: "i" } });
+        }
+        query.$or = orConditions;
+      }
+      const docs = await UserModel.find(query).select("name email").lean();
+      return docs.map((doc) => ({
+        name: doc.name || "",
+        email: doc.email || "",
+      }));
+    } catch (error) {
+      throw new Error("error al buscar usuario");
     }
   }
 }

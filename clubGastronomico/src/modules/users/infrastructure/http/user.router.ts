@@ -17,6 +17,7 @@ import { n8nActivateNotifier } from "@/modules/users/infrastructure/services/n8n
 import { RegisterEmployeeUseCase } from "@/modules/users/application/use-cases/user/registerEmployeeUseCase";
 import { PasswordHasher } from "@/modules/users/infrastructure/services/PasswordHash";
 import { MongooseRoleQueryRepository } from "@/modules/users/infrastructure/persistence/role/MongooseRoleQueryRepository";
+import { findUserUseCase } from "@/modules/users/application/use-cases/user/findUserUseCase";
 
 const UserRouter = Router();
 
@@ -36,6 +37,7 @@ const deactivateUserUseCase = new DeactivateUserUseCase(userRepository);
 const updateRoleUserUseCase = new UpdateRoleUserUseCase(userRepository, roleRepository);
 const findByIdUserUseCase = new findByIdUseCase(userQueryRepository);
 const registerEmployee = new RegisterEmployeeUseCase(userRepository, passwordHash, roleQueryRepository);
+const finduser = new findUserUseCase(userQueryRepository);
 
 const userController = new UserController(
   meUserUseCase,
@@ -47,6 +49,7 @@ const userController = new UserController(
   updateRoleUserUseCase,
   findByIdUserUseCase,
   registerEmployee,
+  finduser,
 );
 
 /**
@@ -450,4 +453,9 @@ UserRouter.patch("/role/:id", authMiddleware, authorizeRoles("SuperAdmin", "owne
 UserRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => userController.softDelete(req, res));
 
 UserRouter.post("/register", authMiddleware, authorizeRoles("owner"), (req, res) => userController.newEmployee(req, res));
+
+UserRouter.post("/search", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
+  userController.findUsers(req, res),
+);
+
 export default UserRouter;
