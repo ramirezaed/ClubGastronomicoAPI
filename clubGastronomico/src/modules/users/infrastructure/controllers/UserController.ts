@@ -18,6 +18,8 @@ import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/Roles
 import { RegisterEmployeeUseCase } from "@/modules/users/application/use-cases/user/registerEmployeeUseCase";
 import { DuplicateEmailError } from "@/modules/users/domain/exceptions/user/DuplicateEmailError";
 import { ValidationRegisterUserError } from "@/modules/users/domain/exceptions/user/validationRegisterUser";
+import { userErrorValidation404 } from "@/modules/users/domain/exceptions/user/UserErrorValidation404";
+import { findUserUseCase } from "@/modules/users/application/use-cases/user/findUserUseCase";
 export class UserController {
   constructor(
     private readonly meUser: MeUserUseCase,
@@ -29,6 +31,7 @@ export class UserController {
     private readonly updateRoleUser: UpdateRoleUserUseCase,
     private readonly findByIdUser: findByIdUseCase,
     private readonly registerEmployee: RegisterEmployeeUseCase,
+    private readonly findUser: findUserUseCase,
   ) {}
 
   async me(req: Request, res: Response): Promise<void> {
@@ -165,7 +168,7 @@ export class UserController {
       res.status(200).json({ userActaulizado });
       return;
     } catch (error) {
-      if (error instanceof UserNotExistError) {
+      if (error instanceof userErrorValidation404) {
         res.status(404).json({ message: error.message });
         return;
       }
@@ -177,6 +180,7 @@ export class UserController {
         res.status(409).json({ message: error.message });
         return;
       }
+      console.error("error al modificar rol", error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
@@ -217,6 +221,19 @@ export class UserController {
       }
       console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
+    }
+  }
+
+  async findUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const { name, email } = req.body;
+      const users = await this.findUser.execute({ name, email });
+      res.status(200).json(users);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
     }
   }
 }
