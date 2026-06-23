@@ -29,12 +29,14 @@ export class SubscriptionPlanRepository implements ISubscriptionRepository {
       const doc = new SubscriptionModel({
         name: plan.name,
         price: plan.price,
+        description: plan.description,
         is_active: plan.is_active,
         deleted_at: plan.deleted_at,
       });
       const saved = await doc.save();
       return this.toEntity(saved);
     } catch (error) {
+      console.error("error1111111111111111", error);
       throw new Error("error al crear un nuevo plan");
     }
   }
