@@ -86,7 +86,7 @@ export class RoleController {
     // const id = req.params;
     try {
       const rol = await this.getRoleByid.execute(id);
-      return res.status(200).json({ message: "Rol", rol });
+      return res.status(200).json(rol);
     } catch (error) {
       if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
@@ -109,7 +109,7 @@ export class RoleController {
     const id = req.params.id as string;
     try {
       await this.deleteRole.execute(id);
-      res.status(204).json({ meesage: "Rol eliminado" });
+      res.status(200).json({ meesage: "Rol eliminado" });
       return;
     } catch (error) {
       if (error instanceof RolesNotFoundError) {
@@ -139,7 +139,6 @@ export class RoleController {
       return;
     }
   }
-
   async deactivate(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {
