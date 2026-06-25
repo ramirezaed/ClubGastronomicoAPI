@@ -56,14 +56,13 @@ export class CompanyController {
     }
   }
   async getAll(req: Request, res: Response): Promise<void> {
-    const id = req.user.id as string;
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const company = await this.getAllCompany.execute({ page, limit });
-      res.status(200).json(company);
+      res.status(200).json({ message: "Lista de Empresas", company });
     } catch (error) {
-      console.log("error get", error);
+      console.error(error);
       res.status(500).json({ messsage: "error interno del servidor" });
     }
   }

@@ -32,49 +32,6 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     };
   }
 
-  // async findAll(
-  //   filter?: { is_active?: boolean; roleName?: string },
-  //   pagination?: IPaginationDTO,
-  // ): Promise<IPaginatedResponseDTO<GetUserResponseDTO>> {
-  //   try {
-  //     const query: Record<string, unknown> = { deleted_at: null };
-
-  //     if (filter?.is_active !== undefined) {
-  //       query.is_active = filter.is_active;
-  //     }
-
-  //     const page = pagination?.page ?? 1;
-  //     const limit = pagination?.limit ?? 10;
-  //     const skip = (page - 1) * limit;
-
-  //     const docs = await UserModel.find(query)
-  //       .populate({
-  //         path: "role_id",
-  //         select: "name",
-  //         match: filter?.roleName ? { name: filter.roleName } : {},
-  //       })
-  //       .populate("company_id", "name") //habilitar cunado esten los modelo de branch y company
-  //       .skip(skip)
-  //       .limit(limit)
-  //       .lean();
-  //     //elimina los que no matcheron en el populate, si no hay match populate devuelve rol null
-  //     const filteredDocs = filter?.roleName ? docs.filter((doc: any) => doc.role_id !== null) : docs;
-
-  //     const total = filteredDocs.length;
-
-  //     return {
-  //       data: filteredDocs.map(this.toDTO),
-  //       total,
-  //       page,
-  //       limit,
-  //       totalPages: Math.ceil(total / limit),
-  //     };
-  //   } catch (error) {
-  //     console.error("error al mostrar lista de usuarios", error);
-  //     throw new Error("error en find all");
-  //   }
-  // }
-
   async findAll(
     filter?: { is_active?: boolean; role_id?: string | null },
     pagination?: IPaginationDTO,
