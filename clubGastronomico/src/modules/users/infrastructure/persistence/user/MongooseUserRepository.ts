@@ -79,4 +79,13 @@ export class MongooseUserRepository implements IUserRepository {
     const doc = await UserModel.findOneAndUpdate({ _id: id, delete_at: null }, { $set: { deleted_at: new Date() } });
     return;
   }
+  //verifica que el rol no este asignado a un usuario
+  async existsByRoleId(roleId: string): Promise<boolean> {
+    const user = await UserModel.exists({
+      role_id: roleId,
+      deleted_at: null,
+    });
+
+    return !!user;
+  }
 }

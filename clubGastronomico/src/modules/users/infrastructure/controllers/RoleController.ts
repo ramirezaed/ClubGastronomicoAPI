@@ -15,6 +15,7 @@ import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/
 import { RoleAlreadyActivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyActiveError";
 import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
 import { RoleAlreadyDeactivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyDeactivateError";
+import { RoleInUseError } from "@/modules/users/domain/exceptions/role/RoleInUseError";
 
 export class RoleController {
   constructor(
@@ -117,6 +118,11 @@ export class RoleController {
         res.status(404).json({ message: error.message });
         return;
       }
+      if (error instanceof RoleInUseError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
       return;
     }
