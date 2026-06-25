@@ -9,18 +9,20 @@ import { SubscriptionPlanRepository } from "@/modules/users/infrastructure/persi
 import { authMiddleware } from "@/shared/infraestructure/http/middleware/auth.middleware";
 import { authorizeRoles } from "@/shared/infraestructure/http/middleware/authorize.middleware";
 import { Router } from "express";
+import { CompanyRepository } from "@/modules/users/infrastructure/persistence/company/CompanyRepository";
 
 const PlansRouter = Router();
 
 //capa de infraestructura(adaptadores de salida)
 const planQueryRepository = new subscriptionQueryRepository();
 const planRepository = new SubscriptionPlanRepository();
+const companyRepository = new CompanyRepository();
 //capa de aplicacion(caso de uso), se define lo que hace
 const getAllUseCase = new getAllPlansUseCase(planQueryRepository);
 const findByIdPlanUseCase = new findByIdPlansUseCase(planQueryRepository);
 const registerPlan = new registerPlanUseCase(planRepository);
 const updatePlan = new UpdatePlanUseCase(planRepository);
-const softdelete = new softdeletePlanUseCase(planRepository);
+const softdelete = new softdeletePlanUseCase(planRepository, companyRepository);
 
 //capa de interfaz, se inyectan las dependencias
 

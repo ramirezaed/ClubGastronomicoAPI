@@ -5,5 +5,6 @@ export interface ICompanyRepository {
   findByOwnerId(ownerID: string): Promise<Company | null>; //verifica si ya tiene compañias registradas
   findById(id: string): Promise<Company | null>;
   update(company: Company): Promise<Company | null>;
-  // softDelete(id: string): Promise<void>;
+
+  existsBySubscriptionPlanId(planId: string): Promise<boolean>; //verifica el plan que tiene asignado
 }

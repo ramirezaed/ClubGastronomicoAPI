@@ -85,7 +85,6 @@ export class MongooseUserRepository implements IUserRepository {
       role_id: roleId,
       deleted_at: null,
     });
-
     return !!user;
   }
 }

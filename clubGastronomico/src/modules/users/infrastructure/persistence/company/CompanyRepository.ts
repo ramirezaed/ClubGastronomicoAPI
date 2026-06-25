@@ -64,12 +64,16 @@ export class CompanyRepository implements ICompanyRepository {
       throw new Error("error en la bd al modificar la compañia");
     }
   }
-  // async softDelete(id: string): Promise<void> {
-  //   try {
-  //     const doc = CompanyModel.findOneAndDelete({ _id: id, deleted_at: null });
-  //   } catch (error) {
-  //     // este error no se muestra al usujario final, se muestra con los logs del servidor
-  //     throw new Error("error en la bd al modificar la compañia");
-  //   }
-  // }
+
+  async existsBySubscriptionPlanId(planId: string): Promise<boolean> {
+    try {
+      const company = await CompanyModel.exists({
+        subscription_plan_id: planId,
+        deleted_at: null,
+      });
+      return !!company;
+    } catch (error) {
+      throw new Error("ocurrio un error al intentar eliminar el plan");
+    }
+  }
 }
