@@ -24,20 +24,25 @@ export class MongooseRoleRepository implements IRoleRepository {
     return this.toEntity(doc);
   }
   async update(role: Role): Promise<Role> {
-    const doc = await RoleModel.findByIdAndUpdate(
-      {
-        _id: role.id,
-        deleted_at: null, //no actualizar roles eliminados
-      },
-      {
-        $set: {
-          description: role.description,
-          is_active: role.is_active, //para los endpoint activate/deactivate
+    try {
+      const doc = await RoleModel.findByIdAndUpdate(
+        {
+          _id: role.id,
+          deleted_at: null, //no actualizar roles eliminados
         },
-      },
-      { new: true },
-    );
-    return this.toEntity(doc);
+        {
+          $set: {
+            description: role.description,
+            is_active: role.is_active, //para los endpoint activate/deactivate
+          },
+        },
+        { returnDocument: "after" },
+      );
+      return this.toEntity(doc);
+    } catch (error) {
+      console.error(error);
+      throw new Error("error al intentar actualizar rol");
+    }
   }
   async delete(id: string): Promise<void> {
     const doc = await RoleModel.findOneAndUpdate(
