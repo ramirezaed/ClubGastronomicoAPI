@@ -9,12 +9,12 @@ export class changePlanCompanyUseCase {
     private readonly icompanyrepository: ICompanyRepository,
     private readonly isubscriptionQueryrepository: ISubscriptionQueryRepository,
   ) {}
-  async execute(company_id: string, namePlan: string): Promise<changePlanResponseDTO> {
+  async execute(company_id: string, plan_id: string): Promise<changePlanResponseDTO> {
     const company = await this.icompanyrepository.findById(company_id);
     if (!company) {
       throw new CompanyNotFoundError();
     }
-    const newPlan = await this.isubscriptionQueryrepository.findByName(namePlan);
+    const newPlan = await this.isubscriptionQueryrepository.findById(plan_id);
     if (!newPlan) {
       throw new SubscriptionPlanNotFoundError();
     }

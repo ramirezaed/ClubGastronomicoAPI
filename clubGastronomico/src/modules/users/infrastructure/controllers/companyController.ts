@@ -179,8 +179,8 @@ export class CompanyController {
   async ChangePlan(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const namePlan = req.body;
-      const companyActualizada = await this.changePlan.execute(id, namePlan);
+      const { plan_id } = req.body;
+      const companyActualizada = await this.changePlan.execute(id, plan_id);
       res.status(200).json(companyActualizada);
       return;
     } catch (error) {
