@@ -2,6 +2,7 @@ import { ActivateCompanyUseCase } from "@/modules/users/application/use-cases/co
 import { changePlanCompanyUseCase } from "@/modules/users/application/use-cases/company/changePlanCompanyUseCase";
 import { DeactivateCompanyUseCase } from "@/modules/users/application/use-cases/company/deactivateCompanyUseCase";
 import { findByIdCompanyUseCase } from "@/modules/users/application/use-cases/company/findByIdCompanyUseCase";
+import { findCompanyUseCase } from "@/modules/users/application/use-cases/company/findCompanyUseCase";
 import { GetAllCompanyUseCase } from "@/modules/users/application/use-cases/company/getAllCompanyUseCase";
 import { meCompanyUseCase } from "@/modules/users/application/use-cases/company/meCompanyUseCase";
 import { RegisterCompanyUseCase } from "@/modules/users/application/use-cases/company/registerCompanyUseCase";
@@ -36,6 +37,7 @@ const softdeleteCompany = new SoftDeleteCompanyUseCase(companyRepository);
 const activate = new ActivateCompanyUseCase(companyRepository);
 const deactivate = new DeactivateCompanyUseCase(companyRepository);
 const changePlan = new changePlanCompanyUseCase(companyRepository, subscription);
+const findCompany = new findCompanyUseCase(companyQueryRepository);
 //capa de interfaz
 //se inyectan las dependencias
 const companyController = new CompanyController(
@@ -48,6 +50,7 @@ const companyController = new CompanyController(
   activate,
   deactivate,
   changePlan,
+  findCompany,
 );
 /**
  * @swagger
@@ -150,7 +153,9 @@ CompanyRouter.post("/", authMiddleware, authorizeRoles("owner"), (req, res) => c
  *       500:
  *         description: error interno del servidor
  */
+
 CompanyRouter.get("/", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => companyController.getAll(req, res));
+
 /**
  * @swagger
  * /api/company/me:
@@ -195,9 +200,7 @@ CompanyRouter.get("/me", authMiddleware, (req, res) => companyController.MeCompa
  *       500:
  *         description: error interno del servidor
  */
-CompanyRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
-  companyController.findById(req, res),
-);
+CompanyRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => companyController.findById(req, res));
 /**
  * @swagger
  * /api/company/update:
@@ -229,9 +232,7 @@ CompanyRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, re
  *       500:
  *         description: error interno del servidor
  */
-CompanyRouter.patch("/update", authMiddleware, authorizeRoles("owner"), (req, res) =>
-  companyController.update(req, res),
-);
+CompanyRouter.patch("/update", authMiddleware, authorizeRoles("owner"), (req, res) => companyController.update(req, res));
 /**
  * @swagger
  * /api/company/{id}:
@@ -348,4 +349,6 @@ CompanyRouter.patch("deactivate/:id", authMiddleware, authorizeRoles("SuperAdmin
 CompanyRouter.patch("/change-plan/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) =>
   companyController.ChangePlan(req, res),
 );
+
+CompanyRouter.post("/search", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => companyController.findCompan(req, res));
 export default CompanyRouter;

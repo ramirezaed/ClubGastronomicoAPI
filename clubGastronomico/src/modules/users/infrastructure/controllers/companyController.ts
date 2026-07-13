@@ -18,6 +18,7 @@ import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/C
 import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
 import { changePlanCompanyUseCase } from "@/modules/users/application/use-cases/company/changePlanCompanyUseCase";
 import { CompanyAlreadyHasThisPlanError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyHasThisPlanError";
+import { findCompanyUseCase } from "@/modules/users/application/use-cases/company/findCompanyUseCase";
 
 export class CompanyController {
   constructor(
@@ -30,6 +31,7 @@ export class CompanyController {
     private readonly activate: ActivateCompanyUseCase,
     private readonly deactivate: DeactivateCompanyUseCase,
     private readonly changePlan: changePlanCompanyUseCase,
+    private readonly findCompany: findCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -196,6 +198,18 @@ export class CompanyController {
         res.status(403).json({ message: error.message });
         return;
       }
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async findCompan(req: Request, res: Response): Promise<void> {
+    try {
+      const { name } = req.body;
+      const company = await this.findCompany.execute({ name });
+      res.status(200).json(company);
+
+      return;
+    } catch (error) {
       res.status(500).json({ message: "error interno del servidor" });
       return;
     }

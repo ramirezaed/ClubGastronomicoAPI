@@ -1,8 +1,9 @@
 import { ICompanyGetResponseDTO } from "@/modules/users/application/dtos/company/IcompanyGetReponseDTO";
 import { IPaginatedResponseDTO, IPaginationDTO } from "@/modules/users/application/dtos/Pagination/paginationDTO";
+import { ICompanyQueryRepository } from "@/modules/users/domain/repositories/company/ICompanyQueryrepository";
 import CompanyModel from "@/modules/users/infrastructure/persistence/company/CompanyModel";
 
-export class CompanyQueryRepository {
+export class CompanyQueryRepository implements ICompanyQueryRepository {
   private toDTO(doc: any): ICompanyGetResponseDTO {
     return {
       id: doc._id.toString(),
@@ -76,6 +77,18 @@ export class CompanyQueryRepository {
     } catch (error) {
       // este error no se muestra al usujario final, se muestra con los logs del servidor
       throw new Error("error en la bd al obtener datos de MeCompany");
+    }
+  }
+  async findCompany(filter?: { name?: string }): Promise<ICompanyGetResponseDTO[]> {
+    try {
+      const query: any = { deleted_at: null };
+      if (filter?.name?.trim()) {
+        query.name = { $regex: filter.name, $options: "i" };
+      }
+      const docs = await CompanyModel.find(query).lean();
+      return docs.map((doc) => this.toDTO(doc));
+    } catch (error) {
+      throw new Error("Error interno al buscar compañía");
     }
   }
 }
