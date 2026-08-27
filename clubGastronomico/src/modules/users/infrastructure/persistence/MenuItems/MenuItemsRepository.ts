@@ -38,7 +38,7 @@ export class MenuItemsRepository implements IMenuRepository {
         price: menuItems.price,
         preparation_time_minutes: menuItems.preparation_time_minutes,
         stock: menuItems.stock,
-        // daily_stock: menuItems.daily_stock,
+
         image: menuItems.image_url,
         is_active: menuItems.is_active,
         deleted_at: menuItems.deleted_at,

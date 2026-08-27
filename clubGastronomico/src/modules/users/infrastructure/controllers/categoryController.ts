@@ -22,8 +22,8 @@ export class CategoryController {
 
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const data = req.body;
-      const category = await this.registerCategory.execute(data);
+      const { name } = req.body;
+      const category = await this.registerCategory.execute(name);
       res.status(201).json(category);
     } catch (error) {
       if (error instanceof categoryDuplicateNameError) {
