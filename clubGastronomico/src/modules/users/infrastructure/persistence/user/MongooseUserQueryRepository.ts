@@ -153,7 +153,7 @@ export class MongooseUserQueryRepository implements IUserQueryRepository {
     }
   }
 
-  async findUser(filter?: { name?: string; email?: string }): Promise<GetUserResponseDTO[]> {
+  async findUser(filter?: { name?: string; email?: string; company_id?: string }): Promise<GetUserResponseDTO[]> {
     try {
       const query: any = { deleted_at: null };
       // Construir condición OR para buscar por nombre O email

@@ -1,7 +1,6 @@
 import { MenuItems } from "@/modules/users/domain/entities/MenuItems";
 import { IMenuRepository } from "@/modules/users/domain/repositories/MenuItems/IMenuRepository";
 import { MenuItemModel } from "@/modules/users/infrastructure/persistence/MenuItems/MenuItemsModel";
-import { transcode } from "node:buffer";
 
 export class MenuItemsRepository implements IMenuRepository {
   private toEntity(doc: any): MenuItems {
@@ -14,7 +13,7 @@ export class MenuItemsRepository implements IMenuRepository {
       doc.price,
       doc.preparation_time_minutes,
       doc.stock,
-      doc.daily_stock,
+      // doc.daily_stock,
       doc.image_url,
       doc.is_active,
       doc.deleted_at,
@@ -39,7 +38,7 @@ export class MenuItemsRepository implements IMenuRepository {
         price: menuItems.price,
         preparation_time_minutes: menuItems.preparation_time_minutes,
         stock: menuItems.stock,
-        daily_stock: menuItems.daily_stock,
+        // daily_stock: menuItems.daily_stock,
         image: menuItems.image_url,
         is_active: menuItems.is_active,
         deleted_at: menuItems.deleted_at,
@@ -62,7 +61,7 @@ export class MenuItemsRepository implements IMenuRepository {
             price: menuItems.price,
             preparation_time_minutes: menuItems.preparation_time_minutes,
             stock: menuItems.stock,
-            daily_stock: menuItems.daily_stock,
+            // daily_stock: menuItems.daily_stock,
 
             is_active: menuItems.is_active, //para activate deactivate
             deleted_at: menuItems.deleted_at, // para soft delete
@@ -82,7 +81,6 @@ export class MenuItemsRepository implements IMenuRepository {
         {
           $set: {
             stock: menuItems.stock,
-            daily_stock: menuItems.daily_stock,
           },
         },
       );

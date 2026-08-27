@@ -79,6 +79,7 @@ export class CompanyQueryRepository implements ICompanyQueryRepository {
       throw new Error("error en la bd al obtener datos de MeCompany");
     }
   }
+  //buscador de companias
   async findCompany(filter?: { name?: string }): Promise<ICompanyGetResponseDTO[]> {
     try {
       const query: any = { deleted_at: null };

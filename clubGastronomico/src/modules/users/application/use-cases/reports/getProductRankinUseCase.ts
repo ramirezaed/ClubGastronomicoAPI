@@ -13,7 +13,7 @@ export class getProductRankingUseCase {
   async execute(company_id: string): Promise<ProductRankingReportDTO> {
     const company = await this.icompanyQueryRepository.findById(company_id);
     if (!company || !company.is_active) throw new CompanyNotFoundError();
-    if (company.subscription_plan.name !== "Free") {
+    if (company.subscription_plan.name !== "Premium") {
       throw new ValidationPlanReportsError("Esta funcion no esta disponible en tu plan");
     }
     return this.ireportQueryRepository.getProductRanking(company_id);

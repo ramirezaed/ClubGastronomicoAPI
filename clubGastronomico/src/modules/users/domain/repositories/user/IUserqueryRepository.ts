@@ -15,6 +15,8 @@ export interface IUserQueryRepository {
     filter?: { is_active?: boolean },
     pagination?: IPaginationDTO,
   ): Promise<IPaginatedResponseDTO<GetUserResponseDTO>>;
+
   me(id: string): Promise<GetUserResponseDTO | null>;
+
   findUser(filter?: { name?: string; email?: string }): Promise<GetUserResponseDTO[]>;
 }

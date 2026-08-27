@@ -16,6 +16,7 @@ export class topHourDayUseCase {
     if (!company || !company.is_active) throw new CompanyNotFoundError();
     const today = new Date().toISOString().split("T")[0];
     //verifica que su plan sea premium
+    //cambiar a que si es free no se puede ver
     if (company.subscription_plan.name !== "Premium") {
       throw new ValidationPlanReportsError("Esta funcion no esta disponible en tu plan");
     }
