@@ -30,7 +30,7 @@ export class MenuItems {
 
     image_url: string | null,
   ): MenuItems {
-    if (!category_id || !company_id || !name || !description || !price || stock) {
+    if (!category_id || !company_id || !name || !description || !price || !stock) {
       throw new itemValidationError(`Todos los campos son necesarios`);
     }
     //al registrar un producot debe ser mayo a 0

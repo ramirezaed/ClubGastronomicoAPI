@@ -8,8 +8,8 @@ export class subscriptionQueryRepository implements ISubscriptionQueryRepository
       id: doc.id.toString(),
       name: doc.name,
       price: doc.price,
+      description: doc.description,
       is_active: doc.is_active,
-      // deleted_at: doc.deleted_at,
     };
   }
   async findByName(name: string): Promise<subscriptionResponseDTO | null> {

@@ -16,9 +16,9 @@ export class topItemsUseCase {
     if (!company || !company.is_active) {
       throw new CompanyNotFoundError();
     }
-    if (company.subscription_plan.name !== "Free") {
-      throw new ValidationPlanReportsError("Esta funcion no esta disponible en tu plan");
-    }
+    // if (company.subscription_plan.name !== "Free") {
+    //   throw new ValidationPlanReportsError("Esta funcion no esta disponible en tu plan");
+    // }
     //asigna fecha del dia
     const today = new Date().toISOString().split("T")[0];
 

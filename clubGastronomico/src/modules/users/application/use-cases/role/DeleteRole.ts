@@ -1,15 +1,25 @@
+import { RoleInUseError } from "@/modules/users/domain/exceptions/role/RoleInUseError";
 import { RolesNotFoundError } from "@/modules/users/domain/exceptions/role/RolesNotFoundError";
 import { IRoleRepository } from "@/modules/users/domain/repositories/role/IRoleRepository";
+import { IUserRepository } from "@/modules/users/domain/repositories/user/IUserRepository";
 
 export class DeleteRole {
-  constructor(private readonly roleRepository: IRoleRepository) {}
+  constructor(
+    private readonly roleRepository: IRoleRepository,
+    private readonly userRepository: IUserRepository,
+  ) {}
+
   async execute(id: string): Promise<void> {
-    const role = await this.roleRepository.findById(id); //verifica si existe el id
+    const role = await this.roleRepository.findById(id);
+
     if (!role) {
-      //si no existe lanza el error
       throw new RolesNotFoundError();
     }
-    await this.roleRepository.delete(id); //eliminar el rol
-    return;
+    const roleInUse = await this.userRepository.existsByRoleId(id);
+    if (roleInUse) {
+      throw new RoleInUseError("Existen usuarios con este rol");
+    }
+
+    await this.roleRepository.delete(id);
   }
 }

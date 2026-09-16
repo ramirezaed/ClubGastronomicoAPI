@@ -122,7 +122,7 @@ export class reportsQueryRepository implements IreportQueryRepository {
         date_from: dateFrom,
         date_to: dateTo,
         topItems: results.map((r) => ({
-          menuItems_id: r._id.toString(),
+          // menuItems_id: r._id.toString(),
           item_name: r.item_name,
           category_name: r.category_name,
           total_quantity: r.total_quantity,
@@ -134,10 +134,12 @@ export class reportsQueryRepository implements IreportQueryRepository {
       throw new Error("error al buscar top productos");
     }
   }
+
   async getTopHours(company_id: string, dateFrom: string, dateTo: string): Promise<TopHoursReportDTO> {
     try {
       const start = new Date(`${dateFrom}T00:00:00.000Z`);
       const end = new Date(`${dateTo}T23:59:59.999Z`);
+      const TIMEZONE = "America/Argentina/Buenos_Aires";
 
       const results = await OrderModel.aggregate([
         {
@@ -145,14 +147,21 @@ export class reportsQueryRepository implements IreportQueryRepository {
             company_id: new mongoose.Types.ObjectId(company_id),
             created_at: { $gte: start, $lte: end },
             deleted_at: null,
-            status: OrderStatus.PENDING,
+            status: OrderStatus.COMPLETED,
+          },
+        },
+        {
+          $addFields: {
+            // Extraer hora y día en la zona horaria deseada
+            localHour: { $hour: { date: "$created_at", timezone: TIMEZONE } },
+            localDayOfWeek: { $dayOfWeek: { date: "$created_at", timezone: TIMEZONE } },
           },
         },
         {
           $group: {
             _id: {
-              dayOfWeek: { $dayOfWeek: "$created_at" }, // 1=domingo, 2=lunes...
-              hourBlock: { $floor: { $divide: [{ $hour: "$created_at" }, 2] } },
+              dayOfWeek: "$localDayOfWeek",
+              hourBlock: { $floor: { $divide: ["$localHour", 2] } },
             },
             total_orders: { $sum: 1 },
           },
@@ -187,6 +196,7 @@ export class reportsQueryRepository implements IreportQueryRepository {
       throw new Error("error al buscar top horas por día");
     }
   }
+
   async getCancellations(company_id: string, dateFrom: string, dateTo: string): Promise<CancellationReportDTO> {
     try {
       const start = new Date(`${dateFrom}T00:00:00.000Z`);
@@ -237,6 +247,7 @@ export class reportsQueryRepository implements IreportQueryRepository {
       throw new Error("error al buscar cancelaciones");
     }
   }
+
   async getSalesEvolution(company_id: string): Promise<SalesEvolutionReportDTO> {
     try {
       const now = new Date();
@@ -248,7 +259,7 @@ export class reportsQueryRepository implements IreportQueryRepository {
             company_id: new mongoose.Types.ObjectId(company_id),
             created_at: { $gte: start },
             deleted_at: null,
-            status: OrderStatus.PENDING,
+            status: OrderStatus.COMPLETED,
           },
         },
         {
@@ -276,46 +287,6 @@ export class reportsQueryRepository implements IreportQueryRepository {
       throw new Error("error al buscar evolución de ventas");
     }
   }
-  // async getProductRanking(company_id: string): Promise<ProductRankingReportDTO> {
-  //   try {
-  //     const results = await OrderModel.aggregate([
-  //       {
-  //         $match: {
-  //           company_id: new mongoose.Types.ObjectId(company_id),
-  //           deleted_at: null,
-  //           status: OrderStatus.PENDING,
-  //         },
-  //       },
-  //       { $unwind: "$items" },
-  //       {
-  //         $group: {
-  //           _id: "$items.menuItems_id",
-  //           item_name: { $first: "$items.item_name" },
-  //           category_name: { $first: "$items.category_name" },
-  //           total_quantity: { $sum: "$items.quantity" },
-  //         },
-  //       },
-  //       { $sort: { total_quantity: -1 } },
-  //     ]);
-
-  //     if (!results.length) return { top_sellers: [], least_sellers: [] };
-
-  //     // umbral del top: cantidad del puesto 5 (o ultimo si hay menos de 5)
-  //     const topThreshold = results[Math.min(4, results.length - 1)].total_quantity;
-  //     // umbral del bottom: cantidad del puesto -5 (o primero si hay menos de 5)
-  //     const bottomThreshold = results[Math.max(results.length - 5, 0)].total_quantity;
-
-  //     // incluye todos los que empatan en el umbral
-  //     const top_sellers = results.filter((r) => r.total_quantity >= topThreshold).map(this.toProductRankingDTO);
-
-  //     const least_sellers = results.filter((r) => r.total_quantity <= bottomThreshold).map(this.toProductRankingDTO);
-
-  //     return { top_sellers, least_sellers };
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new Error("error al buscar ranking de productos");
-  //   }
-  // }
   async getProductRanking(company_id: string): Promise<ProductRankingReportDTO> {
     try {
       const results = await OrderModel.aggregate([

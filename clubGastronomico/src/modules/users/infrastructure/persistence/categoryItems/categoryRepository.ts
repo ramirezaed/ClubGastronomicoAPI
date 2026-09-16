@@ -36,7 +36,7 @@ export class CategoryRepository implements IcategoryRepository {
       const doc = await CategoryModel.findOneAndUpdate(
         { _id: category.id, deleted_at: null },
         {
-          set: {
+          $set: {
             name: category.name,
             is_active: category.is_active,
             deleted_at: category.deleted_at,

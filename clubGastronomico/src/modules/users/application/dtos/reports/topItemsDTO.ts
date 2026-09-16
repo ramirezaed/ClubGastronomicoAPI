@@ -1,5 +1,5 @@
 export interface TopItemsDTO {
-  menuItems_id: string;
+  // menuItems_id: string;
   item_name: string;
   category_name: string;
   total_quantity: number;

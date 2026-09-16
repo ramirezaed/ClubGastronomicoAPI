@@ -15,6 +15,7 @@ import { ActivateRoleUseCase } from "@/modules/users/application/use-cases/role/
 import { RoleAlreadyActivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyActiveError";
 import { DeactivateRoleUserUseCase } from "@/modules/users/application/use-cases/role/DeactivateRoleUseCase";
 import { RoleAlreadyDeactivateError } from "@/modules/users/domain/exceptions/role/RoleAlreadyDeactivateError";
+import { RoleInUseError } from "@/modules/users/domain/exceptions/role/RoleInUseError";
 
 export class RoleController {
   constructor(
@@ -77,6 +78,7 @@ export class RoleController {
         res.status(500).json({ message: error.message });
         return;
       }
+      console.error(error);
       res.status(500).json({ message: "Error interno del servidor" });
       return;
     }
@@ -86,7 +88,7 @@ export class RoleController {
     // const id = req.params;
     try {
       const rol = await this.getRoleByid.execute(id);
-      return res.status(200).json({ message: "Rol", rol });
+      return res.status(200).json(rol);
     } catch (error) {
       if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
@@ -109,13 +111,18 @@ export class RoleController {
     const id = req.params.id as string;
     try {
       await this.deleteRole.execute(id);
-      res.status(204).json({ meesage: "Rol eliminado" });
+      res.status(200).json({ meesage: "Rol eliminado" });
       return;
     } catch (error) {
       if (error instanceof RolesNotFoundError) {
         res.status(404).json({ message: error.message });
         return;
       }
+      if (error instanceof RoleInUseError) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      console.error(error);
       res.status(500).json({ message: "error interno del servidor" });
       return;
     }
@@ -139,7 +146,6 @@ export class RoleController {
       return;
     }
   }
-
   async deactivate(req: Request, res: Response): Promise<void> {
     const id = req.params.id as string;
     try {

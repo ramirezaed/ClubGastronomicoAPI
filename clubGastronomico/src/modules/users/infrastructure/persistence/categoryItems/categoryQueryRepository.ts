@@ -33,6 +33,7 @@ export class CategoryQueryRepository implements IcategoryQueryRepository {
       throw new Error("error al buscar categoria por id");
     }
   }
+
   async getAll(
     company_id: string,
     filter?: { is_active?: boolean; name: string },

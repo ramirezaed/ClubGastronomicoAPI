@@ -66,7 +66,7 @@ export class MenuItemsController {
       const limit = parseInt(req.query.limit as string) || 10;
 
       const items = await this.getAllMenuItems.execute(company_id, { is_active, name }, { page, limit });
-      res.status(200).json(items);
+      res.status(200).json({ message: "lista de items", items });
       return;
     } catch (error) {
       console.error(error);
@@ -174,7 +174,6 @@ export class MenuItemsController {
       return;
     }
   }
-
   async getAllforBot(req: Request, res: Response): Promise<void> {
     try {
       const company_id = req.params.id as string;

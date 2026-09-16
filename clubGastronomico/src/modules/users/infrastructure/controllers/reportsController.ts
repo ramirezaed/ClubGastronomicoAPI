@@ -100,7 +100,7 @@ export class ReportsController {
         company_id,
         (date_from as string) || undefined,
         (date_to as string) || undefined,
-      );
+      ); 
       res.status(200).json(top_hours_day);
       return;
     } catch (error) {

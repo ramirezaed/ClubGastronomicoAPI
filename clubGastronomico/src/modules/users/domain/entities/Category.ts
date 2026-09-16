@@ -18,6 +18,7 @@ export class Category {
     }
     return new Category("", name, true, null); // is_active true por default, deleted_at null por defecto
   }
+
   activate(): void {
     if (this.is_active) {
       throw new categoryAlreadyActiveError();
@@ -28,8 +29,10 @@ export class Category {
     if (!this.is_active) {
       throw new categoryAlreadyInactiveError();
     }
+
     this.is_active = false;
   }
+
   softdelete(): void {
     if (this.deleted_at) {
       throw new categoryNotFound();

@@ -45,6 +45,7 @@ export class AuthController {
       }
       if (error instanceof InactiveUserError) {
         res.status(403).json({ message: error.message });
+        console.error(error);
         return;
       }
       res.status(500).json({ message: "Error interno del servidor" });

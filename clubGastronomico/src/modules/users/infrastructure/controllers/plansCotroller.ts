@@ -7,6 +7,7 @@ import { SubscriptionPlanAlreadyExistsError } from "@/modules/users/domain/excep
 import { SubscriptionPlanRegisterError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanRegisterError";
 import { UpdatePlanUseCase } from "@/modules/users/application/use-cases/plan/updatePlanUseCase";
 import { softdeletePlanUseCase } from "@/modules/users/application/use-cases/plan/deletePlanUseCase";
+import { SubscriptionPlanInUseError } from "@/modules/users/domain/exceptions/subscription/SubscriptionPlanInUseError";
 
 export class PlanController {
   constructor(
@@ -97,6 +98,9 @@ export class PlanController {
       if (error instanceof SubscriptionPlanNotFoundError) {
         res.status(404).json({ message: error.message });
         return;
+      }
+      if (error instanceof SubscriptionPlanInUseError) {
+        res.status(409).json({ message: error.message });
       }
       res.status(500).json({ message: "error interno en el servidor" });
       return;

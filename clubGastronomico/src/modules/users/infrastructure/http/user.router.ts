@@ -241,7 +241,7 @@ UserRouter.get("/me", authMiddleware, (req, res) => userController.me(req, res))
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => userController.findbyId(req, res));
+UserRouter.get("/:id", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) => userController.findbyId(req, res));
 
 /**
  * @swagger
@@ -450,7 +450,9 @@ UserRouter.patch("/role/:id", authMiddleware, authorizeRoles("SuperAdmin", "owne
  *       500:
  *         description: Error interno del servidor
  */
-UserRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin"), (req, res) => userController.softDelete(req, res));
+UserRouter.delete("/:id", authMiddleware, authorizeRoles("SuperAdmin", "owner"), (req, res) =>
+  userController.softDelete(req, res),
+);
 
 UserRouter.post("/register", authMiddleware, authorizeRoles("owner"), (req, res) => userController.newEmployee(req, res));
 

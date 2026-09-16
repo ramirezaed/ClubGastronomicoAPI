@@ -18,6 +18,7 @@ import { CompanyAlreadyActivateError } from "@/modules/users/domain/exceptions/C
 import { CompanyAlreadyDeactivateError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyDeactivateError";
 import { changePlanCompanyUseCase } from "@/modules/users/application/use-cases/company/changePlanCompanyUseCase";
 import { CompanyAlreadyHasThisPlanError } from "@/modules/users/domain/exceptions/Company/CompanyAlreadyHasThisPlanError";
+import { findCompanyUseCase } from "@/modules/users/application/use-cases/company/findCompanyUseCase";
 
 export class CompanyController {
   constructor(
@@ -30,6 +31,7 @@ export class CompanyController {
     private readonly activate: ActivateCompanyUseCase,
     private readonly deactivate: DeactivateCompanyUseCase,
     private readonly changePlan: changePlanCompanyUseCase,
+    private readonly findCompany: findCompanyUseCase,
   ) {}
   async register(req: Request, res: Response): Promise<void> {
     const ownerId = req.user.id;
@@ -56,14 +58,13 @@ export class CompanyController {
     }
   }
   async getAll(req: Request, res: Response): Promise<void> {
-    const id = req.user.id as string;
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const company = await this.getAllCompany.execute({ page, limit });
-      res.status(200).json(company);
+      res.status(200).json({ message: "Lista de Empresas", company });
     } catch (error) {
-      console.log("error get", error);
+      console.error(error);
       res.status(500).json({ messsage: "error interno del servidor" });
     }
   }
@@ -180,8 +181,8 @@ export class CompanyController {
   async ChangePlan(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const namePlan = req.body;
-      const companyActualizada = await this.changePlan.execute(id, namePlan);
+      const { plan_id } = req.body;
+      const companyActualizada = await this.changePlan.execute(id, plan_id);
       res.status(200).json(companyActualizada);
       return;
     } catch (error) {
@@ -197,6 +198,18 @@ export class CompanyController {
         res.status(403).json({ message: error.message });
         return;
       }
+      res.status(500).json({ message: "error interno del servidor" });
+      return;
+    }
+  }
+  async findCompan(req: Request, res: Response): Promise<void> {
+    try {
+      const { name } = req.body;
+      const company = await this.findCompany.execute({ name });
+      res.status(200).json(company);
+
+      return;
+    } catch (error) {
       res.status(500).json({ message: "error interno del servidor" });
       return;
     }
