@@ -205,7 +205,7 @@ const orderController = new OrderController(
  *         description: Error interno del servidor
  */
 //registrar una nueva order
-orderRouter.post("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.register(req, res));
+orderRouter.post("/", authMiddleware, authorizeRoles("owner", "employee"), (req, res) => orderController.register(req, res));
 
 //registrar orden desde el bot
 
@@ -316,7 +316,7 @@ orderRouter.post("/bot/:id", (req, res) => orderController.registerForBOT(req, r
  *         description: Error interno del servidor
  */
 //buscar order por id
-orderRouter.get("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.findById(req, res));
+orderRouter.get("/:id", authMiddleware, authorizeRoles("owner", "employee"), (req, res) => orderController.findById(req, res));
 
 /**
  * @swagger
@@ -355,7 +355,7 @@ orderRouter.get("/:id", authMiddleware, authorizeRoles("owner", "Employee"), (re
  *         description: Error interno del servidor
  */
 //muestra todas las ordenes
-orderRouter.get("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) => orderController.getAll(req, res));
+orderRouter.get("/", authMiddleware, authorizeRoles("owner", "employee"), (req, res) => orderController.getAll(req, res));
 
 /**
  * @swagger
@@ -400,7 +400,7 @@ orderRouter.get("/", authMiddleware, authorizeRoles("owner", "Employee"), (req, 
  *         description: Error interno del servidor
  */
 //cambiar estado de order
-orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) =>
+orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner", "employee"), (req, res) =>
   orderController.changeStatus(req, res),
 );
 
@@ -445,7 +445,7 @@ orderRouter.patch("/:id/status/:status", authMiddleware, authorizeRoles("owner",
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.patch("/:id/cancel", authMiddleware, authorizeRoles("owner", "Employee"), (req, res) =>
+orderRouter.patch("/:id/cancel", authMiddleware, authorizeRoles("owner", "employee"), (req, res) =>
   orderController.cancel(req, res),
 );
 export default orderRouter;

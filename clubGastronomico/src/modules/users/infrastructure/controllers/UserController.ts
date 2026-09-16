@@ -223,7 +223,6 @@ export class UserController {
       res.status(500).json({ message: "error interno del servidor" });
     }
   }
-
   async findUsers(req: Request, res: Response): Promise<void> {
     try {
       const { name, email } = req.body;
